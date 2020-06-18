@@ -21,10 +21,14 @@ import {
   EuiSpacer,
   EuiCallOut,
   EuiButton,
+  EuiProgress,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiText,
 } from '@elastic/eui';
 import { get } from 'lodash';
 import React, { useEffect, Fragment } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 //@ts-ignore
 import chrome from 'ui/chrome';
@@ -40,6 +44,9 @@ import {
   INIT_ERROR_MESSAGE_FIELD,
   INIT_ACTION_ITEM_FIELD,
 } from '../utils/utils';
+import { getDetector } from '../../../redux/reducers/ad';
+import { MIN_IN_MILLI_SECS } from '../../../../server/utils/constants';
+import { isDetectorProgresValid } from '../../DetectorDetail/utils/helpers';
 
 interface AnomalyResultsProps extends RouteComponentProps {
   detectorId: string;
@@ -48,11 +55,12 @@ interface AnomalyResultsProps extends RouteComponentProps {
 }
 
 export function AnomalyResults(props: AnomalyResultsProps) {
+  const dispatch = useDispatch();
   const detectorId = props.detectorId;
   const detector = useSelector(
     (state: AppState) => state.ad.detectors[detectorId]
   );
-
+  console.log('detector in AnomalyResults', detector);
   useEffect(() => {
     chrome.breadcrumbs.set([
       BREADCRUMBS.ANOMALY_DETECTOR,
@@ -60,6 +68,19 @@ export function AnomalyResults(props: AnomalyResultsProps) {
       { text: detector ? detector.name : '' },
     ]);
   }, []);
+
+  const fetchDetector = async () => {
+    await dispatch(getDetector(detectorId));
+  };
+
+  useEffect(() => {
+    if (detector && detector.curState === DETECTOR_STATE.INIT) {
+      const id = setInterval(fetchDetector, MIN_IN_MILLI_SECS);
+      return () => {
+        clearInterval(id);
+      };
+    }
+  }, [detector]);
 
   const monitors = useSelector((state: AppState) => state.alerting.monitors);
   const monitor = get(monitors, `${detectorId}.0`);
@@ -78,18 +99,17 @@ export function AnomalyResults(props: AnomalyResultsProps) {
     // @ts-ignore
     isDetectorPaused && detector.lastUpdateTime > detector.disabledTime;
 
-  const isDetectorInitializingAgain =
-    detector &&
-    detector.curState === DETECTOR_STATE.INIT &&
-    detector.enabled &&
-    detector.disabledTime;
+  const isDetectorInitializing =
+    detector && detector.curState === DETECTOR_STATE.INIT;
 
   const initializationInfo = getDetectorInitializationInfo(detector);
+  console.log('initializationInfo in AnomalyResults', initializationInfo);
   const isInitOvertime = get(initializationInfo, IS_INIT_OVERTIME_FIELD, false);
   const initDetails = get(initializationInfo, INIT_DETAILS_FIELD, {});
   const initErrorMessage = get(initDetails, INIT_ERROR_MESSAGE_FIELD, '');
   const initActionItem = get(initDetails, INIT_ACTION_ITEM_FIELD, '');
 
+  const isInitializingNormaly = isDetectorInitializing && !isInitOvertime;
   return (
     <Fragment>
       <EuiPage style={{ marginTop: '16px', paddingTop: '0px' }}>
@@ -99,19 +119,19 @@ export function AnomalyResults(props: AnomalyResultsProps) {
             <Fragment>
               {isDetectorRunning ||
               isDetectorPaused ||
-              isDetectorInitializingAgain ? (
+              isDetectorInitializing ? (
                 <Fragment>
-                  {isDetectorUpdated || isDetectorInitializingAgain ? (
+                  {isDetectorUpdated || isDetectorInitializing ? (
                     <EuiCallOut
                       title={
                         isDetectorUpdated
                           ? 'The detector configuration has changed since it was last stopped.'
                           : !isInitOvertime
-                          ? 'The detector is being re-initialized based on the latest configuration changes.'
+                          ? 'The detector is being initialized based on the latest configuration changes.'
                           : `Detector initialization is not complete because ${initErrorMessage}.`
                       }
-                      color="warning"
-                      iconType="alert"
+                      color={isInitializingNormaly ? 'primary' : 'warning'}
+                      iconType={isInitializingNormaly ? 'iInCircle' : 'alert'}
                       style={{ marginBottom: '20px' }}
                     >
                       {isDetectorUpdated ? (
@@ -119,8 +139,19 @@ export function AnomalyResults(props: AnomalyResultsProps) {
                           Restart the detector to see accurate anomalies based
                           on configuration changes.
                         </p>
-                      ) : !isInitOvertime ? (
+                      ) : isInitializingNormaly ? (
                         <p>
+                          {isDetectorProgresValid(detector)
+                            ? `The detector needs to capture approximately 
+                          ${
+                            //@ts-ignore
+                            detector.initProgress.neededShingles
+                          } data points for initializing. If your data stream is continuous, this process will take around 
+                          ${
+                            //@ts-ignore
+                            detector.initProgress.estimatedMinutesLeft
+                          } minutes; if not, it may take even longer. `
+                            : ''}
                           After the initialization is complete, you will see the
                           anomaly results based on your latest configuration
                           changes.
@@ -128,9 +159,39 @@ export function AnomalyResults(props: AnomalyResultsProps) {
                       ) : (
                         <p>{`${initActionItem}`}</p>
                       )}
+                      {isDetectorInitializing &&
+                      isDetectorProgresValid(detector) ? (
+                        <div>
+                          <EuiFlexGroup alignItems="center">
+                            <EuiFlexItem
+                              style={{ maxWidth: '20px', marginRight: '5px' }}
+                            >
+                              <EuiText>
+                                {
+                                  //@ts-ignore
+                                  detector.initProgress.percentageStr
+                                }
+                              </EuiText>
+                            </EuiFlexItem>
+                            <EuiFlexItem>
+                              <EuiProgress
+                                //@ts-ignore
+                                value={detector.initProgress.percentageStr.replace(
+                                  '%',
+                                  ''
+                                )}
+                                max={100}
+                                color="primary"
+                                size="xs"
+                              />
+                            </EuiFlexItem>
+                          </EuiFlexGroup>
+                          <EuiSpacer size="l" />
+                        </div>
+                      ) : null}
                       <EuiButton
                         onClick={props.onSwitchToConfiguration}
-                        color="warning"
+                        color={isInitializingNormaly ? 'primary' : 'warning'}
                         style={{ marginRight: '8px' }}
                       >
                         View detector configuration
@@ -157,7 +218,7 @@ export function AnomalyResults(props: AnomalyResultsProps) {
                     }
                   />
                 </Fragment>
-              ) : detector && detector.curState !== DETECTOR_STATE.RUNNING ? (
+              ) : detector ? (
                 <Fragment>
                   <DetectorStateDetails
                     detectorId={detectorId}

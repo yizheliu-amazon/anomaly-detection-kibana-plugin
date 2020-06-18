@@ -50,10 +50,11 @@ import moment from 'moment';
 import { ConfirmModal } from '../components/ConfirmModal/ConfirmModal';
 import { useFetchMonitorInfo } from '../hooks/useFetchMonitorInfo';
 import { MonitorCallout } from '../components/MonitorCallout/MonitorCallout';
-import { DETECTOR_DETAIL_TABS } from '../utils/constants';
+import { DETECTOR_DETAIL_TABS, ZERO_PERCENT } from '../utils/constants';
 import { DetectorConfig } from '../../DetectorConfig/containers/DetectorConfig';
 import { AnomalyResults } from '../../DetectorResults/containers/AnomalyResults';
 import { DETECTOR_STATE_COLOR } from '../../utils/constants';
+import { isDetectorProgresValid } from '../utils/helpers';
 
 export interface DetectorRouterProps {
   detectorId?: string;
@@ -290,7 +291,10 @@ export const DetectorDetail = (props: DetectorDetailProps) => {
                   ) : detector.enabled &&
                     detector.curState === DETECTOR_STATE.INIT ? (
                     <EuiHealth color={DETECTOR_STATE_COLOR.INIT}>
-                      Initializing
+                      {isDetectorProgresValid(detector)
+                        ? //@ts-ignore
+                          `Initializing (${detector.initProgress.percentageStr} complete)`
+                        : 'Initializing'}
                     </EuiHealth>
                   ) : detector.curState === DETECTOR_STATE.INIT_FAILURE ||
                     detector.curState === DETECTOR_STATE.UNEXPECTED_FAILURE ? (

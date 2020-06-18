@@ -18,6 +18,8 @@ export enum DETECTOR_DETAIL_TABS {
   CONFIGURATIONS = 'configurations',
 }
 
+export const ZERO_PERCENT = '0%';
+
 const DEFAULT_ACTION_ITEM = 'Restart the detector and try again.';
 // Known causes:
 // https://github.com/opendistro-for-elasticsearch/anomaly-detection/blob/development/src/main/java/com/amazon/opendistroforelasticsearch/ad/transport/AnomalyResultTransportAction.java#L174-L185

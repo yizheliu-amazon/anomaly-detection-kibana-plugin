@@ -13,7 +13,8 @@
  * permissions and limitations under the License.
  */
 
-import { DETECTOR_INIT_FAILURES } from './constants';
+import { DETECTOR_INIT_FAILURES, ZERO_PERCENT } from './constants';
+import { Detector } from '../../../models/interfaces';
 
 export const getInitFailureMessageAndActionItem = (error: string): object => {
   const failureDetails = Object.values(DETECTOR_INIT_FAILURES);
@@ -24,4 +25,10 @@ export const getInitFailureMessageAndActionItem = (error: string): object => {
     return DETECTOR_INIT_FAILURES.UNKNOWN_EXCEPTION;
   }
   return failureDetail;
+};
+
+export const isDetectorProgresValid = (detector: Detector) => {
+  return (
+    detector.initProgress && detector.initProgress.percentageStr != ZERO_PERCENT
+  );
 };

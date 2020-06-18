@@ -165,7 +165,7 @@ export const AnomalyResultsLiveChart = (
         clearInterval(intervalId);
       };
     }
-  }, []);
+  }, [props.detector]);
 
   const showLoader = useDelayedLoader(isLoading);
 

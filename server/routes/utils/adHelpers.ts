@@ -18,6 +18,7 @@ import { AnomalyResults } from 'server/models/interfaces';
 import { GetDetectorsQueryParams } from '../../models/types';
 import { mapKeysDeep, toCamel, toSnake } from '../../utils/helpers';
 import { DETECTOR_STATE } from '../../../public/utils/constants';
+import { InitProgress } from 'public/models/interfaces';
 
 export const convertDetectorKeysToSnakeCase = (payload: any) => {
   return {
@@ -149,6 +150,21 @@ export const anomalyResultMapper = (anomalyResults: any[]): AnomalyResults => {
     });
   });
   return resultData;
+};
+
+export const getDetectorInitProgress = (
+  detectorStateResponse: any
+): InitProgress | undefined => {
+  console.log('detectorStateResponse', JSON.stringify(detectorStateResponse));
+  if (detectorStateResponse.init_progress) {
+    return {
+      percentageStr: detectorStateResponse.init_progress.percentage,
+      estimatedMinutesLeft:
+        detectorStateResponse.init_progress.estimated_minutes_left,
+      neededShingles: detectorStateResponse.init_progress.needed_shingles,
+    };
+  }
+  return undefined;
 };
 
 export const getFinalDetectorStates = (

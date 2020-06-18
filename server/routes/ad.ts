@@ -44,6 +44,7 @@ import {
   convertDetectorKeysToSnakeCase,
   getResultAggregationQuery,
   getFinalDetectorStates,
+  getDetectorInitProgress,
 } from './utils/adHelpers';
 import { set } from 'lodash';
 
@@ -199,7 +200,11 @@ const getDetector = async (
       ...(detectorState !== undefined ? { curState: detectorState.state } : {}),
       ...(detectorState !== undefined
         ? //@ts-ignore
-          { initializationError: detectorState.error }
+          { stateError: detectorState.error }
+        : {}),
+      ...(detectorState !== undefined
+        ? //@ts-ignore
+          { initProgress: getDetectorInitProgress(detectorState) }
         : {}),
     };
     return {
