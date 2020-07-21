@@ -28,16 +28,41 @@
       "git add"
     ]
   },
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "all": true,
+    "report-dir": ".cypress-coverage",
+    "extension": [
+      ".js",
+      ".ts",
+      ".tsx"
+    ],
+    "include": [
+      "public/**/*.{js,ts,tsx}"
+    ],
+    "exclude": [
+      "**/*.test.{ts,tsx}",
+      "**/__mocks__/**",
+      "**/__test__/**"
+    ],
+    "reporter": [
+      "json",
+      "html"
+    ]
+  },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.3.3",
+    "@cypress/code-coverage": "^3.8.1",
     "@elastic/eslint-config-kibana": "link:../../packages/eslint-config-kibana",
     "@elastic/eslint-import-resolver-kibana": "link:../../packages/kbn-eslint-import-resolver-kibana",
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@kbn/config-schema": "link:../../packages/kbn-config-schema",
     "@kbn/plugin-helpers": "link:../../packages/kbn-plugin-helpers",
+    "@testing-library/cypress": "^6.0.0",
     "@testing-library/jest-dom": "^4.0.0",
     "@testing-library/react": "^8.0.6",
     "@testing-library/user-event": "^4.2.3",
@@ -67,12 +92,16 @@
     "eslint-plugin-no-unsanitized": "^3.0.2",
     "eslint-plugin-prefer-object-spread": "^1.2.1",
     "eslint-plugin-react": "^7.11.1",
+    "istanbul-lib-coverage": "^3.0.0",
     "lint-staged": "^9.2.0",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.26",
+    "nyc": "^15.1.0",
     "react-router-dom": "^5.0.1",
     "redux-mock-store": "^1.5.3",
+    "source-map-support": "^0.5.19",
     "start-server-and-test": "^1.11.0",
+    "ts-node": "^8.10.2",
     "typescript": "3.0.3"
   },
   "dependencies": {
