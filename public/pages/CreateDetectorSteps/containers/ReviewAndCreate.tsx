@@ -34,7 +34,7 @@ export const ReviewAndCreate = (props: ReviewAndCreateProps) => {
     <React.Fragment>
       <EuiText>Review and create detector here</EuiText>
       <EuiSpacer />
-      <EuiFlexGroup alignItems="center" justifyContent="flexEnd">
+      <EuiFlexGroup alignItems="center" justifyContent="flexEnd" gutterSize="s">
         <EuiFlexItem grow={false}>
           <EuiButtonEmpty onClick={props.handleCancelClick}>
             Cancel
@@ -57,8 +57,6 @@ export const ReviewAndCreate = (props: ReviewAndCreateProps) => {
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiButton
-            iconSide="right"
-            iconType="arrowRight"
             fill={true}
             data-test-subj="reviewAndCreateButton"
             //isLoading={formikProps.isSubmitting}
@@ -67,7 +65,7 @@ export const ReviewAndCreate = (props: ReviewAndCreateProps) => {
               props.onCreate();
             }}
           >
-            Create
+            Create detector
           </EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>

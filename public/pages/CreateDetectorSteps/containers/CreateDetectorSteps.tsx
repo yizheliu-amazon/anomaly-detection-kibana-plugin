@@ -22,6 +22,7 @@ import { get } from 'lodash';
 import { CoreStart } from '../../../../../../src/core/public';
 import { APIAction } from '../../../redux/middleware/types';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
+import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
 import { stepStatus } from '../utils/constants';
 import { DefineDetector } from './DefineDetector';
 import { ConfigureModel } from './ConfigureModel';
@@ -39,9 +40,8 @@ interface CreateDetectorStepsProps
 
 export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
   const core = React.useContext(CoreServicesContext) as CoreStart;
-  //useHideSideNavBar(true, false);
+  useHideSideNavBar(true, false);
   const dispatch = useDispatch<Dispatch<APIAction>>();
-  const detectorId: string = get(props, 'match.params.detectorId', '');
 
   const [step1Status, setStep1Status] = useState<stepStatus>(undefined);
   const [step2Status, setStep2Status] = useState<stepStatus>('disabled');
@@ -52,9 +52,7 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
   const [curBody, setCurBody] = useState<any>(undefined);
 
   const handleCancelClick = () => {
-    detectorId
-      ? props.history.push(`/detectors/${detectorId}/configurations`)
-      : props.history.push('/detectors');
+    props.history.push('/dashboard');
   };
 
   const onCreate = () => {
@@ -63,8 +61,10 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
 
   const step1Body = (
     <DefineDetector
+      isEdit={false}
       setStep={setCurStep}
       handleCancelClick={handleCancelClick}
+      {...props}
     />
   );
   const step2Body = (
@@ -147,7 +147,7 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
   return (
     <Fragment>
       <EuiFlexGroup direction="row">
-        <EuiFlexItem>
+        <EuiFlexItem grow={false}>
           <EuiSteps steps={createSteps} />
         </EuiFlexItem>
         <EuiFlexItem>{curBody}</EuiFlexItem>

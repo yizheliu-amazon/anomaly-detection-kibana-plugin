@@ -33,7 +33,7 @@ export const ConfigureModel = (props: ConfigureModelProps) => {
     <React.Fragment>
       <EuiText>Configure model here</EuiText>
       <EuiSpacer />
-      <EuiFlexGroup alignItems="center" justifyContent="flexEnd">
+      <EuiFlexGroup alignItems="center" justifyContent="flexEnd" gutterSize="s">
         <EuiFlexItem grow={false}>
           <EuiButtonEmpty onClick={props.handleCancelClick}>
             Cancel

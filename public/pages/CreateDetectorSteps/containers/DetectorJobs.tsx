@@ -33,7 +33,7 @@ export const DetectorJobs = (props: DetectorJobsProps) => {
     <React.Fragment>
       <EuiText>Set up detector jobs here</EuiText>
       <EuiSpacer />
-      <EuiFlexGroup alignItems="center" justifyContent="flexEnd">
+      <EuiFlexGroup alignItems="center" justifyContent="flexEnd" gutterSize="s">
         <EuiFlexItem grow={false}>
           <EuiButtonEmpty onClick={props.handleCancelClick}>
             Cancel
