@@ -24,6 +24,7 @@ import { HistoricalDetectorList } from '../HistoricalDetectorList';
 import { HistoricalDetectorListRouterParams } from '../HistoricalDetectorList/containers/HistoricalDetectorList';
 import { CreateHistoricalDetector } from '../CreateHistoricalDetector';
 import { HistoricalDetectorDetail } from '../HistoricalDetectorDetail';
+import { CreateDetectorSteps } from '../CreateDetectorSteps';
 // @ts-ignore
 import { EuiSideNav, EuiPage, EuiPageBody, EuiPageSideBar } from '@elastic/eui';
 import { useSelector } from 'react-redux';
@@ -41,6 +42,7 @@ enum Navigation {
   Detectors = 'Detectors',
   HistoricalDetectors = 'Historical detectors',
   SampleDetectors = 'Sample detectors',
+  CreateDetectorSteps = 'Create detector steps',
 }
 
 enum Pathname {
@@ -48,6 +50,7 @@ enum Pathname {
   Detectors = '/detectors',
   HistoricalDetectors = '/historical-detectors',
   SampleDetectors = '/sample-detectors',
+  CreateDetectorSteps = '/create-detector-steps',
 }
 
 interface MainProps extends RouteComponentProps {}
@@ -92,6 +95,12 @@ export function Main(props: MainProps) {
           id: 5,
           href: `#${Pathname.HistoricalDetectors}`,
           isSelected: props.location.pathname === Pathname.HistoricalDetectors,
+        },
+        {
+          name: Navigation.CreateDetectorSteps,
+          id: 6,
+          href: `#${Pathname.CreateDetectorSteps}`,
+          isSelected: props.location.pathname === Pathname.CreateDetectorSteps,
         },
       ],
     },
@@ -178,6 +187,13 @@ export function Main(props: MainProps) {
                   path={APP_PATH.HISTORICAL_DETECTOR_DETAIL}
                   render={(props: RouteComponentProps) => (
                     <HistoricalDetectorDetail {...props} />
+                  )}
+                />
+                <Route
+                  exact
+                  path={APP_PATH.CREATE_DETECTOR_STEPS}
+                  render={(props: RouteComponentProps) => (
+                    <CreateDetectorSteps {...props} isEdit={false} />
                   )}
                 />
                 <Redirect from="/" to={APP_PATH.DASHBOARD} />

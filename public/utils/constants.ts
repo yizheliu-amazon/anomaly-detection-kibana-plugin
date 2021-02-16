@@ -49,6 +49,7 @@ export const APP_PATH = {
   CREATE_HISTORICAL_DETECTOR: '/create-historical-detector/',
   EDIT_HISTORICAL_DETECTOR: '/historical-detectors/:detectorId/edit',
   HISTORICAL_DETECTOR_DETAIL: '/historical-detectors/:detectorId/details',
+  CREATE_DETECTOR_STEPS: '/create-detector-steps',
 };
 
 export const KIBANA_PATH = {
