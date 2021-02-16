@@ -18,7 +18,7 @@ import { RouteComponentProps } from 'react-router';
 import { useDispatch } from 'react-redux';
 import { Dispatch } from 'redux';
 import { Formik } from 'formik';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import {
   EuiSpacer,
   EuiText,
@@ -38,6 +38,13 @@ import { CoreStart } from '../../../../../../src/core/public';
 import { APIAction } from '../../../redux/middleware/types';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
 import { BREADCRUMBS } from '../../../utils/constants';
+import { getErrorMessage, validateDetectorName } from '../../../utils/utils';
+import { matchDetector } from '../../../redux/reducers/ad';
+import { DetectorInfo } from '../components/DetectorInfo';
+import { DataSource } from './DataSource';
+import { Settings } from '../components/Settings/Settings';
+import { detectorToFormik } from './utils/detectorToFormik';
+import { formikToDetector } from './utils/formikToDetector';
 
 interface DefineDetectorRouterProps {
   detectorId?: string;
@@ -56,6 +63,8 @@ export const DefineDetector = (props: DefineDetectorProps) => {
   useHideSideNavBar(true, false);
   const detectorId: string = get(props, 'match.params.detectorId', '');
   const { detector, hasError } = useFetchDetectorInfo(detectorId);
+  const [newIndexSelected, setNewIndexSelected] = useState<boolean>(false);
+
   // Set breadcrumbs based on create / update
   useEffect(() => {
     const createOrEditBreadcrumb = props.isEdit
@@ -75,6 +84,7 @@ export const DefineDetector = (props: DefineDetectorProps) => {
     }
     core.chrome.setBreadcrumbs(breadCrumbs);
   });
+
   // If no detector found with ID, redirect it to list
   useEffect(() => {
     if (props.isEdit && hasError) {
@@ -84,6 +94,32 @@ export const DefineDetector = (props: DefineDetectorProps) => {
       props.history.push(`/detectors`);
     }
   }, [props.isEdit]);
+
+  const handleValidateName = async (detectorName: string) => {
+    if (isEmpty(detectorName)) {
+      return 'Detector name cannot be empty';
+    } else {
+      const error = validateDetectorName(detectorName);
+      if (error) {
+        return error;
+      }
+      //TODO::Avoid making call if value is same
+      const resp = await dispatch(matchDetector(detectorName));
+      const match = get(resp, 'response.match', false);
+      if (!match) {
+        return undefined;
+      }
+      //If more than one detectors found, duplicate exists.
+      if (!props.isEdit && match) {
+        return 'Duplicate detector name';
+      }
+      // if it is in edit mode
+      if (props.isEdit && detectorName !== detector?.name) {
+        return 'Duplicate detector name';
+      }
+    }
+  };
+
   return (
     <React.Fragment>
       <EuiPage
@@ -101,20 +137,36 @@ export const DefineDetector = (props: DefineDetectorProps) => {
           </EuiPageHeader>
           <Formik
             enableReinitialize={true}
-            initialValues={{}}
+            initialValues={detectorToFormik(detector)}
             onSubmit={() => {}}
           >
             {(formikProps) => (
               <Fragment>
-                <EuiText>Some components here</EuiText>
+                <DetectorInfo onValidateDetectorName={handleValidateName} />
+                <EuiSpacer />
+                <DataSource
+                  formikProps={formikProps}
+                  origIndex={
+                    props.isEdit ? get(detector, 'indices.0', '') : null
+                  }
+                  setNewIndexSelected={setNewIndexSelected}
+                  isEdit={props.isEdit}
+                />
+                <EuiSpacer />
+                <Settings />
               </Fragment>
             )}
           </Formik>
         </EuiPageBody>
       </EuiPage>
 
-      <EuiSpacer />
-      <EuiFlexGroup alignItems="center" justifyContent="flexEnd" gutterSize="s">
+      <EuiSpacer size="xs" />
+      <EuiFlexGroup
+        alignItems="center"
+        justifyContent="flexEnd"
+        gutterSize="s"
+        style={{ marginRight: '12px' }}
+      >
         <EuiFlexItem grow={false}>
           <EuiButtonEmpty onClick={props.handleCancelClick}>
             Cancel
