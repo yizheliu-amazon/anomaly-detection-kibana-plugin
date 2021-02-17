@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -32,10 +32,14 @@ export const FormattedFormRow = (props: FormattedFormRowProps) => {
   if (props.hint) {
     const hintTexts = Array.isArray(props.hint) ? props.hint : [props.hint];
     hints = hintTexts.map((hint, i) => {
-      return <p key={i} className="sublabel">{hint}</p>;
+      return (
+        <p key={i} className="sublabel">
+          {hint}
+        </p>
+      );
     });
   }
-  const {formattedTitle, ...euiFormRowProps} = props;
+  const { formattedTitle, ...euiFormRowProps } = props;
 
   return (
     <EuiFormRow

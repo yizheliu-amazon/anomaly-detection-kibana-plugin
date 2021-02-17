@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -31,11 +31,11 @@ const allowedFilters = [
 
 export const getIndexFields = (allFields: { [key: string]: string[] }) =>
   allowedFilters
-    .map(dataType =>
+    .map((dataType) =>
       allFields[dataType]
         ? {
             label: dataType,
-            options: allFields[dataType].map(field => ({
+            options: allFields[dataType].map((field) => ({
               label: field,
               type: dataType,
             })),
@@ -68,7 +68,7 @@ export const displayText = (filter: UIFilter): string => {
   }
   const selectedOperator = filter.operator;
   const operatorObj = COMPARISON_OPERATORS.find(
-    operator => operator.value === selectedOperator
+    (operator) => operator.value === selectedOperator
   ) || { text: '' };
   const initialText = `${fieldName} ${operatorObj.text}`;
 

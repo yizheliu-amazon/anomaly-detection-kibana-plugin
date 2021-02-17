@@ -13,6 +13,9 @@
  * permissions and limitations under the License.
  */
 
+import { FEATURE_TYPE } from '../../../models/interfaces';
+import { FeaturesFormikValues } from '../containers/utils/formikToFeatures';
+
 export type stepStatus =
   | 'incomplete'
   | 'complete'
@@ -20,3 +23,47 @@ export type stepStatus =
   | 'danger'
   | 'disabled'
   | undefined;
+
+export const FEATURE_TYPES = [
+  { text: 'Custom Aggregation', value: FEATURE_TYPE.CUSTOM },
+  { text: 'Defined Aggregation', value: FEATURE_TYPE.SIMPLE },
+];
+
+export const FEATURE_TYPE_OPTIONS = [
+  { text: 'Field value', value: FEATURE_TYPE.SIMPLE },
+  { text: 'Custom expression', value: FEATURE_TYPE.CUSTOM },
+];
+
+export enum SAVE_FEATURE_OPTIONS {
+  START_AD_JOB = 'start_ad_job',
+  KEEP_AD_JOB_STOPPED = 'keep_ad_job_stopped',
+}
+
+export const AGGREGATION_TYPES = [
+  { value: 'avg', text: 'average()' },
+  { value: 'value_count', text: 'count()' },
+  { value: 'sum', text: 'sum()' },
+  { value: 'min', text: 'min()' },
+  { value: 'max', text: 'max()' },
+];
+
+export const FEATURE_FIELDS = [
+  'featureName',
+  'aggregationOf',
+  'aggregationBy',
+  'aggregationQuery',
+];
+
+export const INITIAL_VALUES: FeaturesFormikValues = {
+  featureId: '',
+  featureName: '',
+  featureEnabled: true,
+  featureType: FEATURE_TYPE.SIMPLE,
+  aggregationQuery: JSON.stringify(
+    { aggregation_name: { sum: { field: 'field_name' } } },
+    null,
+    4
+  ),
+  aggregationBy: '',
+  aggregationOf: [],
+};

@@ -18,7 +18,6 @@ import { RouteComponentProps } from 'react-router';
 import { EuiSteps, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { useDispatch } from 'react-redux';
 import { Dispatch } from 'redux';
-import { get } from 'lodash';
 import { CoreStart } from '../../../../../../src/core/public';
 import { APIAction } from '../../../redux/middleware/types';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
@@ -52,7 +51,7 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
   const [curBody, setCurBody] = useState<any>(undefined);
 
   const handleCancelClick = () => {
-    props.history.push('/dashboard');
+    props.history.push('/detectors');
   };
 
   const onCreate = () => {
@@ -69,8 +68,10 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
   );
   const step2Body = (
     <ConfigureModel
+      isEdit={false}
       setStep={setCurStep}
       handleCancelClick={handleCancelClick}
+      {...props}
     />
   );
   const step3Body = (

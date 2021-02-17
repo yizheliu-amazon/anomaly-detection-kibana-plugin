@@ -42,7 +42,7 @@ import { getErrorMessage, validateDetectorName } from '../../../utils/utils';
 import { matchDetector } from '../../../redux/reducers/ad';
 import { DetectorInfo } from '../components/DetectorInfo';
 import { DataSource } from './DataSource';
-import { Settings } from '../components/Settings/Settings';
+import { Settings } from '../components/Settings';
 import { detectorToFormik } from './utils/detectorToFormik';
 import { formikToDetector } from './utils/formikToDetector';
 
