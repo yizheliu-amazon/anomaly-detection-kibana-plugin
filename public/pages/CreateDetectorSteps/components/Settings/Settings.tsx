@@ -33,7 +33,7 @@ import { FormattedFormRow } from '../FormattedFormRow/FormattedFormRow';
 export const Settings = () => {
   return (
     <ContentPanel title="Operation settings" titleSize="s">
-      <Field name="detectionInterval" validate={validatePositiveInteger}>
+      <Field name="interval" validate={validatePositiveInteger}>
         {({ field, form }: FieldProps) => (
           <EuiFlexGroup>
             <EuiFlexItem style={{ maxWidth: '70%' }}>

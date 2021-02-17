@@ -35,7 +35,7 @@ import {
   FormikProps,
 } from 'formik';
 import { cloneDeep, get, debounce, includes } from 'lodash';
-import React, { useEffect, Fragment, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { UIFilter } from '../../../../models/interfaces';
@@ -43,8 +43,8 @@ import { getAllFields } from '../../../../redux/selectors/elasticsearch';
 import { DATA_TYPES } from '../../../../utils/constants';
 import { darkModeEnabled } from '../../../../utils/kibanaUtils';
 import { getError, isInvalid, required } from '../../../../utils/utils';
-import { ADFormikValues } from '../../containers/models/interfaces';
-import { EMPTY_UI_FILTER } from '../../containers/utils/constant';
+import { DetectorDefinitionFormikValues } from '../../models/interfaces';
+import { EMPTY_UI_FILTER } from '../../utils/constants';
 import { AddFilterButton } from './AddFilterButton';
 import FilterValue from './FilterValue';
 import {
@@ -55,7 +55,7 @@ import {
 } from './utils/helpers';
 
 interface DataFilterProps {
-  formikProps: FormikProps<ADFormikValues>;
+  formikProps: FormikProps<DetectorDefinitionFormikValues>;
 }
 
 export const SimpleFilter = (props: DataFilterProps) => {
@@ -71,18 +71,6 @@ export const SimpleFilter = (props: DataFilterProps) => {
   >();
 
   const darkMode = darkModeEnabled();
-  const selectedIndices = get(props, 'formikProps.values.index[0].label', '');
-  //Reset, if selectedIndices change filter could become invalid
-  useEffect(() => {
-    const initialIndex = get(
-      props,
-      'formikProps.initialValues.index[0].label',
-      undefined
-    );
-    if (initialIndex !== selectedIndices) {
-      props.formikProps.setFieldValue('filters', []);
-    }
-  }, [selectedIndices]);
   const lightModeStyles = {
     backgroundColor: '#F6F6F6',
   };

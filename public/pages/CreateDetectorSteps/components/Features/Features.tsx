@@ -29,7 +29,7 @@ import { get } from 'lodash';
 import React, { Fragment, useEffect } from 'react';
 import ContentPanel from '../../../../components/ContentPanel/ContentPanel';
 import { Detector } from '../../../../models/interfaces';
-import { initialFeatureValue } from '../../../EditFeatures/utils/helpers';
+import { initialFeatureValue } from '../../utils/helpers';
 import { MAX_FEATURE_NUM } from '../../../../utils/constants';
 import { FeatureAccordion } from '../FeatureAccordion';
 

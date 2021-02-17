@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import { CustomAggregation, validateQuery } from '../CustomAggregation';
 import { Provider } from 'react-redux';
 import { mockedStore } from '../../../../../redux/utils/testUtils';
 import { Formik } from 'formik';
-import { FeaturesFormikValues } from '../../../../EditFeatures/containers/utils/formikToFeatures';
-import { INITIAL_VALUES } from '../../../../EditFeatures/utils/constants';
+import { FeaturesFormikValues } from '../../../models/interfaces';
+import { INITIAL_FEATURE_VALUES } from '../../../utils/constants';
 import { CoreServicesContext } from '../../../../../components/CoreServices/CoreServices';
 import { coreServicesMock } from '../../../../../../test/mocks';
 
@@ -45,7 +45,7 @@ describe('<CustomAggregation /> spec', () => {
     jest.clearAllMocks();
   });
   test('renders the component', () => {
-    const { container } = renderWithFormik(INITIAL_VALUES);
+    const { container } = renderWithFormik(INITIAL_FEATURE_VALUES);
     expect(container.firstChild).toMatchSnapshot();
   });
   describe('validateQuery', () => {

@@ -20,13 +20,21 @@ import {
 } from '../../../utils/constants';
 import {
   FEATURE_TYPE,
+  FILTER_TYPES,
+  UNITS,
   FeatureAttributes,
   Detector,
+  UIFilter,
 } from '../../../models/interfaces';
 import { v4 as uuidv4 } from 'uuid';
-import { get, forOwn } from 'lodash';
-import { FeaturesFormikValues } from '../containers/utils/formikToFeatures';
+import { get, forOwn, cloneDeep, isEmpty, snakeCase } from 'lodash';
 import { DataTypes } from '../../../redux/reducers/elasticsearch';
+import {
+  DetectorDefinitionFormikValues,
+  FeaturesFormikValues,
+} from '../models/interfaces';
+import { INITIAL_DETECTOR_DEFINITION_VALUES } from './constants';
+import { OPERATORS_QUERY_MAP } from './whereFilters';
 
 export const getFieldOptions = (
   allFields: { [key: string]: string[] },
@@ -213,3 +221,229 @@ export const getShingleSizeFromObject = (
     isHCDetector ? MULTI_ENTITY_SHINGLE_SIZE : SINGLE_ENTITY_SHINGLE_SIZE
   );
 };
+
+export function clearModelConfiguration(ad: Detector): Detector {
+  return {
+    ...ad,
+    featureAttributes: [],
+    uiMetadata: {
+      ...ad.uiMetadata,
+      features: {},
+    },
+    categoryField: undefined,
+    shingleSize: SINGLE_ENTITY_SHINGLE_SIZE,
+  };
+}
+
+//****** Originally in detectorToFormik.ts, renamed to detectorDefinitionToFormik ******
+
+export function detectorDefinitionToFormik(
+  ad: Detector
+): DetectorDefinitionFormikValues {
+  const initialValues = cloneDeep(INITIAL_DETECTOR_DEFINITION_VALUES);
+  if (isEmpty(ad)) return initialValues;
+  //If detector id updated / added using API, convert all filters to Query boxes as we don't have any meta data.
+  const filterType =
+    get(ad, 'uiMetadata.filterType', undefined) || FILTER_TYPES.CUSTOM;
+  let filterQuery = JSON.stringify(
+    get(ad, 'filterQuery', { match_all: {} }),
+    null,
+    4
+  );
+  return {
+    ...initialValues,
+    name: ad.name,
+    description: ad.description,
+    index: [{ label: ad.indices[0] }], // Currently we support only one index
+    filters: get(ad, 'uiMetadata.filters', []),
+    filterType,
+    filterQuery,
+    timeField: ad.timeField,
+    interval: get(ad, 'detectionInterval.period.interval', 10),
+    windowDelay: get(ad, 'windowDelay.period.interval', 0),
+    // shingleSize: getShingleSizeFromObject(
+    //   ad,
+    //   !isEmpty(get(ad, 'categoryField', []))
+    // ),
+  };
+}
+
+//********** Originally in formikToDetector.ts *************
+
+export function formikToDetector(
+  values: DetectorDefinitionFormikValues,
+  detector: Detector
+): Detector {
+  let filterQuery = {};
+  if (values.filterType === FILTER_TYPES.SIMPLE) {
+    filterQuery = formikToFilterQuery(values.filters);
+  } else {
+    try {
+      filterQuery = JSON.parse(values.filterQuery);
+    } catch (e) {
+      //This should mostly not happen as we've have validation before submit
+      filterQuery = {};
+    }
+  }
+  const indices = formikToIndices(values.index);
+  const uiMetaData = formikToUIMetadata(values, detector);
+
+  let apiRequest = {
+    ...detector,
+    name: values.name,
+    description: values.description,
+    indices,
+    filterQuery: {
+      ...filterQuery,
+    },
+    uiMetadata: uiMetaData,
+    timeField: values.timeField,
+    detectionInterval: {
+      period: { interval: values.interval, unit: UNITS.MINUTES },
+    },
+    windowDelay: {
+      period: { interval: values.windowDelay, unit: UNITS.MINUTES },
+    },
+  } as Detector;
+
+  return apiRequest;
+}
+
+// TODO: do we need filter & features information here?? or this fn at all??
+// export const formikToUIMetadata = (values: any, detector: Detector) => {
+//   return {
+//     filterType: values.filterType,
+//     filters: formikFiltersToUiMetadata(values.filters),
+//     features: get(detector, 'uiMetadata.features', {}),
+//   };
+// };
+
+export const formikFiltersToUiMetadata = (filters: UIFilter[]) =>
+  filters.length > 0 ? filters : [];
+
+export const formikToFilterQuery = (
+  filters: UIFilter[]
+): { [key: string]: any } => {
+  if (filters.length > 0) {
+    const esFilters = filters.map((filter: UIFilter) => {
+      return OPERATORS_QUERY_MAP[filter.operator].query(filter);
+    });
+    return {
+      bool: {
+        filter: [...esFilters],
+      },
+    };
+  } else {
+    return { match_all: {} };
+  }
+};
+
+const formikToIndices = (indices: { label: string }[]) =>
+  indices.map((index) => index.label);
+
+// ********* Originally in formikToFeatures.ts **********
+
+export function prepareDetector(
+  featureValues: FeaturesFormikValues[],
+  shingleSizeValue: number,
+  categoryFields: string[],
+  ad: Detector,
+  forPreview: boolean = false
+): Detector {
+  const detector = cloneDeep(ad);
+  const featureAttributes = formikToFeatures(featureValues, forPreview);
+
+  return {
+    ...detector,
+    featureAttributes: [...featureAttributes],
+    shingleSize: shingleSizeValue,
+    categoryField: isEmpty(categoryFields) ? undefined : categoryFields,
+    uiMetadata: {
+      ...detector.uiMetadata,
+      features: { ...formikToUIMetadata(featureValues) },
+    },
+  };
+}
+
+export function formikToSimpleAggregation(value: FeaturesFormikValues) {
+  if (
+    value.aggregationBy &&
+    value.aggregationOf &&
+    value.aggregationOf.length > 0
+  ) {
+    return {
+      [value.featureName]: {
+        [value.aggregationBy]: { field: value.aggregationOf[0].label },
+      },
+    };
+  } else {
+    return {};
+  }
+}
+
+export function formikToAggregation(values: FeaturesFormikValues) {
+  if (values.featureType === FEATURE_TYPE.SIMPLE) {
+    return values.aggregationBy &&
+      values.aggregationOf &&
+      values.aggregationOf.length > 0
+      ? {
+          [snakeCase(values.featureName)]: {
+            [values.aggregationBy]: { field: values.aggregationOf[0].label },
+          },
+        }
+      : {};
+  }
+  return JSON.parse(values.aggregationQuery);
+}
+
+export function formikToFeatures(
+  values: FeaturesFormikValues[],
+  forPreview: boolean
+) {
+  const featureAttribute = formikToFeatureAttributes(values, forPreview);
+  return featureAttribute;
+}
+
+export function formikToUIMetadata(values: FeaturesFormikValues[]) {
+  // TODO:: Delete Stale metadata if name is changed
+  let features: {
+    [key: string]: UiFeature;
+  } = {};
+  values.forEach((value) => {
+    if (value.featureType === FEATURE_TYPE.SIMPLE) {
+      features[value.featureName] = {
+        featureType: value.featureType,
+        aggregationBy: value.aggregationBy,
+        aggregationOf:
+          value.aggregationOf && value.aggregationOf.length
+            ? value.aggregationOf[0].label
+            : undefined,
+      };
+    } else {
+      features[value.featureName] = {
+        featureType: value.featureType,
+      };
+    }
+  });
+  return features;
+}
+
+function formikToFeatureAttributes(
+  values: FeaturesFormikValues[],
+  forPreview: boolean
+): FeatureAttributes[] {
+  return values.map(function (value) {
+    const id = forPreview
+      ? value.featureId
+      : value.newFeature
+      ? undefined
+      : value.featureId;
+    return {
+      featureId: id,
+      featureName: value.featureName,
+      featureEnabled: value.featureEnabled,
+      importance: 1,
+      aggregationQuery: formikToAggregation(value),
+    };
+  });
+}

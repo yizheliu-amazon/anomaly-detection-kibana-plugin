@@ -13,10 +13,21 @@
  * permissions and limitations under the License.
  */
 
-import { FEATURE_TYPE } from '../../../models/interfaces';
-import { FeaturesFormikValues } from '../containers/utils/formikToFeatures';
+import {
+  FEATURE_TYPE,
+  FILTER_TYPES,
+  UIFilter,
+} from '../../../models/interfaces';
+import { OPERATORS_MAP } from '../components/DataFilters/utils/constant';
+import {
+  CreateDetectorFormikValues,
+  DetectorDefinitionFormikValues,
+  ModelConfigurationFormikValues,
+  DetectorJobFormikValues,
+  FeaturesFormikValues,
+} from '../models/interfaces';
 
-export type stepStatus =
+export type STEP_STATUS =
   | 'incomplete'
   | 'complete'
   | 'warning'
@@ -54,7 +65,13 @@ export const FEATURE_FIELDS = [
   'aggregationQuery',
 ];
 
-export const INITIAL_VALUES: FeaturesFormikValues = {
+export const EMPTY_UI_FILTER: UIFilter = {
+  fieldInfo: [],
+  operator: OPERATORS_MAP.IS,
+  fieldValue: '',
+};
+
+export const INITIAL_FEATURE_VALUES: FeaturesFormikValues = {
   featureId: '',
   featureName: '',
   featureEnabled: true,
@@ -66,4 +83,34 @@ export const INITIAL_VALUES: FeaturesFormikValues = {
   ),
   aggregationBy: '',
   aggregationOf: [],
+};
+
+export const INITIAL_DETECTOR_DEFINITION_VALUES: DetectorDefinitionFormikValues = {
+  name: '',
+  description: '',
+  index: [],
+  filters: [],
+  filterType: FILTER_TYPES.SIMPLE,
+  filterQuery: JSON.stringify({ bool: { filter: [] } }, null, 4),
+  timeField: '',
+  interval: 10,
+  windowDelay: 1,
+};
+
+export const INITIAL_MODEL_CONFIGURATION_VALUES: ModelConfigurationFormikValues = {
+  featureList: [],
+  categoricalField: '',
+  windowSize: 4,
+};
+
+export const INITIAL_DETECTOR_JOB_VALUES: DetectorJobFormikValues = {
+  startTime: 'now',
+  endTime: 'now-30d',
+  rangeValid: true,
+};
+
+export const INITIAL_DETECTOR_VALUES: CreateDetectorFormikValues = {
+  ...INITIAL_DETECTOR_DEFINITION_VALUES,
+  ...INITIAL_MODEL_CONFIGURATION_VALUES,
+  ...INITIAL_DETECTOR_JOB_VALUES,
 };

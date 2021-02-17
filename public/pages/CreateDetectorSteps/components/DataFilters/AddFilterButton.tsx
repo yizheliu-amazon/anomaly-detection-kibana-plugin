@@ -15,7 +15,7 @@
 
 import { EuiButton } from '@elastic/eui';
 import React from 'react';
-import { EMPTY_UI_FILTER } from '../../containers/utils/constant';
+import { EMPTY_UI_FILTER } from '../../utils/constants';
 
 interface AddFilterButtonProps {
   unshift: ({}) => void;

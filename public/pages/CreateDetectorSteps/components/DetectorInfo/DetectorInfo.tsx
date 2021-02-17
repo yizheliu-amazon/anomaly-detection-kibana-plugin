@@ -27,7 +27,7 @@ interface DetectorInfoProps {
 function DetectorInfo(props: DetectorInfoProps) {
   return (
     <ContentPanel title="Detector details" titleSize="s">
-      <Field name="detectorName" validate={props.onValidateDetectorName}>
+      <Field name="name" validate={props.onValidateDetectorName}>
         {({ field, form }: FieldProps) => (
           <FormattedFormRow
             title="Name"
@@ -48,7 +48,7 @@ function DetectorInfo(props: DetectorInfoProps) {
           </FormattedFormRow>
         )}
       </Field>
-      <Field name="detectorDescription" validate={validateDetectorDesc}>
+      <Field name="description" validate={validateDetectorDesc}>
         {({ field, form }: FieldProps) => (
           <FormattedFormRow
             formattedTitle={

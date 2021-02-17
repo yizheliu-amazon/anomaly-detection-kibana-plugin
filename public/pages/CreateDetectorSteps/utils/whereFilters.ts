@@ -13,9 +13,9 @@
  * permissions and limitations under the License.
  */
 
-import { UIFilter } from '../../../../models/interfaces';
-import { DATA_TYPES } from '../../../../utils/constants';
-import { OPERATORS_MAP } from '../../components/DataFilters/utils/constant';
+import { UIFilter } from '../../../models/interfaces';
+import { DATA_TYPES } from '../../../utils/constants';
+import { OPERATORS_MAP } from '../components/DataFilters/utils/constant';
 
 //TODO:: Breakdown to factory pattern for rules in-case we support multiple filters. This is just ease for the single one
 export const OPERATORS_QUERY_MAP = {

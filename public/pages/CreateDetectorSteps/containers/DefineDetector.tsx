@@ -17,7 +17,7 @@ import React, { Fragment, useState, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { useDispatch } from 'react-redux';
 import { Dispatch } from 'redux';
-import { Formik } from 'formik';
+import { FormikProps } from 'formik';
 import { get, isEmpty } from 'lodash';
 import {
   EuiSpacer,
@@ -32,6 +32,11 @@ import {
   EuiPageHeaderSection,
   EuiTitle,
 } from '@elastic/eui';
+import {
+  updateDetector,
+  matchDetector,
+  getDetectorCount,
+} from '../../../redux/reducers/ad';
 import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
 import { useFetchDetectorInfo } from '../hooks/useFetchDetectorInfo';
 import { CoreStart } from '../../../../../../src/core/public';
@@ -39,12 +44,14 @@ import { APIAction } from '../../../redux/middleware/types';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
 import { BREADCRUMBS } from '../../../utils/constants';
 import { getErrorMessage, validateDetectorName } from '../../../utils/utils';
-import { matchDetector } from '../../../redux/reducers/ad';
 import { DetectorInfo } from '../components/DetectorInfo';
 import { DataSource } from './DataSource';
 import { Settings } from '../components/Settings';
-import { detectorToFormik } from './utils/detectorToFormik';
-import { formikToDetector } from './utils/formikToDetector';
+import { detectorDefinitionToFormik, formikToDetector } from '../utils/helpers';
+import { DetectorDefinitionFormikValues } from '../models/interfaces';
+import { Detector } from '../../../models/interfaces';
+import { prettifyErrorMessage } from '../../../../server/utils/helpers';
+import { DETECTOR_STATE } from '../../../../server/utils/constants';
 
 interface DefineDetectorRouterProps {
   detectorId?: string;
@@ -55,6 +62,7 @@ interface DefineDetectorProps
   isEdit: boolean;
   setStep(stepNumber: number): void;
   handleCancelClick(): void;
+  formikProps: FormikProps<DetectorDefinitionFormikValues>;
 }
 
 export const DefineDetector = (props: DefineDetectorProps) => {
@@ -63,7 +71,6 @@ export const DefineDetector = (props: DefineDetectorProps) => {
   useHideSideNavBar(true, false);
   const detectorId: string = get(props, 'match.params.detectorId', '');
   const { detector, hasError } = useFetchDetectorInfo(detectorId);
-  const [newIndexSelected, setNewIndexSelected] = useState<boolean>(false);
 
   // Set breadcrumbs based on create / update
   useEffect(() => {
@@ -120,6 +127,60 @@ export const DefineDetector = (props: DefineDetectorProps) => {
     }
   };
 
+  const handleFormValidation = (
+    formikProps: FormikProps<DetectorDefinitionFormikValues>
+  ) => {
+    try {
+      if (props.isEdit && detector.curState === DETECTOR_STATE.RUNNING) {
+        core.notifications.toasts.addDanger(
+          'Detector cannot be updated while it is running'
+        );
+      } else {
+        formikProps.setSubmitting(true);
+        formikProps.setFieldTouched('name');
+        formikProps.setFieldTouched('description');
+        formikProps.setFieldTouched('index');
+        formikProps.setFieldTouched('filters');
+        formikProps.setFieldTouched('timeField');
+        formikProps.setFieldTouched('interval');
+        formikProps.setFieldTouched('windowDelay');
+        formikProps.validateForm();
+
+        if (formikProps.isValid) {
+          if (props.isEdit) {
+            const apiRequest = formikToDetector(formikProps.values, detector);
+            handleUpdate(apiRequest);
+          } else {
+            props.setStep(2);
+          }
+        } else {
+          core.notifications.toasts.addDanger(
+            'One or more input fields is invalid'
+          );
+        }
+      }
+      formikProps.setSubmitting(false);
+    } catch (e) {
+      formikProps.setSubmitting(false);
+    }
+  };
+
+  const handleUpdate = async (detectorToBeUpdated: Detector) => {
+    try {
+      await dispatch(updateDetector(detectorId, detectorToBeUpdated));
+      core.notifications.toasts.addSuccess(
+        `Detector updated: ${detectorToBeUpdated.name}`
+      );
+      props.history.push(`/detectors/${detectorId}/configurations/`);
+    } catch (err) {
+      core.notifications.toasts.addDanger(
+        prettifyErrorMessage(
+          getErrorMessage(err, 'There was a problem updating the detector')
+        )
+      );
+    }
+  };
+
   return (
     <React.Fragment>
       <EuiPage
@@ -135,28 +196,17 @@ export const DefineDetector = (props: DefineDetectorProps) => {
               </EuiTitle>
             </EuiPageHeaderSection>
           </EuiPageHeader>
-          <Formik
-            enableReinitialize={true}
-            initialValues={detectorToFormik(detector)}
-            onSubmit={() => {}}
-          >
-            {(formikProps) => (
-              <Fragment>
-                <DetectorInfo onValidateDetectorName={handleValidateName} />
-                <EuiSpacer />
-                <DataSource
-                  formikProps={formikProps}
-                  origIndex={
-                    props.isEdit ? get(detector, 'indices.0', '') : null
-                  }
-                  setNewIndexSelected={setNewIndexSelected}
-                  isEdit={props.isEdit}
-                />
-                <EuiSpacer />
-                <Settings />
-              </Fragment>
-            )}
-          </Formik>
+          <Fragment>
+            <DetectorInfo onValidateDetectorName={handleValidateName} />
+            <EuiSpacer />
+            <DataSource
+              formikProps={props.formikProps}
+              origIndex={props.isEdit ? get(detector, 'indices.0', '') : null}
+              isEdit={props.isEdit}
+            />
+            <EuiSpacer />
+            <Settings />
+          </Fragment>
         </EuiPageBody>
       </EuiPage>
 
@@ -178,10 +228,10 @@ export const DefineDetector = (props: DefineDetectorProps) => {
             iconType="arrowRight"
             fill={true}
             data-test-subj="defineDetectorNextButton"
-            //isLoading={formikProps.isSubmitting}
+            isLoading={props.formikProps.isSubmitting}
             //@ts-ignore
             onClick={() => {
-              props.setStep(2);
+              handleFormValidation(props.formikProps);
             }}
           >
             Next

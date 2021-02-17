@@ -44,11 +44,8 @@ import { HeatmapCell } from '../../AnomalyCharts/containers/AnomalyHeatmapChart'
 import { FeatureBreakDown } from '../../AnomalyCharts/containers/FeatureBreakDown';
 import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
 import { generateAnomalyAnnotations } from '../../utils/anomalyResultUtils';
-import { focusOnFirstWrongFeature } from '../utils/helpers';
-import {
-  FeaturesFormikValues,
-  prepareDetector,
-} from './utils/formikToFeatures';
+import { focusOnFirstWrongFeature, prepareDetector } from '../utils/helpers';
+import { FeaturesFormikValues } from '../models/interfaces';
 import { prettifyErrorMessage } from '../../../../server/utils/helpers';
 import { CoreStart } from '../../../../../../src/core/public';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';

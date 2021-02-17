@@ -31,7 +31,7 @@ import { required, isInvalid, getError } from '../../../../utils/utils';
 import { get } from 'lodash';
 import { FEATURE_TYPE_OPTIONS } from '../../utils/constants';
 import { FEATURE_TYPE } from '../../../../models/interfaces';
-import { formikToSimpleAggregation } from '../../containers/utils/formikToFeatures';
+import { formikToSimpleAggregation } from '../../utils/helpers';
 import { AggregationSelector } from '../AggregationSelector';
 import { CustomAggregation } from '../CustomAggregation';
 

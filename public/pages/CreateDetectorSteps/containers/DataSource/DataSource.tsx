@@ -32,12 +32,11 @@ import { getVisibleOptions, sanitizeSearchText } from '../../../utils/helpers';
 import { validateIndex } from '../../../utils/validate';
 import { DataFilter } from '../../components/DataFilters/DataFilter';
 import { FormattedFormRow } from '../../components/FormattedFormRow/FormattedFormRow';
-import { ADFormikValues } from '../../containers/models/interfaces';
+import { DetectorDefinitionFormikValues } from '../../models/interfaces';
 
 interface DataSourceProps {
-  formikProps: FormikProps<ADFormikValues>;
+  formikProps: FormikProps<DetectorDefinitionFormikValues>;
   origIndex: string;
-  setNewIndexSelected: (isNew: boolean) => void;
   isEdit: boolean;
 }
 
@@ -75,11 +74,6 @@ function DataSource(props: DataSourceProps) {
     if (indexName !== '') {
       dispatch(getMappings(indexName));
     }
-    if (indexName !== props.origIndex) {
-      props.setNewIndexSelected(true);
-    } else {
-      props.setNewIndexSelected(false);
-    }
   };
 
   const dateFields = Array.from(
@@ -104,22 +98,8 @@ function DataSource(props: DataSourceProps) {
       : initialIndex.includes(':');
   };
 
-  const isDifferentIndex = () => {
-    return props.isEdit && indexName !== props.origIndex;
-  };
-
   return (
     <ContentPanel title="Data Source" titleSize="s">
-      {isDifferentIndex() ? (
-        <div>
-          <EuiCallOut
-            title="Modifying the selected index resets your detector configuration."
-            color="warning"
-            iconType="alert"
-          />
-          <EuiSpacer size="m" />
-        </div>
-      ) : null}
       {isRemoteIndex() ? (
         <div>
           <EuiCallOut

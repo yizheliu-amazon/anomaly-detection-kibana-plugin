@@ -22,8 +22,8 @@ import {
   initialState,
   mockedStore,
 } from '../../../../../redux/utils/testUtils';
-import { FeaturesFormikValues } from '../../../containers/utils/formikToFeatures';
-import { INITIAL_VALUES } from '../../../utils/constants';
+import { FeaturesFormikValues } from '../../../models/interfaces';
+import { INITIAL_FEATURE_VALUES } from '../../../utils/constants';
 
 const renderAggregationSelector = (initialValue: FeaturesFormikValues) => ({
   ...render(
@@ -54,7 +54,7 @@ const renderAggregationSelector = (initialValue: FeaturesFormikValues) => ({
 describe('<AggregationSelector /> spec', () => {
   describe('Empty results', () => {
     test('renders component with aggregation types and defaults to empty', () => {
-      const { container } = renderAggregationSelector(INITIAL_VALUES);
+      const { container } = renderAggregationSelector(INITIAL_FEATURE_VALUES);
       expect(container.firstChild).toMatchSnapshot();
     });
   });

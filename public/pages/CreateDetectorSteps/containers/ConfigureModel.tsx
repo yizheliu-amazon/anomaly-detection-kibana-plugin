@@ -32,7 +32,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { AppState } from '../../../redux/reducers';
 import { getMappings } from '../../../redux/reducers/elasticsearch';
-import { useFetchDetectorInfo } from '../../createDetector/hooks/useFetchDetectorInfo';
+import { useFetchDetectorInfo } from '../hooks/useFetchDetectorInfo';
 import { BREADCRUMBS } from '../../../utils/constants';
 import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
 import {

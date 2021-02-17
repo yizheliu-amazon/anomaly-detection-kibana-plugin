@@ -13,25 +13,94 @@
  * permissions and limitations under the License.
  */
 
-import { formikToDetector, formikToFilterQuery } from '../formikToDetector';
-
-import { getRandomDetector } from '../../../../../redux/reducers/__tests__/utils';
-import { INITIAL_VALUES } from '../constant';
+import { INITIAL_DETECTOR_DEFINITION_VALUES } from '../constants';
+import {
+  MULTI_ENTITY_SHINGLE_SIZE,
+  SINGLE_ENTITY_SHINGLE_SIZE,
+} from '../../../../utils/constants';
+import { getRandomDetector } from '../../../../redux/reducers/__tests__/utils';
+import {
+  detectorDefinitionToFormik,
+  formikToDetector,
+  formikToFilterQuery,
+  prepareDetector,
+} from '../helpers';
 import {
   Detector,
+  FEATURE_TYPE,
+  FILTER_TYPES,
   OPERATORS_MAP,
   UIFilter,
-  FILTER_TYPES,
   UNITS,
-} from '../../../../../models/interfaces';
-import { DATA_TYPES } from '../../../../../utils/constants';
+} from '../../../../models/interfaces';
+import { FeaturesFormikValues } from '../../models/interfaces';
+import { DATA_TYPES } from '../../../../utils/constants';
+
+describe('adToFormik', () => {
+  test('should return initialValues if detector is null', () => {
+    const randomDetector = {} as Detector;
+    const adFormikValues = detectorDefinitionToFormik(randomDetector);
+    expect(adFormikValues).toEqual(INITIAL_DETECTOR_DEFINITION_VALUES);
+  });
+  test('should return remote values if detector is not null', () => {
+    const randomDetector = getRandomDetector();
+    const adFormikValues = detectorDefinitionToFormik(randomDetector);
+    expect(adFormikValues).toEqual({
+      detectorName: randomDetector.name,
+      detectorDescription: randomDetector.description,
+      filters: randomDetector.uiMetadata.filters,
+      filterType: FILTER_TYPES.SIMPLE,
+      filterQuery: JSON.stringify(randomDetector.filterQuery || {}, null, 4),
+      index: [{ label: randomDetector.indices[0] }], // Currently we support only one index
+      shingleSize: SINGLE_ENTITY_SHINGLE_SIZE,
+      timeField: randomDetector.timeField,
+      detectionInterval: randomDetector.detectionInterval.period.interval,
+      windowDelay: randomDetector.windowDelay.period.interval,
+    });
+  });
+  test('should return if detector does not have metadata', () => {
+    const randomDetector = getRandomDetector();
+    //@ts-ignore
+    randomDetector.uiMetadata = undefined;
+    const adFormikValues = detectorDefinitionToFormik(randomDetector);
+    expect(adFormikValues).toEqual({
+      detectorName: randomDetector.name,
+      detectorDescription: randomDetector.description,
+      filters: [],
+      filterType: FILTER_TYPES.CUSTOM,
+      filterQuery: JSON.stringify(randomDetector.filterQuery || {}, null, 4),
+      index: [{ label: randomDetector.indices[0] }], // Currently we support only one index
+      shingleSize: SINGLE_ENTITY_SHINGLE_SIZE,
+      timeField: randomDetector.timeField,
+      detectionInterval: randomDetector.detectionInterval.period.interval,
+      windowDelay: randomDetector.windowDelay.period.interval,
+    });
+  });
+  test('should return if detector has categoryField', () => {
+    let randomDetector = getRandomDetector();
+    randomDetector.categoryField = ['field'];
+    const adFormikValues = detectorDefinitionToFormik(randomDetector);
+    expect(adFormikValues).toEqual({
+      detectorName: randomDetector.name,
+      detectorDescription: randomDetector.description,
+      filters: [],
+      filterType: FILTER_TYPES.SIMPLE,
+      filterQuery: JSON.stringify(randomDetector.filterQuery || {}, null, 4),
+      index: [{ label: randomDetector.indices[0] }], // Currently we support only one index
+      shingleSize: MULTI_ENTITY_SHINGLE_SIZE,
+      timeField: randomDetector.timeField,
+      detectionInterval: randomDetector.detectionInterval.period.interval,
+      windowDelay: randomDetector.windowDelay.period.interval,
+    });
+  });
+});
 
 describe('formikToAd', () => {
   test('should convert formikValues to API request model', () => {
     const randomDetector = getRandomDetector();
     const ad = formikToDetector(
       {
-        ...INITIAL_VALUES,
+        ...INITIAL_DETECTOR_DEFINITION_VALUES,
         detectorName: randomDetector.name,
         detectorDescription: randomDetector.description,
         index: [{ label: randomDetector.indices[0] }],
@@ -70,7 +139,7 @@ describe('formikToAd', () => {
     const randomDetector = getRandomDetector();
     const ad = formikToDetector(
       {
-        ...INITIAL_VALUES,
+        ...INITIAL_DETECTOR_DEFINITION_VALUES,
         detectorName: randomDetector.name,
         detectorDescription: randomDetector.description,
         index: [{ label: randomDetector.indices[0] }],
@@ -259,4 +328,63 @@ describe('formikToFilterQuery', () => {
       ).toEqual(expected);
     }
   );
+});
+
+describe('featuresToFormik', () => {
+  test('should able to add new feature', () => {
+    const randomDetector = getRandomDetector(false);
+    const newFeature: FeaturesFormikValues = {
+      featureId: 'test-feature-id',
+      aggregationBy: 'sum',
+      aggregationOf: [{ label: 'bytes' }],
+      featureEnabled: true,
+      featureName: 'New feature',
+      featureType: FEATURE_TYPE.SIMPLE,
+      aggregationQuery: '',
+    };
+    const randomPositiveInt = Math.ceil(Math.random() * 100);
+    const apiRequest = prepareDetector(
+      [newFeature],
+      randomPositiveInt,
+      randomDetector,
+      false
+    );
+    // expect(apiRequest.featureAttributes).toEqual([
+    //   {
+    //     featureId: newFeature.featureId,
+    //     featureName: newFeature.featureName,
+    //     featureEnabled: newFeature.featureEnabled,
+    //     importance: 1,
+    //     aggregationQuery: { new_feature: { sum: { field: 'bytes' } } },
+    //   },
+    //   ...randomDetector.featureAttributes,
+    // ]);
+  });
+  // test('should able to edit feature', () => {
+  //   const randomDetector = getRandomDetector(false);
+  //   const featureToEdit = randomDetector.featureAttributes[0];
+  //   const newFeature: FeaturesFormikValues = {
+  //     aggregationBy: 'sum',
+  //     aggregationOf: [{ label: 'bytes' }],
+  //     enabled: true,
+  //     featureName: 'New feature',
+  //     featureType: FEATURE_TYPE.SIMPLE,
+  //     customAggregation: '',
+  //   };
+  //   const apiRequest = prepareDetector(
+  //     newFeature,
+  //     randomDetector,
+  //     featureToEdit.featureId || ''
+  //   );
+  //   expect(apiRequest.featureAttributes).toEqual([
+  //     {
+  //       featureId: featureToEdit.featureId,
+  //       featureName: newFeature.featureName,
+  //       featureEnabled: newFeature.enabled,
+  //       importance: 1,
+  //       aggregationQuery: { new_feature: { sum: { field: 'bytes' } } },
+  //     },
+  //     ...randomDetector.featureAttributes.slice(1),
+  //   ]);
+  // });
 });

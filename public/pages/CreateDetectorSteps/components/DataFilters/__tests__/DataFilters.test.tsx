@@ -21,13 +21,13 @@ import {
   initialState,
   mockedStore,
 } from '../../../../../redux/utils/testUtils';
-import { ADFormikValues } from '../../../containers/models/interfaces';
-import { INITIAL_VALUES } from '../../../containers/utils/constant';
+import { DetectorDefinitionFormikValues } from '../../../models/interfaces';
+import { INITIAL_DETECTOR_DEFINITION_VALUES } from '../../../utils/constants';
 import { DataFilter } from '../DataFilter';
 import { CoreServicesContext } from '../../../../../components/CoreServices/CoreServices';
 import { coreServicesMock } from '../../../../../../test/mocks';
 
-const renderDataFilter = (initialValue: ADFormikValues) => ({
+const renderDataFilter = (initialValue: DetectorDefinitionFormikValues) => ({
   ...render(
     <Provider
       store={mockedStore({
@@ -56,14 +56,18 @@ const renderDataFilter = (initialValue: ADFormikValues) => ({
 });
 describe('<DataFilter /> spec', () => {
   test('renders empty message if no filters are available', async () => {
-    const { getByText, getAllByText } = renderDataFilter(INITIAL_VALUES);
+    const { getByText, getAllByText } = renderDataFilter(
+      INITIAL_DETECTOR_DEFINITION_VALUES
+    );
     getByText('Use data filter to reduce noisy data');
     expect(getAllByText('Add filter')).not.toBeNull();
     expect(getAllByText('Add filter').length).toBe(2);
   });
   test('should render filter on clicking on Add Filter', async () => {
     try {
-      const { getByText, getAllByText } = renderDataFilter(INITIAL_VALUES);
+      const { getByText, getAllByText } = renderDataFilter(
+        INITIAL_DETECTOR_DEFINITION_VALUES
+      );
       fireEvent.click(getAllByText('Add filter')[1]);
       expect(getByText('Add filter')).not.toBeNull();
       getByText('Operator');

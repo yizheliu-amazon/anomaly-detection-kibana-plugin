@@ -17,7 +17,7 @@ import { EuiHorizontalRule, EuiSelect } from '@elastic/eui';
 import { Field, FieldProps, FormikProps } from 'formik';
 import React, { Fragment } from 'react';
 import { getError, isInvalid, required } from '../../../../utils/utils';
-import { ADFormikValues } from '../../containers/models/interfaces';
+import { DetectorDefinitionFormikValues } from '../../models/interfaces';
 import { FILTER_TYPES_OPTIONS } from './utils/constant';
 import { SimpleFilter } from './SimpleFilter';
 import { QueryDataFilter } from './QueryDataFilter';
@@ -25,7 +25,7 @@ import { FILTER_TYPES } from '../../../../models/interfaces';
 import { FormattedFormRow } from '../FormattedFormRow/FormattedFormRow';
 
 interface DataFilterProps {
-  formikProps: FormikProps<ADFormikValues>;
+  formikProps: FormikProps<DetectorDefinitionFormikValues>;
 }
 
 function DataFilter(props: DataFilterProps) {
