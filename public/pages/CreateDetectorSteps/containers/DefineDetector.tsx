@@ -13,15 +13,14 @@
  * permissions and limitations under the License.
  */
 
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { useDispatch } from 'react-redux';
 import { Dispatch } from 'redux';
-import { FormikProps } from 'formik';
+import { FormikProps, Formik } from 'formik';
 import { get, isEmpty } from 'lodash';
 import {
   EuiSpacer,
-  EuiText,
   EuiFlexGroup,
   EuiFlexItem,
   EuiButton,
@@ -62,7 +61,8 @@ interface DefineDetectorProps
   isEdit: boolean;
   setStep(stepNumber: number): void;
   handleCancelClick(): void;
-  formikProps: FormikProps<DetectorDefinitionFormikValues>;
+  initialValues?: DetectorDefinitionFormikValues;
+  setInitialValues?(initialValues: DetectorDefinitionFormikValues): void;
 }
 
 export const DefineDetector = (props: DefineDetectorProps) => {
@@ -181,63 +181,87 @@ export const DefineDetector = (props: DefineDetectorProps) => {
     }
   };
 
-  return (
-    <React.Fragment>
-      <EuiPage
-        style={{
-          marginTop: '-24px',
-        }}
-      >
-        <EuiPageBody>
-          <EuiPageHeader>
-            <EuiPageHeaderSection>
-              <EuiTitle size="l">
-                <h1>{props.isEdit ? 'Edit detector' : 'Define detector'} </h1>
-              </EuiTitle>
-            </EuiPageHeaderSection>
-          </EuiPageHeader>
-          <Fragment>
-            <DetectorInfo onValidateDetectorName={handleValidateName} />
-            <EuiSpacer />
-            <DataSource
-              formikProps={props.formikProps}
-              origIndex={props.isEdit ? get(detector, 'indices.0', '') : null}
-              isEdit={props.isEdit}
-            />
-            <EuiSpacer />
-            <Settings />
-          </Fragment>
-        </EuiPageBody>
-      </EuiPage>
+  const optionallySaveValues = (values: DetectorDefinitionFormikValues) => {
+    if (props.setInitialValues) {
+      props.setInitialValues(values);
+    }
+  };
 
-      <EuiSpacer size="xs" />
-      <EuiFlexGroup
-        alignItems="center"
-        justifyContent="flexEnd"
-        gutterSize="s"
-        style={{ marginRight: '12px' }}
-      >
-        <EuiFlexItem grow={false}>
-          <EuiButtonEmpty onClick={props.handleCancelClick}>
-            Cancel
-          </EuiButtonEmpty>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiButton
-            iconSide="right"
-            iconType="arrowRight"
-            fill={true}
-            data-test-subj="defineDetectorNextButton"
-            isLoading={props.formikProps.isSubmitting}
-            //@ts-ignore
-            onClick={() => {
-              handleFormValidation(props.formikProps);
+  return (
+    <Formik
+      enableReinitialize={true}
+      initialValues={
+        props.initialValues
+          ? props.initialValues
+          : detectorDefinitionToFormik(detector)
+      }
+      onSubmit={() => {}}
+      validateOnMount={props.isEdit ? false : true}
+    >
+      {(formikProps) => (
+        <React.Fragment>
+          <EuiPage
+            style={{
+              marginTop: '-24px',
             }}
           >
-            Next
-          </EuiButton>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    </React.Fragment>
+            <EuiPageBody>
+              <EuiPageHeader>
+                <EuiPageHeaderSection>
+                  <EuiTitle size="l">
+                    <h1>
+                      {props.isEdit ? 'Edit detector' : 'Define detector'}{' '}
+                    </h1>
+                  </EuiTitle>
+                </EuiPageHeaderSection>
+              </EuiPageHeader>
+              <Fragment>
+                <DetectorInfo onValidateDetectorName={handleValidateName} />
+                <EuiSpacer />
+                <DataSource
+                  formikProps={formikProps}
+                  origIndex={
+                    props.isEdit ? get(detector, 'indices.0', '') : null
+                  }
+                  isEdit={props.isEdit}
+                />
+                <EuiSpacer />
+                <Settings />
+              </Fragment>
+            </EuiPageBody>
+          </EuiPage>
+
+          <EuiSpacer size="xs" />
+          <EuiFlexGroup
+            alignItems="center"
+            justifyContent="flexEnd"
+            gutterSize="s"
+            style={{ marginRight: '12px' }}
+          >
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty onClick={props.handleCancelClick}>
+                Cancel
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButton
+                iconSide="right"
+                iconType="arrowRight"
+                fill={true}
+                data-test-subj="defineDetectorNextButton"
+                isLoading={formikProps.isSubmitting}
+                //@ts-ignore
+                onClick={() => {
+                  optionallySaveValues(formikProps.values);
+                  handleFormValidation(formikProps);
+                }}
+              >
+                Next
+              </EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </React.Fragment>
+      )}
+    </Formik>
   );
 };

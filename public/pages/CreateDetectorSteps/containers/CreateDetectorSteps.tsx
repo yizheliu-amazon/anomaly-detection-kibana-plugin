@@ -18,17 +18,24 @@ import { RouteComponentProps } from 'react-router';
 import { EuiSteps, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { useDispatch } from 'react-redux';
 import { Dispatch } from 'redux';
-import { Formik } from 'formik';
 import { CoreStart } from '../../../../../../src/core/public';
 import { APIAction } from '../../../redux/middleware/types';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
 import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
-import { STEP_STATUS, INITIAL_DETECTOR_VALUES } from '../utils/constants';
+import {
+  STEP_STATUS,
+  INITIAL_DETECTOR_VALUES,
+  INITIAL_DETECTOR_DEFINITION_VALUES,
+  INITIAL_MODEL_CONFIGURATION_VALUES,
+} from '../utils/constants';
 import { DefineDetector } from './DefineDetector';
 import { ConfigureModel } from './ConfigureModel';
 import { DetectorJobs } from './DetectorJobs';
 import { ReviewAndCreate } from './ReviewAndCreate';
-import { DetectorDefinitionFormikValues } from '../models/interfaces';
+import {
+  DetectorDefinitionFormikValues,
+  ModelConfigurationFormikValues,
+} from '../models/interfaces';
 
 interface CreateDetectorRouterProps {
   detectorId?: string;
@@ -49,6 +56,13 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
   const [step3Status, setStep3Status] = useState<STEP_STATUS>('disabled');
   const [step4Status, setStep4Status] = useState<STEP_STATUS>('disabled');
 
+  const [step1Fields, setStep1Fields] = useState<
+    DetectorDefinitionFormikValues
+  >(INITIAL_DETECTOR_DEFINITION_VALUES);
+  const [step2Fields, setStep2Fields] = useState<
+    ModelConfigurationFormikValues
+  >(INITIAL_MODEL_CONFIGURATION_VALUES);
+
   const [curStep, setCurStep] = useState<number>(1);
 
   const handleCancelClick = () => {
@@ -59,20 +73,23 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
     console.log('Placeholder for creating detector');
   };
 
-  const renderStep1Body = (formikProps: any) => (
+  const renderStep1Body = () => (
     <DefineDetector
       isEdit={false}
       setStep={setCurStep}
       handleCancelClick={handleCancelClick}
-      formikProps={formikProps}
+      initialValues={step1Fields}
+      setInitialValues={setStep1Fields}
       {...props}
     />
   );
-  const step2Body = (
+  const renderStep2Body = () => (
     <ConfigureModel
       isEdit={false}
       setStep={setCurStep}
       handleCancelClick={handleCancelClick}
+      initialValues={step2Fields}
+      setInitialValues={setStep2Fields}
       {...props}
     />
   );
@@ -90,6 +107,7 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
   useEffect(() => {
     switch (curStep) {
       case 1:
+      default:
         setStep1Status(undefined);
         setStep2Status('disabled');
         setStep3Status('disabled');
@@ -141,31 +159,22 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
 
   return (
     <Fragment>
-      <Formik
-        enableReinitialize={true}
-        initialValues={INITIAL_DETECTOR_VALUES}
-        onSubmit={() => {}}
-        isInitialValid={false}
-      >
-        {(formikProps) => (
-          <EuiFlexGroup direction="row">
-            <EuiFlexItem grow={false}>
-              <EuiSteps steps={createSteps} />
-            </EuiFlexItem>
-            <EuiFlexItem>
-              {curStep === 1
-                ? renderStep1Body(formikProps)
-                : curStep === 2
-                ? step2Body
-                : curStep === 3
-                ? step3Body
-                : curStep === 4
-                ? step4Body
-                : null}
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        )}
-      </Formik>
+      <EuiFlexGroup direction="row">
+        <EuiFlexItem grow={false}>
+          <EuiSteps steps={createSteps} />
+        </EuiFlexItem>
+        <EuiFlexItem>
+          {curStep === 1
+            ? renderStep1Body()
+            : curStep === 2
+            ? renderStep2Body()
+            : curStep === 3
+            ? step3Body
+            : curStep === 4
+            ? step4Body
+            : null}
+        </EuiFlexItem>
+      </EuiFlexGroup>
     </Fragment>
   );
 };

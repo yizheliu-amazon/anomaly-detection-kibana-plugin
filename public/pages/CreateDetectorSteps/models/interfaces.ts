@@ -42,8 +42,8 @@ export interface DetectorDefinitionFormikValues {
 // Formik values used when creating/editing the model configuration
 export interface ModelConfigurationFormikValues {
   featureList: FeaturesFormikValues[];
-  categoricalField: string;
-  windowSize: number;
+  categoryField: string[];
+  shingleSize: number;
 }
 
 export interface DetectorJobFormikValues {

@@ -25,7 +25,7 @@ import {
   EuiButtonEmpty,
   EuiSpacer,
 } from '@elastic/eui';
-import { Form, Formik } from 'formik';
+import { FormikProps, Formik } from 'formik';
 import { get, isEmpty } from 'lodash';
 import React, { Fragment, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -36,7 +36,6 @@ import { useFetchDetectorInfo } from '../hooks/useFetchDetectorInfo';
 import { BREADCRUMBS } from '../../../utils/constants';
 import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
 import {
-  generateInitialFeatures,
   validateFeatures,
   getCategoryFields,
   getShingleSizeFromObject,
@@ -47,6 +46,12 @@ import { AdvancedSettings } from '../components/AdvancedSettings';
 import { SampleAnomalies } from './SampleAnomalies';
 import { CoreStart } from '../../../../../../src/core/public';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
+import { ModelConfigurationFormikValues } from '../models/interfaces';
+import { DETECTOR_STATE } from '../../../../server/utils/constants';
+import {
+  focusOnFirstWrongFeature,
+  modelConfigurationToFormik,
+} from '../utils/helpers';
 
 interface ConfigureModelRouterProps {
   detectorId?: string;
@@ -57,6 +62,8 @@ interface ConfigureModelProps
   isEdit: boolean;
   setStep(stepNumber: number): void;
   handleCancelClick(): void;
+  initialValues?: ModelConfigurationFormikValues;
+  setInitialValues?(initialValues: ModelConfigurationFormikValues): void;
 }
 
 export function ConfigureModel(props: ConfigureModelProps) {
@@ -72,6 +79,7 @@ export function ConfigureModel(props: ConfigureModelProps) {
   const isLoading = useSelector(
     (state: AppState) => state.elasticsearch.requesting
   );
+  const originalShingleSize = getShingleSizeFromObject(detector, isHCDetector);
 
   // When detector is loaded: get any category fields (if applicable) and
   // get all index mappings based on detector's selected index
@@ -110,107 +118,149 @@ export function ConfigureModel(props: ConfigureModelProps) {
     }
   }, [hasError]);
 
-  const originalShingleSize = getShingleSizeFromObject(detector, isHCDetector);
+  const handleFormValidation = (
+    formikProps: FormikProps<ModelConfigurationFormikValues>
+  ) => {
+    try {
+      if (props.isEdit && detector.curState === DETECTOR_STATE.RUNNING) {
+        core.notifications.toasts.addDanger(
+          'Detector cannot be updated while it is running'
+        );
+      } else {
+        formikProps.setSubmitting(true);
+        formikProps.setFieldTouched('featureList');
+        formikProps.setFieldTouched('categoryField');
+        formikProps.setFieldTouched('shingleSize');
+        formikProps.validateForm();
+
+        if (formikProps.isValid) {
+          if (props.isEdit) {
+            // TODO: need to figure out logic for saving and starting the detector from here
+            // const apiRequest = formikToDetector(formikProps.values, detector);
+            // handleUpdate(apiRequest);
+          } else {
+            props.setStep(3);
+          }
+        } else {
+          focusOnFirstWrongFeature(
+            formikProps.errors,
+            formikProps.setFieldTouched
+          );
+          core.notifications.toasts.addDanger(
+            'One or more input fields is invalid'
+          );
+        }
+      }
+      formikProps.setSubmitting(false);
+    } catch (e) {
+      formikProps.setSubmitting(false);
+    }
+  };
+
+  const optionallySaveValues = (values: ModelConfigurationFormikValues) => {
+    if (props.setInitialValues) {
+      props.setInitialValues(values);
+    }
+  };
 
   return (
-    <Fragment>
-      <Formik
-        enableReinitialize
-        initialValues={{
-          featureList: generateInitialFeatures(detector),
-          shingleSize: originalShingleSize,
-          categoryField: get(detector, 'categoryField', []),
-        }}
-        onSubmit={() => {}}
-        validate={validateFeatures}
-      >
-        {(formikProps) => (
-          <Fragment>
-            <Form>
-              <EuiPage
-                style={{
-                  marginTop: '-24px',
+    <Formik
+      enableReinitialize={true}
+      initialValues={
+        props.initialValues
+          ? props.initialValues
+          : modelConfigurationToFormik(detector)
+      }
+      onSubmit={() => {}}
+      validateOnMount={props.isEdit ? false : true}
+      validate={validateFeatures}
+    >
+      {(formikProps) => (
+        <Fragment>
+          <EuiPage
+            style={{
+              marginTop: '-24px',
+            }}
+          >
+            <EuiPageBody>
+              <EuiPageHeader>
+                <EuiPageHeaderSection>
+                  <EuiTitle size="l">
+                    <h1>Configure model </h1>
+                  </EuiTitle>
+                </EuiPageHeaderSection>
+              </EuiPageHeader>
+              <Features detector={detector} formikProps={formikProps} />
+              <EuiSpacer />
+              <CategoryField
+                isHCDetector={isHCDetector}
+                categoryFieldOptions={getCategoryFields(indexDataTypes)}
+                setIsHCDetector={setIsHCDetector}
+                isLoading={isLoading}
+                originalShingleSize={originalShingleSize}
+              />
+              <EuiSpacer />
+              <AdvancedSettings />
+              <EuiSpacer />
+              {!isEmpty(detector) ? (
+                <SampleAnomalies
+                  detector={detector}
+                  featureList={formikProps.values.featureList}
+                  shingleSize={formikProps.values.shingleSize}
+                  categoryFields={formikProps.values.categoryField}
+                  errors={formikProps.errors}
+                  setFieldTouched={formikProps.setFieldTouched}
+                />
+              ) : null}
+            </EuiPageBody>
+          </EuiPage>
+
+          <EuiFlexGroup
+            alignItems="center"
+            justifyContent="flexEnd"
+            gutterSize="s"
+            style={{ marginRight: '12px' }}
+          >
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty onClick={props.handleCancelClick}>
+                Cancel
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButton
+                iconSide="left"
+                iconType="arrowLeft"
+                fill={false}
+                data-test-subj="configureModelPreviousButton"
+                //isLoading={formikProps.isSubmitting}
+                //@ts-ignore
+                onClick={() => {
+                  optionallySaveValues(formikProps.values);
+                  props.setStep(1);
                 }}
               >
-                <EuiPageBody>
-                  <EuiPageHeader>
-                    <EuiPageHeaderSection>
-                      <EuiTitle size="l">
-                        <h1>Configure model </h1>
-                      </EuiTitle>
-                    </EuiPageHeaderSection>
-                  </EuiPageHeader>
-                  <Features detector={detector} formikProps={formikProps} />
-                  <EuiSpacer />
-                  <CategoryField
-                    isHCDetector={isHCDetector}
-                    categoryFieldOptions={getCategoryFields(indexDataTypes)}
-                    setIsHCDetector={setIsHCDetector}
-                    isLoading={isLoading}
-                    originalShingleSize={originalShingleSize}
-                  />
-                  <EuiSpacer />
-                  <AdvancedSettings />
-                  <EuiSpacer />
-                  {!isEmpty(detector) ? (
-                    <SampleAnomalies
-                      detector={detector}
-                      featureList={formikProps.values.featureList}
-                      shingleSize={formikProps.values.shingleSize}
-                      categoryFields={formikProps.values.categoryField}
-                      errors={formikProps.errors}
-                      setFieldTouched={formikProps.setFieldTouched}
-                    />
-                  ) : null}
-                </EuiPageBody>
-              </EuiPage>
-            </Form>
-
-            <EuiFlexGroup
-              alignItems="center"
-              justifyContent="flexEnd"
-              gutterSize="s"
-              style={{ marginRight: '12px' }}
-            >
-              <EuiFlexItem grow={false}>
-                <EuiButtonEmpty onClick={props.handleCancelClick}>
-                  Cancel
-                </EuiButtonEmpty>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiButton
-                  iconSide="left"
-                  iconType="arrowLeft"
-                  fill={false}
-                  data-test-subj="configureModelPreviousButton"
-                  //isLoading={formikProps.isSubmitting}
-                  //@ts-ignore
-                  onClick={() => {
-                    props.setStep(1);
-                  }}
-                >
-                  Previous
-                </EuiButton>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiButton
-                  iconSide="right"
-                  iconType="arrowRight"
-                  fill={true}
-                  data-test-subj="configureModelNextButton"
-                  //isLoading={formikProps.isSubmitting}
-                  //@ts-ignore
-                  onClick={() => {
-                    props.setStep(3);
-                  }}
-                >
-                  Next
-                </EuiButton>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </Fragment>
-        )}
-      </Formik>
-    </Fragment>
+                Previous
+              </EuiButton>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButton
+                iconSide="right"
+                iconType="arrowRight"
+                fill={true}
+                data-test-subj="configureModelNextButton"
+                //isLoading={formikProps.isSubmitting}
+                //@ts-ignore
+                onClick={() => {
+                  optionallySaveValues(formikProps.values);
+                  handleFormValidation(formikProps);
+                }}
+              >
+                Next
+              </EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </Fragment>
+      )}
+    </Formik>
   );
 }

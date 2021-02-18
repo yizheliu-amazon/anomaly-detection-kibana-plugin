@@ -31,9 +31,13 @@ import { get, forOwn, cloneDeep, isEmpty, snakeCase } from 'lodash';
 import { DataTypes } from '../../../redux/reducers/elasticsearch';
 import {
   DetectorDefinitionFormikValues,
+  ModelConfigurationFormikValues,
   FeaturesFormikValues,
 } from '../models/interfaces';
-import { INITIAL_DETECTOR_DEFINITION_VALUES } from './constants';
+import {
+  INITIAL_DETECTOR_DEFINITION_VALUES,
+  INITIAL_MODEL_CONFIGURATION_VALUES,
+} from './constants';
 import { OPERATORS_QUERY_MAP } from './whereFilters';
 
 export const getFieldOptions = (
@@ -266,6 +270,53 @@ export function detectorDefinitionToFormik(
     //   !isEmpty(get(ad, 'categoryField', []))
     // ),
   };
+}
+
+// **** added the following 2 fns - need to make sure these work as expected
+export function modelConfigurationToFormik(
+  detector: Detector
+): ModelConfigurationFormikValues {
+  const initialValues = cloneDeep(INITIAL_MODEL_CONFIGURATION_VALUES);
+  if (isEmpty(detector)) {
+    return initialValues;
+  }
+  return {
+    ...initialValues,
+    featureList: featuresToFormik(detector),
+    categoryField: get(detector, 'categoryField.0'),
+    shingleSize: get(detector, 'shingleSize', 4),
+    //startTime: get(detector, 'detectionDateRange.startTime'),
+    //endTime: get(detector, 'detectionDateRange.endTime'),
+  };
+}
+
+function featuresToFormik(detector: Detector): FeaturesFormikValues[] {
+  const featureUiMetaData = get(detector, 'uiMetadata.features', []);
+  const features = get(detector, 'featureAttributes', []);
+  // @ts-ignore
+  return features.map((feature: FeatureAttributes) => {
+    return {
+      ...featureUiMetaData[feature.featureName],
+      ...feature,
+      aggregationQuery: JSON.stringify(feature['aggregationQuery'], null, 4),
+      aggregationOf: get(
+        featureUiMetaData,
+        `${feature.featureName}.aggregationOf`
+      )
+        ? [
+            {
+              label: get(
+                featureUiMetaData,
+                `${feature.featureName}.aggregationOf`
+              ),
+            },
+          ]
+        : [],
+      featureType: get(featureUiMetaData, `${feature.featureName}.featureType`)
+        ? get(featureUiMetaData, `${feature.featureName}.featureType`)
+        : FEATURE_TYPE.CUSTOM,
+    };
+  });
 }
 
 //********** Originally in formikToDetector.ts *************

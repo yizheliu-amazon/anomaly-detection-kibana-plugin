@@ -99,8 +99,8 @@ export const INITIAL_DETECTOR_DEFINITION_VALUES: DetectorDefinitionFormikValues 
 
 export const INITIAL_MODEL_CONFIGURATION_VALUES: ModelConfigurationFormikValues = {
   featureList: [],
-  categoricalField: '',
-  windowSize: 4,
+  categoryField: [],
+  shingleSize: 4,
 };
 
 export const INITIAL_DETECTOR_JOB_VALUES: DetectorJobFormikValues = {
