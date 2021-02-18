@@ -129,6 +129,7 @@ export function ConfigureModel(props: ConfigureModelProps) {
       } else {
         formikProps.setSubmitting(true);
         formikProps.setFieldTouched('featureList');
+        formikProps.setFieldTouched('categoryFieldEnabled');
         formikProps.setFieldTouched('categoryField');
         formikProps.setFieldTouched('shingleSize');
         formikProps.validateForm();
@@ -139,6 +140,7 @@ export function ConfigureModel(props: ConfigureModelProps) {
             // const apiRequest = formikToDetector(formikProps.values, detector);
             // handleUpdate(apiRequest);
           } else {
+            optionallySaveValues(formikProps.values);
             props.setStep(3);
           }
         } else {
@@ -157,6 +159,20 @@ export function ConfigureModel(props: ConfigureModelProps) {
     }
   };
 
+  const handleSubmit = async (
+    values: ModelConfigurationFormikValues,
+    formikProps: any
+  ) => {
+    try {
+      if (props.isEdit) {
+        // TODO: submit the update here
+      }
+    } catch (e) {
+    } finally {
+      formikProps.setSubmitting(false);
+    }
+  };
+
   const optionallySaveValues = (values: ModelConfigurationFormikValues) => {
     if (props.setInitialValues) {
       props.setInitialValues(values);
@@ -165,13 +181,12 @@ export function ConfigureModel(props: ConfigureModelProps) {
 
   return (
     <Formik
-      enableReinitialize={true}
       initialValues={
         props.initialValues
           ? props.initialValues
           : modelConfigurationToFormik(detector)
       }
-      onSubmit={() => {}}
+      onSubmit={handleSubmit}
       validateOnMount={props.isEdit ? false : true}
       validate={validateFeatures}
     >
@@ -198,6 +213,7 @@ export function ConfigureModel(props: ConfigureModelProps) {
                 setIsHCDetector={setIsHCDetector}
                 isLoading={isLoading}
                 originalShingleSize={originalShingleSize}
+                formikProps={formikProps}
               />
               <EuiSpacer />
               <AdvancedSettings />
@@ -244,6 +260,7 @@ export function ConfigureModel(props: ConfigureModelProps) {
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButton
+                type="submit"
                 iconSide="right"
                 iconType="arrowRight"
                 fill={true}
@@ -251,7 +268,6 @@ export function ConfigureModel(props: ConfigureModelProps) {
                 //isLoading={formikProps.isSubmitting}
                 //@ts-ignore
                 onClick={() => {
-                  optionallySaveValues(formikProps.values);
                   handleFormValidation(formikProps);
                 }}
               >

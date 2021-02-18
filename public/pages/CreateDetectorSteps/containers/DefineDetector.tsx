@@ -151,6 +151,7 @@ export const DefineDetector = (props: DefineDetectorProps) => {
             const apiRequest = formikToDetector(formikProps.values, detector);
             handleUpdate(apiRequest);
           } else {
+            optionallySaveValues(formikProps.values);
             props.setStep(2);
           }
         } else {
@@ -181,6 +182,20 @@ export const DefineDetector = (props: DefineDetectorProps) => {
     }
   };
 
+  const handleSubmit = async (
+    values: DetectorDefinitionFormikValues,
+    formikProps: any
+  ) => {
+    try {
+      if (props.isEdit) {
+        // TODO: submit the update here
+      }
+    } catch (e) {
+    } finally {
+      formikProps.setSubmitting(false);
+    }
+  };
+
   const optionallySaveValues = (values: DetectorDefinitionFormikValues) => {
     if (props.setInitialValues) {
       props.setInitialValues(values);
@@ -189,13 +204,12 @@ export const DefineDetector = (props: DefineDetectorProps) => {
 
   return (
     <Formik
-      enableReinitialize={true}
       initialValues={
         props.initialValues
           ? props.initialValues
           : detectorDefinitionToFormik(detector)
       }
-      onSubmit={() => {}}
+      onSubmit={handleSubmit}
       validateOnMount={props.isEdit ? false : true}
     >
       {(formikProps) => (
@@ -245,6 +259,7 @@ export const DefineDetector = (props: DefineDetectorProps) => {
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButton
+                type="submit"
                 iconSide="right"
                 iconType="arrowRight"
                 fill={true}
@@ -252,7 +267,6 @@ export const DefineDetector = (props: DefineDetectorProps) => {
                 isLoading={formikProps.isSubmitting}
                 //@ts-ignore
                 onClick={() => {
-                  optionallySaveValues(formikProps.values);
                   handleFormValidation(formikProps);
                 }}
               >

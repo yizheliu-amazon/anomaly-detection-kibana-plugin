@@ -42,6 +42,7 @@ export interface DetectorDefinitionFormikValues {
 // Formik values used when creating/editing the model configuration
 export interface ModelConfigurationFormikValues {
   featureList: FeaturesFormikValues[];
+  categoryFieldEnabled: boolean;
   categoryField: string[];
   shingleSize: number;
 }

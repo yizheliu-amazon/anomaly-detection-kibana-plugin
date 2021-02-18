@@ -26,7 +26,7 @@ import {
   EuiCallOut,
   EuiSpacer,
 } from '@elastic/eui';
-import { Field, FieldProps } from 'formik';
+import { Field, FieldProps, FormikProps } from 'formik';
 import { get, isEmpty } from 'lodash';
 import { MULTI_ENTITY_SHINGLE_SIZE } from '../../../../utils/constants';
 import React, { useState, useEffect } from 'react';
@@ -36,6 +36,7 @@ import {
   getError,
   validateCategoryField,
 } from '../../../../utils/utils';
+import { ModelConfigurationFormikValues } from '../../models/interfaces';
 
 interface CategoryFieldProps {
   isHCDetector: boolean;
@@ -43,10 +44,13 @@ interface CategoryFieldProps {
   setIsHCDetector(isHCDetector: boolean): void;
   isLoading: boolean;
   originalShingleSize: number;
+  formikProps: FormikProps<ModelConfigurationFormikValues>;
 }
 
 export function CategoryField(props: CategoryFieldProps) {
-  const [enabled, setEnabled] = useState<boolean>(props.isHCDetector);
+  const [enabled, setEnabled] = useState<boolean>(
+    props.formikProps.values.categoryFieldEnabled
+  );
   const noCategoryFields = isEmpty(props.categoryFieldOptions);
   const convertedOptions = props.categoryFieldOptions.map((option: string) => {
     return {

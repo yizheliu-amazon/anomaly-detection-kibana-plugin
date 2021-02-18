@@ -99,6 +99,7 @@ export const INITIAL_DETECTOR_DEFINITION_VALUES: DetectorDefinitionFormikValues 
 
 export const INITIAL_MODEL_CONFIGURATION_VALUES: ModelConfigurationFormikValues = {
   featureList: [],
+  categoryFieldEnabled: false,
   categoryField: [],
   shingleSize: 4,
 };

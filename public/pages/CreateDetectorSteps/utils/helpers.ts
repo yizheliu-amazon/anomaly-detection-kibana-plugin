@@ -283,7 +283,9 @@ export function modelConfigurationToFormik(
   return {
     ...initialValues,
     featureList: featuresToFormik(detector),
-    categoryField: get(detector, 'categoryField.0'),
+    categoryFieldEnabled:
+      get(detector, 'categoryField.0', []).length > 0 ? true : false,
+    categoryField: get(detector, 'categoryField.0', []),
     shingleSize: get(detector, 'shingleSize', 4),
     //startTime: get(detector, 'detectionDateRange.startTime'),
     //endTime: get(detector, 'detectionDateRange.endTime'),
