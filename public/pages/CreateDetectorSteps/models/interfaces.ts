@@ -52,7 +52,6 @@ export interface DetectorJobsFormikValues {
   historical: boolean;
   startTime: number | string;
   endTime: number | string;
-  rangeValid: boolean;
 }
 
 export interface FeaturesFormikValues {

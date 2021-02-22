@@ -26,9 +26,9 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 import { FormikProps, Formik } from 'formik';
-import { get, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 import React, { Fragment, useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { BREADCRUMBS } from '../../../utils/constants';
 import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
 import { CoreStart } from '../../../../../../src/core/public';
@@ -36,6 +36,7 @@ import { CoreServicesContext } from '../../../components/CoreServices/CoreServic
 import { DetectorJobsFormikValues } from '../models/interfaces';
 import { RealTimeJob } from '../components/RealTimeJob';
 import { HistoricalJob } from '../components/HistoricalJob';
+import { convertTimestampToNumber } from '../../../utils/utils';
 
 interface DetectorJobsProps {
   setStep(stepNumber: number): void;
@@ -69,17 +70,19 @@ export function DetectorJobs(props: DetectorJobsProps) {
   ) => {
     try {
       formikProps.setSubmitting(true);
-
-      // TODO: need some validation on isValid when the time isn't changed. It says it's valid bc it doesn't re-check
-      // the time ranges, since that's only triggered during EuiSuperDatePicker's onChange()
-      //
-      // formikProps.setFieldTouched('historical');
-      // formikProps.setFieldTouched('categoryField', isHCDetector);
-      // formikProps.setFieldTouched('shingleSize');
       formikProps.validateForm().then((errors) => {
+        // We need some custom logic to check the validity here. The EUI date range validity
+        // is limited and can only be checked on selection changes. Since a user may go back
+        // and forth without changing the selection, we still need to prevent moving to the
+        // next step without checking time range validity.
         const isValid =
           isEmpty(errors) &&
-          (historical ? formikProps.values.rangeValid : true);
+          (historical
+            ? //@ts-ignore
+              convertTimestampToNumber(formikProps.values.startTime) <
+              //@ts-ignore
+              convertTimestampToNumber(formikProps.values.endTime)
+            : true);
         if (isValid) {
           optionallySaveValues({
             ...formikProps.values,

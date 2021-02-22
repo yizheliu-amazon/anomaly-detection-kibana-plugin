@@ -24,14 +24,11 @@ import {
 } from '@elastic/eui';
 import { Field, FieldProps, FormikProps } from 'formik';
 import { get } from 'lodash';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ContentPanel from '../../../../components/ContentPanel/ContentPanel';
 import { FormattedFormRow } from '../../components/FormattedFormRow/FormattedFormRow';
 import { DetectorJobsFormikValues } from '../../models/interfaces';
-import {
-  HISTORICAL_DATE_RANGE_COMMON_OPTIONS,
-  INITIAL_DETECTOR_JOB_VALUES,
-} from '../../utils/constants';
+import { HISTORICAL_DATE_RANGE_COMMON_OPTIONS } from '../../utils/constants';
 import {
   isInvalid,
   getError,
@@ -47,12 +44,6 @@ export function HistoricalJob(props: HistoricalJobProps) {
   const [enabled, setEnabled] = useState<boolean>(
     get(props, 'formikProps.values.historical', true)
   );
-
-  useEffect(() => {
-    if (!enabled) {
-      props.formikProps.setFieldValue('rangeValid', true);
-    }
-  }, [enabled]);
 
   return (
     <ContentPanel
@@ -91,12 +82,6 @@ export function HistoricalJob(props: HistoricalJobProps) {
                 }}
               />
             </EuiFlexItem>
-            {/* {enabled
-              ? () => {
-                  form.setFieldTouched('startTime');
-                  form.setFieldTouched('endTime');
-                }
-              : null} */}
             {enabled ? (
               <EuiFlexItem>
                 <FormattedFormRow
@@ -117,7 +102,6 @@ export function HistoricalJob(props: HistoricalJobProps) {
                     }) => {
                       form.setFieldValue('startTime', start);
                       form.setFieldValue('endTime', end);
-                      form.setFieldValue('rangeValid', !isInvalid);
                     }}
                     isPaused={true}
                     showUpdateButton={false}

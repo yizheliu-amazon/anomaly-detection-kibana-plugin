@@ -109,7 +109,6 @@ export const INITIAL_DETECTOR_JOB_VALUES: DetectorJobsFormikValues = {
   historical: false,
   startTime: 'now-30d',
   endTime: 'now',
-  rangeValid: true,
 };
 
 export const INITIAL_DETECTOR_VALUES: CreateDetectorFormikValues = {
