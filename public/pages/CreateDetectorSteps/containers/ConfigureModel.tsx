@@ -39,6 +39,9 @@ import {
   validateFeatures,
   getCategoryFields,
   getShingleSizeFromObject,
+  focusOnFirstWrongFeature,
+  modelConfigurationToFormik,
+  focusOnCategoryField,
 } from '../utils/helpers';
 import { Features } from '../components/Features';
 import { CategoryField } from '../components/CategoryField';
@@ -48,10 +51,6 @@ import { CoreStart } from '../../../../../../src/core/public';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
 import { ModelConfigurationFormikValues } from '../models/interfaces';
 import { DETECTOR_STATE } from '../../../../server/utils/constants';
-import {
-  focusOnFirstWrongFeature,
-  modelConfigurationToFormik,
-} from '../utils/helpers';
 
 interface ConfigureModelRouterProps {
   detectorId?: string;
@@ -80,6 +79,18 @@ export function ConfigureModel(props: ConfigureModelProps) {
     (state: AppState) => state.elasticsearch.requesting
   );
   const originalShingleSize = getShingleSizeFromObject(detector, isHCDetector);
+
+  const setIsHCDetectorAndForm = (
+    isHCDetector: boolean,
+    formikProps: FormikProps<ModelConfigurationFormikValues>
+  ) => {
+    console.log(
+      'setting isHCDetector and categoryFieldEnabled to ',
+      isHCDetector
+    );
+    setIsHCDetector(isHCDetector);
+    formikProps.setFieldValue('categoryFieldEnabled', isHCDetector);
+  };
 
   // When detector is loaded: get any category fields (if applicable) and
   // get all index mappings based on detector's selected index
@@ -118,7 +129,7 @@ export function ConfigureModel(props: ConfigureModelProps) {
     }
   }, [hasError]);
 
-  const handleFormValidation = (
+  const handleFormValidation = async (
     formikProps: FormikProps<ModelConfigurationFormikValues>
   ) => {
     try {
@@ -130,31 +141,34 @@ export function ConfigureModel(props: ConfigureModelProps) {
         formikProps.setSubmitting(true);
         formikProps.setFieldTouched('featureList');
         formikProps.setFieldTouched('categoryFieldEnabled');
-        formikProps.setFieldTouched('categoryField');
+        formikProps.setFieldTouched('categoryField', isHCDetector);
         formikProps.setFieldTouched('shingleSize');
-        formikProps.validateForm();
-
-        if (formikProps.isValid) {
-          if (props.isEdit) {
-            // TODO: need to figure out logic for saving and starting the detector from here
-            // const apiRequest = formikToDetector(formikProps.values, detector);
-            // handleUpdate(apiRequest);
+        formikProps.validateForm().then((errors) => {
+          if (isEmpty(errors)) {
+            if (props.isEdit) {
+              // TODO: need to figure out logic for saving and starting the detector from here
+              // const apiRequest = formikToDetector(formikProps.values, detector);
+              // handleUpdate(apiRequest);
+            } else {
+              optionallySaveValues(formikProps.values);
+              props.setStep(3);
+            }
           } else {
-            optionallySaveValues(formikProps.values);
-            props.setStep(3);
+            // TODO: can add focus to all components or possibly customize error message too
+            if (get(errors, 'featureList')) {
+              focusOnFirstWrongFeature(errors, formikProps.setFieldTouched);
+            } else if (get(errors, 'categoryField')) {
+              focusOnCategoryField();
+            }
+
+            core.notifications.toasts.addDanger(
+              'One or more input fields is invalid'
+            );
           }
-        } else {
-          focusOnFirstWrongFeature(
-            formikProps.errors,
-            formikProps.setFieldTouched
-          );
-          core.notifications.toasts.addDanger(
-            'One or more input fields is invalid'
-          );
-        }
+        });
       }
-      formikProps.setSubmitting(false);
     } catch (e) {
+    } finally {
       formikProps.setSubmitting(false);
     }
   };

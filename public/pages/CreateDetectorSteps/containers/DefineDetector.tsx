@@ -127,7 +127,7 @@ export const DefineDetector = (props: DefineDetectorProps) => {
     }
   };
 
-  const handleFormValidation = (
+  const handleFormValidation = async (
     formikProps: FormikProps<DetectorDefinitionFormikValues>
   ) => {
     try {
@@ -144,24 +144,25 @@ export const DefineDetector = (props: DefineDetectorProps) => {
         formikProps.setFieldTouched('timeField');
         formikProps.setFieldTouched('interval');
         formikProps.setFieldTouched('windowDelay');
-        formikProps.validateForm();
-
-        if (formikProps.isValid) {
-          if (props.isEdit) {
-            const apiRequest = formikToDetector(formikProps.values, detector);
-            handleUpdate(apiRequest);
+        formikProps.validateForm().then((errors) => {
+          if (isEmpty(errors)) {
+            if (props.isEdit) {
+              const apiRequest = formikToDetector(formikProps.values, detector);
+              handleUpdate(apiRequest);
+            } else {
+              optionallySaveValues(formikProps.values);
+              props.setStep(2);
+            }
           } else {
-            optionallySaveValues(formikProps.values);
-            props.setStep(2);
+            // TODO: can add focus to all components or possibly customize error message too
+            core.notifications.toasts.addDanger(
+              'One or more input fields is invalid'
+            );
           }
-        } else {
-          core.notifications.toasts.addDanger(
-            'One or more input fields is invalid'
-          );
-        }
+        });
       }
-      formikProps.setSubmitting(false);
     } catch (e) {
+    } finally {
       formikProps.setSubmitting(false);
     }
   };

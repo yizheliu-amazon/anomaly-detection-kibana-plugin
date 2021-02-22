@@ -48,9 +48,7 @@ interface CategoryFieldProps {
 }
 
 export function CategoryField(props: CategoryFieldProps) {
-  const [enabled, setEnabled] = useState<boolean>(
-    props.formikProps.values.categoryFieldEnabled
-  );
+  const [enabled, setEnabled] = useState<boolean>(props.isHCDetector);
   const noCategoryFields = isEmpty(props.categoryFieldOptions);
   const convertedOptions = props.categoryFieldOptions.map((option: string) => {
     return {
@@ -65,7 +63,7 @@ export function CategoryField(props: CategoryFieldProps) {
   return (
     <ContentPanel
       title={
-        <EuiTitle size="s">
+        <EuiTitle size="s" id={'categoryFieldTitle'}>
           <h2>Categorical field </h2>
         </EuiTitle>
       }
