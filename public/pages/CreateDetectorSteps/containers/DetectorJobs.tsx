@@ -35,6 +35,7 @@ import { CoreStart } from '../../../../../../src/core/public';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
 import { DetectorJobsFormikValues } from '../models/interfaces';
 import { RealTimeJob } from '../components/RealTimeJob';
+import { HistoricalJob } from '../components/HistoricalJob';
 
 interface DetectorJobsProps {
   setStep(stepNumber: number): void;
@@ -51,6 +52,9 @@ export function DetectorJobs(props: DetectorJobsProps) {
   const [realTime, setRealTime] = useState<boolean>(
     props.initialValues ? props.initialValues.realTime : true
   );
+  const [historical, setHistorical] = useState<boolean>(
+    props.initialValues ? props.initialValues.historical : false
+  );
 
   useEffect(() => {
     core.chrome.setBreadcrumbs([
@@ -65,14 +69,22 @@ export function DetectorJobs(props: DetectorJobsProps) {
   ) => {
     try {
       formikProps.setSubmitting(true);
-      // formikProps.setFieldTouched('featureList');
+
+      // TODO: need some validation on isValid when the time isn't changed. It says it's valid bc it doesn't re-check
+      // the time ranges, since that's only triggered during EuiSuperDatePicker's onChange()
+      //
+      // formikProps.setFieldTouched('historical');
       // formikProps.setFieldTouched('categoryField', isHCDetector);
       // formikProps.setFieldTouched('shingleSize');
       formikProps.validateForm().then((errors) => {
-        if (isEmpty(errors)) {
+        const isValid =
+          isEmpty(errors) &&
+          (historical ? formikProps.values.rangeValid : true);
+        if (isValid) {
           optionallySaveValues({
             ...formikProps.values,
             realTime: realTime,
+            historical: historical,
           });
           props.setStep(4);
         } else {
@@ -120,6 +132,12 @@ export function DetectorJobs(props: DetectorJobsProps) {
                 setRealTime={setRealTime}
               />
               <EuiSpacer />
+              <HistoricalJob
+                formikProps={formikProps}
+                historical={historical}
+                setHistorical={setHistorical}
+              />
+              <EuiSpacer />
             </EuiPageBody>
           </EuiPage>
 
@@ -146,6 +164,7 @@ export function DetectorJobs(props: DetectorJobsProps) {
                   optionallySaveValues({
                     ...formikProps.values,
                     realTime: realTime,
+                    historical: historical,
                   });
                   props.setStep(2);
                 }}

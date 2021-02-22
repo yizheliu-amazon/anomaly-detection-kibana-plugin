@@ -107,8 +107,8 @@ export const INITIAL_MODEL_CONFIGURATION_VALUES: ModelConfigurationFormikValues 
 export const INITIAL_DETECTOR_JOB_VALUES: DetectorJobsFormikValues = {
   realTime: true,
   historical: false,
-  startTime: 'now',
-  endTime: 'now-30d',
+  startTime: 'now-30d',
+  endTime: 'now',
   rangeValid: true,
 };
 
@@ -117,3 +117,15 @@ export const INITIAL_DETECTOR_VALUES: CreateDetectorFormikValues = {
   ...INITIAL_MODEL_CONFIGURATION_VALUES,
   ...INITIAL_DETECTOR_JOB_VALUES,
 };
+
+export const HISTORICAL_DATE_RANGE_COMMON_OPTIONS = [
+  { start: 'now-24h', end: 'now', label: 'last 24 hours' },
+  { start: 'now-7d', end: 'now', label: 'last 7 days' },
+  { start: 'now-30d', end: 'now', label: 'last 30 days' },
+  { start: 'now-90d', end: 'now', label: 'last 90 days' },
+
+  { start: 'now/d', end: 'now', label: 'Today' },
+  { start: 'now/w', end: 'now', label: 'Week to date' },
+  { start: 'now/M', end: 'now', label: 'Month to date' },
+  { start: 'now/y', end: 'now', label: 'Year to date' },
+];
