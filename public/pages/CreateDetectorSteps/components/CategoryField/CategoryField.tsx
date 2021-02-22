@@ -39,6 +39,7 @@ import {
 import { ModelConfigurationFormikValues } from '../../models/interfaces';
 
 interface CategoryFieldProps {
+  isEdit: boolean;
   isHCDetector: boolean;
   categoryFieldOptions: string[];
   setIsHCDetector(isHCDetector: boolean): void;
@@ -48,7 +49,9 @@ interface CategoryFieldProps {
 }
 
 export function CategoryField(props: CategoryFieldProps) {
-  const [enabled, setEnabled] = useState<boolean>(props.isHCDetector);
+  const [enabled, setEnabled] = useState<boolean>(
+    get(props, 'formikProps.values.categoryFieldEnabled', false)
+  );
   const noCategoryFields = isEmpty(props.categoryFieldOptions);
   const convertedOptions = props.categoryFieldOptions.map((option: string) => {
     return {
@@ -57,7 +60,10 @@ export function CategoryField(props: CategoryFieldProps) {
   });
 
   useEffect(() => {
-    setEnabled(props.isHCDetector);
+    // only update this if we're editing and the detector has finally come
+    if (props.isEdit) {
+      setEnabled(props.isHCDetector);
+    }
   }, [props.isHCDetector]);
 
   return (
@@ -99,7 +105,7 @@ export function CategoryField(props: CategoryFieldProps) {
             <EuiFlexItem>
               <EuiCheckbox
                 id={'categoryFieldCheckbox'}
-                label="Enable category field"
+                label="Enable categorical field"
                 checked={enabled}
                 disabled={noCategoryFields}
                 onChange={() => {

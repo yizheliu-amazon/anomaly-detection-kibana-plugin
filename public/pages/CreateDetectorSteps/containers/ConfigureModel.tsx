@@ -74,23 +74,13 @@ export function ConfigureModel(props: ConfigureModelProps) {
   const indexDataTypes = useSelector(
     (state: AppState) => state.elasticsearch.dataTypes
   );
-  const [isHCDetector, setIsHCDetector] = useState<boolean>(false);
+  const [isHCDetector, setIsHCDetector] = useState<boolean>(
+    props.initialValues ? props.initialValues.categoryFieldEnabled : false
+  );
   const isLoading = useSelector(
     (state: AppState) => state.elasticsearch.requesting
   );
   const originalShingleSize = getShingleSizeFromObject(detector, isHCDetector);
-
-  const setIsHCDetectorAndForm = (
-    isHCDetector: boolean,
-    formikProps: FormikProps<ModelConfigurationFormikValues>
-  ) => {
-    console.log(
-      'setting isHCDetector and categoryFieldEnabled to ',
-      isHCDetector
-    );
-    setIsHCDetector(isHCDetector);
-    formikProps.setFieldValue('categoryFieldEnabled', isHCDetector);
-  };
 
   // When detector is loaded: get any category fields (if applicable) and
   // get all index mappings based on detector's selected index
@@ -140,7 +130,6 @@ export function ConfigureModel(props: ConfigureModelProps) {
       } else {
         formikProps.setSubmitting(true);
         formikProps.setFieldTouched('featureList');
-        formikProps.setFieldTouched('categoryFieldEnabled');
         formikProps.setFieldTouched('categoryField', isHCDetector);
         formikProps.setFieldTouched('shingleSize');
         formikProps.validateForm().then((errors) => {
@@ -150,7 +139,10 @@ export function ConfigureModel(props: ConfigureModelProps) {
               // const apiRequest = formikToDetector(formikProps.values, detector);
               // handleUpdate(apiRequest);
             } else {
-              optionallySaveValues(formikProps.values);
+              optionallySaveValues({
+                ...formikProps.values,
+                categoryFieldEnabled: isHCDetector,
+              });
               props.setStep(3);
             }
           } else {
@@ -222,6 +214,7 @@ export function ConfigureModel(props: ConfigureModelProps) {
               <Features detector={detector} formikProps={formikProps} />
               <EuiSpacer />
               <CategoryField
+                isEdit={props.isEdit}
                 isHCDetector={isHCDetector}
                 categoryFieldOptions={getCategoryFields(indexDataTypes)}
                 setIsHCDetector={setIsHCDetector}
@@ -265,7 +258,10 @@ export function ConfigureModel(props: ConfigureModelProps) {
                 //isLoading={formikProps.isSubmitting}
                 //@ts-ignore
                 onClick={() => {
-                  optionallySaveValues(formikProps.values);
+                  optionallySaveValues({
+                    ...formikProps.values,
+                    categoryFieldEnabled: isHCDetector,
+                  });
                   props.setStep(1);
                 }}
               >
@@ -279,7 +275,7 @@ export function ConfigureModel(props: ConfigureModelProps) {
                 iconType="arrowRight"
                 fill={true}
                 data-test-subj="configureModelNextButton"
-                //isLoading={formikProps.isSubmitting}
+                isLoading={formikProps.isSubmitting}
                 //@ts-ignore
                 onClick={() => {
                   handleFormValidation(formikProps);
