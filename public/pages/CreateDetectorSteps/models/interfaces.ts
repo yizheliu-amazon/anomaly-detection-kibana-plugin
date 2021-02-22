@@ -24,7 +24,7 @@ import { AggregationOption } from './types';
 export interface CreateDetectorFormikValues
   extends DetectorDefinitionFormikValues,
     ModelConfigurationFormikValues,
-    DetectorJobFormikValues {}
+    DetectorJobsFormikValues {}
 
 // Formik values used when creating/editing the detector definition
 export interface DetectorDefinitionFormikValues {
@@ -47,7 +47,9 @@ export interface ModelConfigurationFormikValues {
   shingleSize: number;
 }
 
-export interface DetectorJobFormikValues {
+export interface DetectorJobsFormikValues {
+  realTime: boolean;
+  historical: boolean;
   startTime: number | string;
   endTime: number | string;
   rangeValid: boolean;

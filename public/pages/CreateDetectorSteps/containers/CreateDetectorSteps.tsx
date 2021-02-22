@@ -27,6 +27,7 @@ import {
   INITIAL_DETECTOR_VALUES,
   INITIAL_DETECTOR_DEFINITION_VALUES,
   INITIAL_MODEL_CONFIGURATION_VALUES,
+  INITIAL_DETECTOR_JOB_VALUES,
 } from '../utils/constants';
 import { DefineDetector } from './DefineDetector';
 import { ConfigureModel } from './ConfigureModel';
@@ -35,6 +36,7 @@ import { ReviewAndCreate } from './ReviewAndCreate';
 import {
   DetectorDefinitionFormikValues,
   ModelConfigurationFormikValues,
+  DetectorJobsFormikValues,
 } from '../models/interfaces';
 
 interface CreateDetectorRouterProps {
@@ -62,6 +64,9 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
   const [step2Fields, setStep2Fields] = useState<
     ModelConfigurationFormikValues
   >(INITIAL_MODEL_CONFIGURATION_VALUES);
+  const [step3Fields, setStep3Fields] = useState<DetectorJobsFormikValues>(
+    INITIAL_DETECTOR_JOB_VALUES
+  );
 
   const [curStep, setCurStep] = useState<number>(1);
 
@@ -94,7 +99,12 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
     />
   );
   const step3Body = (
-    <DetectorJobs setStep={setCurStep} handleCancelClick={handleCancelClick} />
+    <DetectorJobs
+      setStep={setCurStep}
+      handleCancelClick={handleCancelClick}
+      initialValues={step3Fields}
+      setInitialValues={setStep3Fields}
+    />
   );
   const step4Body = (
     <ReviewAndCreate

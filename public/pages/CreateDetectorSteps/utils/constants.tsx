@@ -23,7 +23,7 @@ import {
   CreateDetectorFormikValues,
   DetectorDefinitionFormikValues,
   ModelConfigurationFormikValues,
-  DetectorJobFormikValues,
+  DetectorJobsFormikValues,
   FeaturesFormikValues,
 } from '../models/interfaces';
 
@@ -104,7 +104,9 @@ export const INITIAL_MODEL_CONFIGURATION_VALUES: ModelConfigurationFormikValues 
   shingleSize: 4,
 };
 
-export const INITIAL_DETECTOR_JOB_VALUES: DetectorJobFormikValues = {
+export const INITIAL_DETECTOR_JOB_VALUES: DetectorJobsFormikValues = {
+  realTime: true,
+  historical: false,
   startTime: 'now',
   endTime: 'now-30d',
   rangeValid: true,
