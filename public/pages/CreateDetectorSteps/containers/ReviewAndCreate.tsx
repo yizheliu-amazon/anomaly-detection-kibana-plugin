@@ -35,11 +35,13 @@ import { CoreStart } from '../../../../../../src/core/public';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
 import { CreateDetectorFormikValues } from '../models/interfaces';
 import { DetectorDefinitionFields } from '../components/DetectorDefinitionFields';
+import { ModelConfigurationFields } from '../components/ModelConfigurationFields';
+import { formikToDetector } from '../utils/helpers';
 
 interface ReviewAndCreateProps {
   setStep(stepNumber: number): void;
   handleCancelClick(): void;
-  initialValues: CreateDetectorFormikValues;
+  values: CreateDetectorFormikValues;
 }
 
 export function ReviewAndCreate(props: ReviewAndCreateProps) {
@@ -68,9 +70,14 @@ export function ReviewAndCreate(props: ReviewAndCreateProps) {
     }
   };
 
+  // Converting to detector for passing to the fields
+  const detectorToCreate = formikToDetector(props.values);
+
+  console.log('detector to create: ', detectorToCreate);
+
   return (
     <Formik
-      initialValues={props.initialValues}
+      initialValues={props.values}
       onSubmit={() => {}}
       validateOnMount={true}
     >
@@ -91,8 +98,13 @@ export function ReviewAndCreate(props: ReviewAndCreateProps) {
               </EuiPageHeader>
               <DetectorDefinitionFields
                 onEditDetectorDefinition={() => props.setStep(1)}
-                fields={props.initialValues}
+                fields={props.values}
                 isCreate={true}
+              />
+              <EuiSpacer />
+              <ModelConfigurationFields
+                onEditModelConfiguration={() => props.setStep(2)}
+                detector={detectorToCreate}
               />
               <EuiSpacer />
             </EuiPageBody>

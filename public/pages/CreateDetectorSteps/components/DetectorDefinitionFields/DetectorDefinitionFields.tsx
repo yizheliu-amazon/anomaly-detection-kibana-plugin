@@ -167,8 +167,6 @@ const renderDate = (obj: any) => {
 export const DetectorDefinitionFields = (
   props: DetectorDefinitionFieldsProps
 ) => {
-  console.log('fields passed: ', props.fields);
-
   // TODO: will need to preprocess detector and change into fields before passing to this component.
   // will need to preprocess a lot of the fields (interval), need to add last update time + ID
   // examples of how to preprocess the filter inputs see commented out sections below:

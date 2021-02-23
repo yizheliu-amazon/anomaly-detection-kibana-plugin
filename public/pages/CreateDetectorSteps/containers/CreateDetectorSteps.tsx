@@ -116,7 +116,7 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
     <ReviewAndCreate
       setStep={setCurStep}
       handleCancelClick={handleCancelClick}
-      initialValues={step4Fields}
+      values={step4Fields}
     />
   );
 

@@ -40,6 +40,7 @@ import {
   INITIAL_MODEL_CONFIGURATION_VALUES,
 } from './constants';
 import { OPERATORS_QUERY_MAP } from './whereFilters';
+import { convertTimestampToNumber } from '../../../utils/utils';
 
 export const getFieldOptions = (
   allFields: { [key: string]: string[] },
@@ -324,33 +325,20 @@ function featuresToFormik(detector: Detector): FeaturesFormikValues[] {
 
 //********** Originally in formikToDetector.ts *************
 
-export function formikToDetector(
-  values: DetectorDefinitionFormikValues,
-  detector: Detector
-): Detector {
-  let filterQuery = {};
-  if (values.filterType === FILTER_TYPES.SIMPLE) {
-    filterQuery = formikToFilterQuery(values.filters);
-  } else {
-    try {
-      filterQuery = JSON.parse(values.filterQuery);
-    } catch (e) {
-      //This should mostly not happen as we've have validation before submit
-      filterQuery = {};
-    }
-  }
-  const indices = formikToIndices(values.index);
-  const uiMetaData = formikToUIMetadata(values, detector);
-
-  let apiRequest = {
-    ...detector,
+// Modified to include all detector fields (used in create detector flow)
+// TODO: make similar ones for the sub-sections (formikToDetectorDefinition, formikToModelConfiguration)
+// that use some existing detector instead of formik values
+export function formikToDetector(values: CreateDetectorFormikValues): Detector {
+  let detectorBody = {
     name: values.name,
     description: values.description,
-    indices,
-    filterQuery: {
-      ...filterQuery,
+    indices: formikToIndices(values.index),
+    filterQuery: formikToFilterQuery(values),
+    uiMetadata: {
+      features: { ...featuresToUIMetadata(values.featureList) },
+      ...filtersToUIMetadata(values),
     },
-    uiMetadata: uiMetaData,
+    featureAttributes: formikToFeatureAttributes(values.featureList),
     timeField: values.timeField,
     detectionInterval: {
       period: { interval: values.interval, unit: UNITS.MINUTES },
@@ -358,24 +346,36 @@ export function formikToDetector(
     windowDelay: {
       period: { interval: values.windowDelay, unit: UNITS.MINUTES },
     },
+    shingleSize: values.shingleSize,
+    detectionDateRange: {
+      startTime: convertTimestampToNumber(values.startTime),
+      endTime: convertTimestampToNumber(values.endTime),
+    },
+    categoryField: get(values, 'categoryField', []),
   } as Detector;
 
-  return apiRequest;
+  return detectorBody;
 }
-
-// TODO: do we need filter & features information here?? or this fn at all??
-// export const formikToUIMetadata = (values: any, detector: Detector) => {
-//   return {
-//     filterType: values.filterType,
-//     filters: formikFiltersToUiMetadata(values.filters),
-//     features: get(detector, 'uiMetadata.features', {}),
-//   };
-// };
 
 export const formikFiltersToUiMetadata = (filters: UIFilter[]) =>
   filters.length > 0 ? filters : [];
 
-export const formikToFilterQuery = (
+export const formikToFilterQuery = (values: any) => {
+  let filterQuery = {};
+  if (values.filterType === FILTER_TYPES.SIMPLE) {
+    filterQuery = formikToSimpleFilterQuery(values.filters);
+  } else {
+    try {
+      filterQuery = JSON.parse(values.filterQuery);
+    } catch (e) {
+      //This should mostly not happen as we have validation before submit
+      filterQuery = {};
+    }
+  }
+  return filterQuery;
+};
+
+export const formikToSimpleFilterQuery = (
   filters: UIFilter[]
 ): { [key: string]: any } => {
   if (filters.length > 0) {
@@ -458,7 +458,7 @@ export function formikToFeatures(
   return featureAttribute;
 }
 
-export function formikToUIMetadata(values: FeaturesFormikValues[]) {
+export function featuresToUIMetadata(values: FeaturesFormikValues[]) {
   // TODO:: Delete Stale metadata if name is changed
   let features: {
     [key: string]: UiFeature;
@@ -484,7 +484,7 @@ export function formikToUIMetadata(values: FeaturesFormikValues[]) {
 
 function formikToFeatureAttributes(
   values: FeaturesFormikValues[],
-  forPreview: boolean
+  forPreview: boolean = false
 ): FeatureAttributes[] {
   return values.map(function (value) {
     const id = forPreview
