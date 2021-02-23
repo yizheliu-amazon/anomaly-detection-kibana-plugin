@@ -13,62 +13,134 @@
  * permissions and limitations under the License.
  */
 
-import React from 'react';
 import {
-  EuiSpacer,
-  EuiText,
-  EuiFlexGroup,
+  EuiPageBody,
+  EuiPageHeader,
+  EuiPageHeaderSection,
   EuiFlexItem,
+  EuiFlexGroup,
+  EuiPage,
   EuiButton,
+  EuiTitle,
   EuiButtonEmpty,
+  EuiSpacer,
 } from '@elastic/eui';
+import { FormikProps, Formik } from 'formik';
+import { isEmpty } from 'lodash';
+import React, { Fragment, useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { BREADCRUMBS } from '../../../utils/constants';
+import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
+import { CoreStart } from '../../../../../../src/core/public';
+import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
+import { CreateDetectorFormikValues } from '../models/interfaces';
+import { DetectorDefinitionFields } from '../components/DetectorDefinitionFields';
 
 interface ReviewAndCreateProps {
   setStep(stepNumber: number): void;
   handleCancelClick(): void;
-  onCreate(): void;
+  initialValues: CreateDetectorFormikValues;
 }
 
-export const ReviewAndCreate = (props: ReviewAndCreateProps) => {
+export function ReviewAndCreate(props: ReviewAndCreateProps) {
+  const core = React.useContext(CoreServicesContext) as CoreStart;
+  const dispatch = useDispatch();
+  useHideSideNavBar(true, false);
+
+  useEffect(() => {
+    core.chrome.setBreadcrumbs([
+      BREADCRUMBS.ANOMALY_DETECTOR,
+      BREADCRUMBS.DETECTORS,
+      BREADCRUMBS.CREATE_DETECTOR,
+    ]);
+  }, []);
+
+  const handleFormValidation = async (
+    formikProps: FormikProps<CreateDetectorFormikValues>
+  ) => {
+    try {
+      formikProps.setSubmitting(true);
+
+      // TODO: do the submission here - look at existing create logic for doing this
+    } catch (e) {
+    } finally {
+      formikProps.setSubmitting(false);
+    }
+  };
+
   return (
-    <React.Fragment>
-      <EuiText>Review and create detector here</EuiText>
-      <EuiSpacer />
-      <EuiFlexGroup alignItems="center" justifyContent="flexEnd" gutterSize="s">
-        <EuiFlexItem grow={false}>
-          <EuiButtonEmpty onClick={props.handleCancelClick}>
-            Cancel
-          </EuiButtonEmpty>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiButton
-            iconSide="left"
-            iconType="arrowLeft"
-            fill={false}
-            data-test-subj="reviewAndCreatePreviousButton"
-            //isLoading={formikProps.isSubmitting}
-            //@ts-ignore
-            onClick={() => {
-              props.setStep(3);
+    <Formik
+      initialValues={props.initialValues}
+      onSubmit={() => {}}
+      validateOnMount={true}
+    >
+      {(formikProps) => (
+        <Fragment>
+          <EuiPage
+            style={{
+              marginTop: '-24px',
             }}
           >
-            Previous
-          </EuiButton>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiButton
-            fill={true}
-            data-test-subj="reviewAndCreateButton"
-            //isLoading={formikProps.isSubmitting}
-            //@ts-ignore
-            onClick={() => {
-              props.onCreate();
-            }}
+            <EuiPageBody>
+              <EuiPageHeader>
+                <EuiPageHeaderSection>
+                  <EuiTitle size="l">
+                    <h1>Review and create </h1>
+                  </EuiTitle>
+                </EuiPageHeaderSection>
+              </EuiPageHeader>
+              <DetectorDefinitionFields
+                onEditDetectorDefinition={() => props.setStep(1)}
+                fields={props.initialValues}
+                isCreate={true}
+              />
+              <EuiSpacer />
+            </EuiPageBody>
+          </EuiPage>
+
+          <EuiFlexGroup
+            alignItems="center"
+            justifyContent="flexEnd"
+            gutterSize="s"
+            style={{ marginRight: '12px' }}
           >
-            Create detector
-          </EuiButton>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    </React.Fragment>
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty onClick={props.handleCancelClick}>
+                Cancel
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButton
+                iconSide="left"
+                iconType="arrowLeft"
+                fill={false}
+                data-test-subj="reviewAndCreatePreviousButton"
+                //isLoading={formikProps.isSubmitting}
+                //@ts-ignore
+                onClick={() => {
+                  props.setStep(3);
+                }}
+              >
+                Previous
+              </EuiButton>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButton
+                type="submit"
+                fill={true}
+                data-test-subj="createDetectorButton"
+                isLoading={formikProps.isSubmitting}
+                //@ts-ignore
+                onClick={() => {
+                  console.log('Placeholder for creating');
+                }}
+              >
+                Create detector
+              </EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </Fragment>
+      )}
+    </Formik>
   );
-};
+}

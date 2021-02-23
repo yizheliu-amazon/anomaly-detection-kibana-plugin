@@ -37,6 +37,7 @@ import {
   DetectorDefinitionFormikValues,
   ModelConfigurationFormikValues,
   DetectorJobsFormikValues,
+  CreateDetectorFormikValues,
 } from '../models/interfaces';
 
 interface CreateDetectorRouterProps {
@@ -67,6 +68,11 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
   const [step3Fields, setStep3Fields] = useState<DetectorJobsFormikValues>(
     INITIAL_DETECTOR_JOB_VALUES
   );
+  const [step4Fields, setStep4Fields] = useState<CreateDetectorFormikValues>({
+    ...step1Fields,
+    ...step2Fields,
+    ...step3Fields,
+  });
 
   const [curStep, setCurStep] = useState<number>(1);
 
@@ -78,7 +84,7 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
     console.log('Placeholder for creating detector');
   };
 
-  const renderStep1Body = () => (
+  const step1Body = (
     <DefineDetector
       isEdit={false}
       setStep={setCurStep}
@@ -88,7 +94,7 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
       {...props}
     />
   );
-  const renderStep2Body = () => (
+  const step2Body = (
     <ConfigureModel
       isEdit={false}
       setStep={setCurStep}
@@ -110,10 +116,20 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
     <ReviewAndCreate
       setStep={setCurStep}
       handleCancelClick={handleCancelClick}
-      onCreate={onCreate}
+      initialValues={step4Fields}
     />
   );
 
+  // Hook to update the field values needed for the review step
+  useEffect(() => {
+    setStep4Fields({
+      ...step1Fields,
+      ...step2Fields,
+      ...step3Fields,
+    });
+  }, [step1Fields, step2Fields, step3Fields]);
+
+  // Hook to update the progress of the steps - undefined = blue, disabled = grey
   useEffect(() => {
     switch (curStep) {
       case 1:
@@ -175,9 +191,9 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
         </EuiFlexItem>
         <EuiFlexItem>
           {curStep === 1
-            ? renderStep1Body()
+            ? step1Body
             : curStep === 2
-            ? renderStep2Body()
+            ? step2Body
             : curStep === 3
             ? step3Body
             : curStep === 4

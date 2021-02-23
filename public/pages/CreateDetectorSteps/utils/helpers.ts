@@ -33,6 +33,7 @@ import {
   DetectorDefinitionFormikValues,
   ModelConfigurationFormikValues,
   FeaturesFormikValues,
+  CreateDetectorFormikValues,
 } from '../models/interfaces';
 import {
   INITIAL_DETECTOR_DEFINITION_VALUES,
@@ -500,3 +501,15 @@ function formikToFeatureAttributes(
     };
   });
 }
+
+// ********** added the following helper fns ************
+export const filtersToUIMetadata = (
+  values: CreateDetectorFormikValues
+  //detector: Detector
+) => {
+  return {
+    filterType: values.filterType,
+    filters: formikFiltersToUiMetadata(values.filters),
+    //features: get(detector, 'uiMetadata.features', {}),
+  };
+};

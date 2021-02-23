@@ -28,7 +28,6 @@ import {
 import { FormikProps, Formik } from 'formik';
 import { isEmpty } from 'lodash';
 import React, { Fragment, useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import { BREADCRUMBS } from '../../../utils/constants';
 import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
 import { CoreStart } from '../../../../../../src/core/public';
@@ -47,7 +46,6 @@ interface DetectorJobsProps {
 
 export function DetectorJobs(props: DetectorJobsProps) {
   const core = React.useContext(CoreServicesContext) as CoreStart;
-  const dispatch = useDispatch();
   useHideSideNavBar(true, false);
 
   const [realTime, setRealTime] = useState<boolean>(
@@ -112,7 +110,6 @@ export function DetectorJobs(props: DetectorJobsProps) {
       initialValues={props.initialValues}
       onSubmit={() => {}}
       validateOnMount={true}
-      //validate={() => {}}
     >
       {(formikProps) => (
         <Fragment>
@@ -181,7 +178,7 @@ export function DetectorJobs(props: DetectorJobsProps) {
                 iconSide="right"
                 iconType="arrowRight"
                 fill={true}
-                data-test-subj="configureJobsNextButton"
+                data-test-subj="detectorJobsNextButton"
                 isLoading={formikProps.isSubmitting}
                 //@ts-ignore
                 onClick={() => {
