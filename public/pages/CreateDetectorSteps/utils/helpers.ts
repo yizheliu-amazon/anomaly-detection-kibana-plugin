@@ -326,9 +326,8 @@ function featuresToFormik(detector: Detector): FeaturesFormikValues[] {
 
 //********** Originally in formikToDetector.ts *************
 
-// Modified to include all detector fields (used in create detector flow)
-// TODO: make similar ones for the sub-sections (formikToDetectorDefinition, formikToModelConfiguration)
-// that use some existing detector instead of formik values
+// Modified to include all detector fields
+// Used in create detector flow
 export function formikToDetector(values: CreateDetectorFormikValues): Detector {
   let detectorBody = {
     name: values.name,
@@ -352,6 +351,52 @@ export function formikToDetector(values: CreateDetectorFormikValues): Detector {
       startTime: convertTimestampToNumber(values.startTime),
       endTime: convertTimestampToNumber(values.endTime),
     },
+    categoryField: get(values, 'categoryField', []),
+  } as Detector;
+
+  return detectorBody;
+}
+
+// Used when editing detector definition
+export function formikToDetectorDefinition(
+  values: DetectorDefinitionFormikValues,
+  detector: Detector
+): Detector {
+  let detectorBody = {
+    ...detector,
+    name: values.name,
+    description: values.description,
+    indices: formikToIndices(values.index),
+    filterQuery: formikToFilterQuery(values),
+    uiMetadata: {
+      ...detector.uiMetadata,
+      ...filtersToUIMetadata(values),
+    },
+    timeField: values.timeField,
+    detectionInterval: {
+      period: { interval: values.interval, unit: UNITS.MINUTES },
+    },
+    windowDelay: {
+      period: { interval: values.windowDelay, unit: UNITS.MINUTES },
+    },
+  } as Detector;
+
+  return detectorBody;
+}
+
+// Used when editing model configuration
+export function formikToModelConfiguration(
+  values: ModelConfigurationFormikValues,
+  detector: Detector
+): Detector {
+  let detectorBody = {
+    ...detector,
+    uiMetadata: {
+      ...detector.uiMetadata,
+      features: { ...featuresToUIMetadata(values.featureList) },
+    },
+    featureAttributes: formikToFeatureAttributes(values.featureList),
+    shingleSize: values.shingleSize,
     categoryField: get(values, 'categoryField', []),
   } as Detector;
 
@@ -505,7 +550,7 @@ function formikToFeatureAttributes(
 
 // ********** added the following helper fns ************
 export const filtersToUIMetadata = (
-  values: CreateDetectorFormikValues
+  values: CreateDetectorFormikValues | DetectorDefinitionFormikValues
   //detector: Detector
 ) => {
   return {

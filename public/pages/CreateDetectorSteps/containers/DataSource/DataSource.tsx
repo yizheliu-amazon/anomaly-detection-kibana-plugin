@@ -13,9 +13,9 @@
  * permissions and limitations under the License.
  */
 
-import { EuiComboBox, EuiCallOut, EuiSpacer } from '@elastic/eui';
+import { EuiComboBox } from '@elastic/eui';
 import { Field, FieldProps, FormikProps } from 'formik';
-import { debounce, get, isEmpty } from 'lodash';
+import { debounce, get } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CatIndex, IndexAlias } from '../../../../../server/models/types';
@@ -26,7 +26,7 @@ import {
   getMappings,
   getPrioritizedIndices,
 } from '../../../../redux/reducers/elasticsearch';
-import { getError, isInvalid, required } from '../../../../utils/utils';
+import { getError, isInvalid } from '../../../../utils/utils';
 import { IndexOption } from '../../components/Datasource/IndexOption';
 import { getVisibleOptions, sanitizeSearchText } from '../../../utils/helpers';
 import { validateIndex } from '../../../utils/validate';
@@ -43,9 +43,6 @@ interface DataSourceProps {
 function DataSource(props: DataSourceProps) {
   const dispatch = useDispatch();
   const [queryText, setQueryText] = useState('');
-  const [indexName, setIndexName] = useState<string>(
-    props.formikProps.values.index[0]?.label
-  );
   const elasticsearchState = useSelector(
     (state: AppState) => state.elasticsearch
   );
@@ -55,10 +52,6 @@ function DataSource(props: DataSourceProps) {
     };
     getInitialIndices();
   }, []);
-
-  useEffect(() => {
-    setIndexName(props.formikProps.values.index[0]?.label);
-  }, [props.formikProps]);
 
   const handleSearchChange = debounce(async (searchValue: string) => {
     if (searchValue !== queryText) {
@@ -70,46 +63,16 @@ function DataSource(props: DataSourceProps) {
 
   const handleIndexNameChange = (selectedOptions: any) => {
     const indexName = get(selectedOptions, '0.label', '');
-    setIndexName(indexName);
     if (indexName !== '') {
       dispatch(getMappings(indexName));
     }
   };
 
-  const dateFields = Array.from(
-    get(elasticsearchState, 'dataTypes.date', []) as string[]
-  );
-
-  const timeStampFieldOptions = isEmpty(dateFields)
-    ? []
-    : dateFields.map((dateField) => ({ label: dateField }));
-
   const visibleIndices = get(elasticsearchState, 'indices', []) as CatIndex[];
   const visibleAliases = get(elasticsearchState, 'aliases', []) as IndexAlias[];
 
-  const isRemoteIndex = () => {
-    const initialIndex = get(
-      props.formikProps,
-      'initialValues.index.0.label',
-      ''
-    );
-    return indexName !== undefined
-      ? indexName.includes(':')
-      : initialIndex.includes(':');
-  };
-
   return (
     <ContentPanel title="Data Source" titleSize="s">
-      {isRemoteIndex() ? (
-        <div>
-          <EuiCallOut
-            title="This detector is using a remote cluster index, so you need to manually input the time field."
-            color="warning"
-            iconType="alert"
-          />
-          <EuiSpacer size="m" />
-        </div>
-      ) : null}
       <Field name="index" validate={validateIndex}>
         {({ field, form }: FieldProps) => {
           return (
@@ -156,37 +119,6 @@ function DataSource(props: DataSourceProps) {
             </FormattedFormRow>
           );
         }}
-      </Field>
-      <Field name="timeField" validate={required}>
-        {({ field, form }: FieldProps) => (
-          <FormattedFormRow
-            title="Timestamp field"
-            hint="Choose the time field you want to use for time filter."
-            isInvalid={isInvalid(field.name, form)}
-            error={getError(field.name, form)}
-          >
-            <EuiComboBox
-              id="timeField"
-              placeholder="Find timestamp"
-              options={timeStampFieldOptions}
-              onSearchChange={handleSearchChange}
-              onCreateOption={(createdOption: string) => {
-                const normalizedOptions = createdOption.trim();
-                if (!normalizedOptions) return;
-                form.setFieldValue('timeField', normalizedOptions);
-              }}
-              onBlur={() => {
-                form.setFieldTouched('timeField', true);
-              }}
-              onChange={(options) => {
-                form.setFieldValue('timeField', get(options, '0.label'));
-              }}
-              selectedOptions={(field.value && [{ label: field.value }]) || []}
-              singleSelection={{ asPlainText: true }}
-              isClearable={false}
-            />
-          </FormattedFormRow>
-        )}
       </Field>
       <DataFilter formikProps={props.formikProps} />
     </ContentPanel>

@@ -61,9 +61,7 @@ export const DetectorScheduleFields = (props: DetectorScheduleFieldsProps) => {
           <ConfigCell
             title="Real-time detector"
             description={
-              realTimeEnabled
-                ? 'Start automatically'
-                : `Don't start automatically`
+              realTimeEnabled ? 'Start automatically' : `Start manually`
             }
           />
         </EuiFlexItem>

@@ -45,8 +45,12 @@ import { BREADCRUMBS } from '../../../utils/constants';
 import { getErrorMessage, validateDetectorName } from '../../../utils/utils';
 import { DetectorInfo } from '../components/DetectorInfo';
 import { DataSource } from './DataSource';
+import { Timestamp } from '../components/Timestamp';
 import { Settings } from '../components/Settings';
-import { detectorDefinitionToFormik, formikToDetector } from '../utils/helpers';
+import {
+  detectorDefinitionToFormik,
+  formikToDetectorDefinition,
+} from '../utils/helpers';
 import { DetectorDefinitionFormikValues } from '../models/interfaces';
 import { Detector } from '../../../models/interfaces';
 import { prettifyErrorMessage } from '../../../../server/utils/helpers';
@@ -147,7 +151,10 @@ export const DefineDetector = (props: DefineDetectorProps) => {
         formikProps.validateForm().then((errors) => {
           if (isEmpty(errors)) {
             if (props.isEdit) {
-              const apiRequest = formikToDetector(formikProps.values, detector);
+              const apiRequest = formikToDetectorDefinition(
+                formikProps.values,
+                detector
+              );
               handleUpdate(apiRequest);
             } else {
               optionallySaveValues(formikProps.values);
@@ -240,6 +247,8 @@ export const DefineDetector = (props: DefineDetectorProps) => {
                   }
                   isEdit={props.isEdit}
                 />
+                <EuiSpacer />
+                <Timestamp formikProps={formikProps} />
                 <EuiSpacer />
                 <Settings />
               </Fragment>
