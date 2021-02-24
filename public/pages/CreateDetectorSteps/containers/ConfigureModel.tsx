@@ -224,7 +224,7 @@ export function ConfigureModel(props: ConfigureModelProps) {
               />
               <EuiSpacer />
               <AdvancedSettings />
-              <EuiSpacer />
+              {!isEmpty(detector) ? <EuiSpacer /> : null}
               {!isEmpty(detector) ? (
                 <SampleAnomalies
                   detector={detector}

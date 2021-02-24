@@ -112,7 +112,6 @@ export function ReviewAndCreate(props: ReviewAndCreateProps) {
                 onEditDetectorSchedule={() => props.setStep(3)}
                 values={props.values}
               />
-              <EuiSpacer />
             </EuiPageBody>
           </EuiPage>
 

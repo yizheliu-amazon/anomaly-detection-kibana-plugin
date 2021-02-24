@@ -137,7 +137,6 @@ export function DetectorJobs(props: DetectorJobsProps) {
                 historical={historical}
                 setHistorical={setHistorical}
               />
-              <EuiSpacer />
             </EuiPageBody>
           </EuiPage>
 
