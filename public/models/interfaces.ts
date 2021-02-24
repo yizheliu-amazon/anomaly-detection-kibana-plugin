@@ -66,7 +66,7 @@ export type FeatureAttributes = {
 };
 
 export enum UNITS {
-  MINUTES = 'MINUTES',
+  MINUTES = 'Minutes',
 }
 
 export type Schedule = {

@@ -98,7 +98,7 @@ export function ReviewAndCreate(props: ReviewAndCreateProps) {
               </EuiPageHeader>
               <DetectorDefinitionFields
                 onEditDetectorDefinition={() => props.setStep(1)}
-                fields={props.values}
+                detector={detectorToCreate}
                 isCreate={true}
               />
               <EuiSpacer />
