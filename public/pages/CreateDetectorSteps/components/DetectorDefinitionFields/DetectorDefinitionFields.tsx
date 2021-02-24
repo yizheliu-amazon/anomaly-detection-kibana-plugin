@@ -14,54 +14,18 @@
  */
 
 import ContentPanel from '../../../../components/ContentPanel/ContentPanel';
-import {
-  EuiFlexGrid,
-  EuiFlexItem,
-  EuiText,
-  EuiFormRow,
-  EuiButton,
-  EuiFormRowProps,
-} from '@elastic/eui';
+import { EuiFlexGrid, EuiFlexItem, EuiButton } from '@elastic/eui';
 import React from 'react';
-import moment from 'moment';
 import { get } from 'lodash';
 import { Detector } from '../../../../models/interfaces';
 import { FilterDisplay } from '../FilterDisplay';
+import { ConfigCell, FixedWidthRow } from '../ConfigCell';
+import { toStringConfigCell } from '../../utils/helpers';
 
 interface DetectorDefinitionFieldsProps {
   onEditDetectorDefinition(): void;
   detector: Detector;
   isCreate: boolean;
-}
-
-const FixedWidthRow = (props: EuiFormRowProps) => (
-  <EuiFormRow {...props} style={{ width: '250px' }} />
-);
-
-interface ConfigCellProps {
-  title: string;
-  description: string | string[];
-}
-
-const ConfigCell = (props: ConfigCellProps) => (
-  <FixedWidthRow label={props.title}>
-    <EuiText>
-      <p className="enabled">{props.description}</p>
-    </EuiText>
-  </FixedWidthRow>
-);
-
-export function toString(obj: any): string {
-  if (typeof obj != 'undefined') {
-    if (obj.hasOwnProperty('period')) {
-      let period = obj.period;
-      return period.interval + ' ' + period.unit;
-    } else if (typeof obj == 'number') {
-      // epoch
-      return moment(obj).format('MM/DD/YY hh:mm A');
-    }
-  }
-  return '-';
 }
 
 export const DetectorDefinitionFields = (
@@ -111,7 +75,9 @@ export const DetectorDefinitionFields = (
         <EuiFlexItem>
           <ConfigCell
             title="Window delay"
-            description={toString(get(props, 'detector.windowDelay', 0))}
+            description={toStringConfigCell(
+              get(props, 'detector.windowDelay', 0)
+            )}
           />
         </EuiFlexItem>
         {props.isCreate ? null : (
@@ -137,14 +103,18 @@ export const DetectorDefinitionFields = (
         <EuiFlexItem>
           <ConfigCell
             title="Detector interval"
-            description={toString(get(props, 'detector.detectionInterval', 0))}
+            description={toStringConfigCell(
+              get(props, 'detector.detectionInterval', 0)
+            )}
           />
         </EuiFlexItem>
         {props.isCreate ? null : (
           <EuiFlexItem>
             <ConfigCell
               title="Last Updated"
-              description={toString(get(props, 'detector.lastUpdateTime', ''))}
+              description={toStringConfigCell(
+                get(props, 'detector.lastUpdateTime', '')
+              )}
             />
           </EuiFlexItem>
         )}

@@ -27,6 +27,7 @@ import {
   UIFilter,
 } from '../../../models/interfaces';
 import { v4 as uuidv4 } from 'uuid';
+import moment from 'moment';
 import { get, forOwn, cloneDeep, isEmpty, snakeCase } from 'lodash';
 import { DataTypes } from '../../../redux/reducers/elasticsearch';
 import {
@@ -513,3 +514,16 @@ export const filtersToUIMetadata = (
     //features: get(detector, 'uiMetadata.features', {}),
   };
 };
+
+export function toStringConfigCell(obj: any): string {
+  if (typeof obj != 'undefined') {
+    if (obj.hasOwnProperty('period')) {
+      let period = obj.period;
+      return period.interval + ' ' + period.unit;
+    } else if (typeof obj == 'number') {
+      // epoch
+      return moment(obj).format('MM/DD/YY hh:mm A');
+    }
+  }
+  return '-';
+}

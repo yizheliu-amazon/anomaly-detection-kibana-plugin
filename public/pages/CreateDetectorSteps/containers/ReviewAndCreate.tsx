@@ -37,6 +37,7 @@ import { CreateDetectorFormikValues } from '../models/interfaces';
 import { DetectorDefinitionFields } from '../components/DetectorDefinitionFields';
 import { ModelConfigurationFields } from '../components/ModelConfigurationFields';
 import { formikToDetector } from '../utils/helpers';
+import { DetectorScheduleFields } from '../components/DetectorScheduleFields';
 
 interface ReviewAndCreateProps {
   setStep(stepNumber: number): void;
@@ -105,6 +106,11 @@ export function ReviewAndCreate(props: ReviewAndCreateProps) {
               <ModelConfigurationFields
                 onEditModelConfiguration={() => props.setStep(2)}
                 detector={detectorToCreate}
+              />
+              <EuiSpacer />
+              <DetectorScheduleFields
+                onEditDetectorSchedule={() => props.setStep(3)}
+                values={props.values}
               />
               <EuiSpacer />
             </EuiPageBody>

@@ -13,4 +13,24 @@
  * permissions and limitations under the License.
  */
 
-export { CustomAggregation } from './CustomAggregation';
+import { EuiText, EuiFormRow, EuiFormRowProps } from '@elastic/eui';
+import React from 'react';
+
+export const FixedWidthRow = (props: EuiFormRowProps) => (
+  <EuiFormRow {...props} style={{ width: '250px' }} />
+);
+
+interface ConfigCellProps {
+  title: string;
+  description: string | string[];
+}
+
+export const ConfigCell = (props: ConfigCellProps) => {
+  return (
+    <FixedWidthRow label={props.title}>
+      <EuiText>
+        <p className="enabled">{props.description}</p>
+      </EuiText>
+    </FixedWidthRow>
+  );
+};
