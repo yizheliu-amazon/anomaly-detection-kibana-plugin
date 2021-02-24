@@ -14,7 +14,7 @@
  */
 
 import React, { ReactElement, ReactNode } from 'react';
-import { EuiFormRow } from '@elastic/eui';
+import { EuiFormRow, EuiText, EuiLink, EuiIcon } from '@elastic/eui';
 
 type FormattedFormRowProps = {
   title?: string;
@@ -25,6 +25,7 @@ type FormattedFormRowProps = {
   error?: ReactNode | ReactNode[];
   fullWidth?: boolean;
   helpText?: string;
+  link?: string;
 };
 
 export const FormattedFormRow = (props: FormattedFormRowProps) => {
@@ -33,12 +34,19 @@ export const FormattedFormRow = (props: FormattedFormRowProps) => {
     const hintTexts = Array.isArray(props.hint) ? props.hint : [props.hint];
     hints = hintTexts.map((hint, i) => {
       return (
-        <p key={i} className="sublabel">
+        <EuiText key={i} className="sublabel">
           {hint}
-        </p>
+          {props.link ? ' ' : null}
+          {props.link ? (
+            <EuiLink href={props.link} target="_blank">
+              Learn more <EuiIcon size="s" type="popout" />
+            </EuiLink>
+          ) : null}
+        </EuiText>
       );
     });
   }
+
   const { formattedTitle, ...euiFormRowProps } = props;
 
   return (

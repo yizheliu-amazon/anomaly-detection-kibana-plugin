@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import { EuiHorizontalRule, EuiSelect } from '@elastic/eui';
+import { EuiHorizontalRule, EuiSelect, EuiLink } from '@elastic/eui';
 import { Field, FieldProps, FormikProps } from 'formik';
 import React, { Fragment } from 'react';
 import { getError, isInvalid, required } from '../../../../utils/utils';
@@ -43,8 +43,10 @@ function DataFilter(props: DataFilterProps) {
             }
             hint={[
               'Choose a subset of your data source to focus your data stream and reduce noisy data.',
-              'Use the visual editor to create a simple filter, or use the Elasticsearch query DSL to create more advanced filters.',
             ]}
+            link={
+              'https://opendistro.github.io/for-elasticsearch-docs/docs/ad/'
+            }
             isInvalid={isInvalid(field.name, form)}
             error={getError(field.name, form)}
           >
