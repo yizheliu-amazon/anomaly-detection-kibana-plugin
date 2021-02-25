@@ -25,7 +25,7 @@ type FormattedFormRowProps = {
   error?: ReactNode | ReactNode[];
   fullWidth?: boolean;
   helpText?: string;
-  link?: string;
+  hintLink?: string;
 };
 
 export const FormattedFormRow = (props: FormattedFormRowProps) => {
@@ -36,9 +36,9 @@ export const FormattedFormRow = (props: FormattedFormRowProps) => {
       return (
         <EuiText key={i} className="sublabel">
           {hint}
-          {props.link ? ' ' : null}
-          {props.link ? (
-            <EuiLink href={props.link} target="_blank">
+          {props.hintLink ? ' ' : null}
+          {props.hintLink ? (
+            <EuiLink href={props.hintLink} target="_blank">
               Learn more <EuiIcon size="s" type="popout" />
             </EuiLink>
           ) : null}

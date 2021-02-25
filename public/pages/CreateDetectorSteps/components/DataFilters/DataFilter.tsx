@@ -44,7 +44,7 @@ function DataFilter(props: DataFilterProps) {
             hint={[
               'Choose a subset of your data source to focus your data stream and reduce noisy data.',
             ]}
-            link={
+            hintLink={
               'https://opendistro.github.io/for-elasticsearch-docs/docs/ad/'
             }
             isInvalid={isInvalid(field.name, form)}
