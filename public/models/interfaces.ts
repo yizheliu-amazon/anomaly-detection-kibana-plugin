@@ -50,11 +50,14 @@ export enum OPERATORS_MAP {
 }
 
 export type UIFilter = {
-  fieldInfo: FieldInfo[];
-  operator: OPERATORS_MAP;
+  fieldInfo?: FieldInfo[];
+  operator?: OPERATORS_MAP;
   fieldValue?: string | number | null;
   fieldRangeStart?: number;
   fieldRangeEnd?: number;
+  filterType?: FILTER_TYPES;
+  query?: string;
+  label?: string;
 };
 
 export type FeatureAttributes = {
@@ -81,7 +84,7 @@ export type UiFeature = {
 };
 
 export type UiMetaData = {
-  filterType: FILTER_TYPES;
+  filterType?: FILTER_TYPES;
   filters: UIFilter[];
   features: {
     [key: string]: UiFeature;

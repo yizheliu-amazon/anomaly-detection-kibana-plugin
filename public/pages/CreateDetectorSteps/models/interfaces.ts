@@ -13,11 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import {
-  UIFilter,
-  FILTER_TYPES,
-  FEATURE_TYPE,
-} from '../../../models/interfaces';
+import { UIFilter, FEATURE_TYPE } from '../../../models/interfaces';
 import { AggregationOption } from './types';
 
 // Formik values used upon creation (includes all fields + those related to historical detector date range)
@@ -32,7 +28,6 @@ export interface DetectorDefinitionFormikValues {
   description: string;
   index: { label: string }[];
   filters: UIFilter[];
-  filterType: FILTER_TYPES;
   filterQuery: string;
   timeField: string;
   interval: number;

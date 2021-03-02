@@ -249,22 +249,18 @@ export function detectorDefinitionToFormik(
 ): DetectorDefinitionFormikValues {
   const initialValues = cloneDeep(INITIAL_DETECTOR_DEFINITION_VALUES);
   if (isEmpty(ad)) return initialValues;
-  //If detector id updated / added using API, convert all filters to Query boxes as we don't have any meta data.
-  const filterType =
-    get(ad, 'uiMetadata.filterType', undefined) || FILTER_TYPES.CUSTOM;
-  let filterQuery = JSON.stringify(
-    get(ad, 'filterQuery', { match_all: {} }),
-    null,
-    4
-  );
+
   return {
     ...initialValues,
     name: ad.name,
     description: ad.description,
     index: [{ label: ad.indices[0] }], // Currently we support only one index
-    filters: get(ad, 'uiMetadata.filters', []),
-    filterType,
-    filterQuery,
+    filters: filtersToFormik(get(ad, 'uiMetadata.filters', [])),
+    filterQuery: JSON.stringify(
+      get(ad, 'filterQuery', { match_all: {} }),
+      null,
+      4
+    ),
     timeField: ad.timeField,
     interval: get(ad, 'detectionInterval.period.interval', 10),
     windowDelay: get(ad, 'windowDelay.period.interval', 0),
@@ -293,6 +289,47 @@ export function modelConfigurationToFormik(
     //startTime: get(detector, 'detectionDateRange.startTime'),
     //endTime: get(detector, 'detectionDateRange.endTime'),
   };
+}
+
+function filtersToFormik(detector: Detector): UIFilter[] {
+  // Detectors created or updated using the API will not have metadata - create a custom filter in this case.
+  const noMetadata =
+    get(detector, 'uiMetadata.filterType') === undefined &&
+    get(detector, 'uiMetadata.filters') === undefined;
+  if (noMetadata) {
+    return [
+      {
+        filterType: FILTER_TYPES.CUSTOM,
+        query: JSON.stringify(
+          get(detector, 'filterQuery', { match_all: {} }),
+          null,
+          4
+        ),
+      },
+    ];
+  }
+
+  const curFilterType = get(detector, 'uiMetadata.filterType');
+  const curFilters = get(detector, 'uiMetadata.filters', []);
+  const curFilterQuery = JSON.stringify(
+    get(detector, 'filterQuery', { match_all: {} }),
+    null,
+    4
+  );
+
+  // If this is an old detector (has a base filter type): modify it by injecting that
+  // filter type into each existing filter
+  if (curFilterType !== undefined) {
+    curFilters.forEach((filter: UIFilter) => {
+      return {
+        ...filter,
+        filterType: curFilterType,
+        query:
+          curFilterType === FILTER_TYPES.CUSTOM ? curFilterQuery : undefined,
+      };
+    });
+  }
+  return curFilters;
 }
 
 function featuresToFormik(detector: Detector): FeaturesFormikValues[] {
@@ -336,7 +373,7 @@ export function formikToDetector(values: CreateDetectorFormikValues): Detector {
     filterQuery: formikToFilterQuery(values),
     uiMetadata: {
       features: { ...featuresToUIMetadata(values.featureList) },
-      ...filtersToUIMetadata(values),
+      filters: get(values, 'filters', []),
     },
     featureAttributes: formikToFeatureAttributes(values.featureList),
     timeField: values.timeField,
@@ -370,7 +407,7 @@ export function formikToDetectorDefinition(
     filterQuery: formikToFilterQuery(values),
     uiMetadata: {
       ...detector.uiMetadata,
-      ...filtersToUIMetadata(values),
+      filters: get(values, 'filters', []),
     },
     timeField: values.timeField,
     detectionInterval: {
@@ -402,24 +439,6 @@ export function formikToModelConfiguration(
 
   return detectorBody;
 }
-
-export const formikFiltersToUiMetadata = (filters: UIFilter[]) =>
-  filters.length > 0 ? filters : [];
-
-export const formikToFilterQuery = (values: any) => {
-  let filterQuery = {};
-  if (values.filterType === FILTER_TYPES.SIMPLE) {
-    filterQuery = formikToSimpleFilterQuery(values.filters);
-  } else {
-    try {
-      filterQuery = JSON.parse(values.filterQuery);
-    } catch (e) {
-      //This should mostly not happen as we have validation before submit
-      filterQuery = {};
-    }
-  }
-  return filterQuery;
-};
 
 export const formikToSimpleFilterQuery = (
   filters: UIFilter[]
@@ -549,15 +568,36 @@ function formikToFeatureAttributes(
 }
 
 // ********** added the following helper fns ************
-export const filtersToUIMetadata = (
+export const formikToFilterQuery = (
   values: CreateDetectorFormikValues | DetectorDefinitionFormikValues
-  //detector: Detector
 ) => {
-  return {
-    filterType: values.filterType,
-    filters: formikFiltersToUiMetadata(values.filters),
-    //features: get(detector, 'uiMetadata.features', {}),
-  };
+  let filterQuery = {};
+  const filters = get(values, 'filters', []);
+
+  // If we have filters: need to combine into a single filter query.
+  // Need to handle each filter type differently when converting
+  if (filters.length > 0) {
+    let filterArr = [] as any[];
+    filters.forEach((filter) => {
+      if (filter.filterType === FILTER_TYPES.SIMPLE) {
+        filterArr.push(
+          //@ts-ignore
+          OPERATORS_QUERY_MAP[filter.operator].query(filter)
+        );
+      } else {
+        filterArr.push(
+          //@ts-ignore
+          JSON.parse(filter.query)
+        );
+      }
+    });
+    filterQuery = {
+      bool: {
+        filter: [...filterArr],
+      },
+    };
+  }
+  return filterQuery;
 };
 
 export function toStringConfigCell(obj: any): string {
