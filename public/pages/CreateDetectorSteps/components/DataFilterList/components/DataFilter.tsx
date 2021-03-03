@@ -88,6 +88,7 @@ export const DataFilter = (props: DataFilterProps) => {
 
   const newFilterButton = (
     <EuiButtonEmpty
+      style={{ marginTop: '-2px' }}
       size="xs"
       onClick={() => {
         props.onOpen();
@@ -99,7 +100,7 @@ export const DataFilter = (props: DataFilterProps) => {
   );
 
   return (
-    <EuiFlexItem grow={false} style={{ marginBottom: '8px' }}>
+    <EuiFlexItem grow={false} style={{ marginBottom: '2px' }}>
       <EuiPopover
         ownFocus
         button={props.isNewFilter ? newFilterButton : badge}
