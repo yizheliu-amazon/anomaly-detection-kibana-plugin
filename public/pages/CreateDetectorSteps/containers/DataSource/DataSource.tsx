@@ -31,6 +31,7 @@ import { IndexOption } from '../../components/Datasource/IndexOption';
 import { getVisibleOptions, sanitizeSearchText } from '../../../utils/helpers';
 import { validateIndex } from '../../../utils/validate';
 import { DataFilter } from '../../components/DataFilters/DataFilter';
+import { DataFilterList } from '../../components/DataFilterList/DataFilterList';
 import { FormattedFormRow } from '../../components/FormattedFormRow/FormattedFormRow';
 import { DetectorDefinitionFormikValues } from '../../models/interfaces';
 
@@ -120,7 +121,8 @@ function DataSource(props: DataSourceProps) {
           );
         }}
       </Field>
-      <DataFilter formikProps={props.formikProps} />
+      {/* <DataFilter formikProps={props.formikProps} /> */}
+      <DataFilterList formikProps={props.formikProps} />
     </ContentPanel>
   );
 }

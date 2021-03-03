@@ -26,6 +26,7 @@ import {
   DetectorJobsFormikValues,
   FeaturesFormikValues,
 } from '../models/interfaces';
+import { DATA_TYPES } from '../../../utils/constants';
 
 export type STEP_STATUS =
   | 'incomplete'
@@ -66,6 +67,7 @@ export const FEATURE_FIELDS = [
 ];
 
 export const EMPTY_UI_FILTER: UIFilter = {
+  filterType: FILTER_TYPES.SIMPLE,
   fieldInfo: [],
   operator: OPERATORS_MAP.IS,
   fieldValue: '',
@@ -89,8 +91,33 @@ export const INITIAL_DETECTOR_DEFINITION_VALUES: DetectorDefinitionFormikValues 
   name: '',
   description: '',
   index: [],
-  filters: [],
-  filterType: FILTER_TYPES.SIMPLE,
+  //TODO: set filters back to [] when finished testing
+  filters: [
+    {
+      label: 'sample filter',
+      filterType: FILTER_TYPES.SIMPLE,
+      fieldInfo: [
+        {
+          label: 'some_field',
+          type: DATA_TYPES.BOOLEAN,
+        },
+      ],
+      operator: OPERATORS_MAP.IS,
+      fieldValue: 'some_value',
+    },
+    {
+      label: 'sample filter 2',
+      filterType: FILTER_TYPES.SIMPLE,
+      fieldInfo: [
+        {
+          label: 'some_field',
+          type: DATA_TYPES.BOOLEAN,
+        },
+      ],
+      operator: OPERATORS_MAP.IS,
+      fieldValue: 'some_value',
+    },
+  ],
   filterQuery: JSON.stringify({ bool: { filter: [] } }, null, 4),
   timeField: '',
   interval: 10,
