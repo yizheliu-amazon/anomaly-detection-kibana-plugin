@@ -92,32 +92,33 @@ export const INITIAL_DETECTOR_DEFINITION_VALUES: DetectorDefinitionFormikValues 
   description: '',
   index: [],
   //TODO: set filters back to [] when finished testing
-  filters: [
-    {
-      label: 'sample filter',
-      filterType: FILTER_TYPES.SIMPLE,
-      fieldInfo: [
-        {
-          label: 'some_field',
-          type: DATA_TYPES.BOOLEAN,
-        },
-      ],
-      operator: OPERATORS_MAP.IS,
-      fieldValue: 'some_value',
-    },
-    {
-      label: 'sample filter 2',
-      filterType: FILTER_TYPES.SIMPLE,
-      fieldInfo: [
-        {
-          label: 'some_field',
-          type: DATA_TYPES.BOOLEAN,
-        },
-      ],
-      operator: OPERATORS_MAP.IS,
-      fieldValue: 'some_value',
-    },
-  ],
+  filters: [],
+  // filters: [
+  //   {
+  //     label: 'sample filter',
+  //     filterType: FILTER_TYPES.SIMPLE,
+  //     fieldInfo: [
+  //       {
+  //         label: 'some_field',
+  //         type: DATA_TYPES.BOOLEAN,
+  //       },
+  //     ],
+  //     operator: OPERATORS_MAP.IS,
+  //     fieldValue: 'some_value',
+  //   },
+  //   {
+  //     label: 'sample filter 2',
+  //     filterType: FILTER_TYPES.SIMPLE,
+  //     fieldInfo: [
+  //       {
+  //         label: 'some_field',
+  //         type: DATA_TYPES.BOOLEAN,
+  //       },
+  //     ],
+  //     operator: OPERATORS_MAP.IS,
+  //     fieldValue: 'some_value',
+  //   },
+  // ],
   filterQuery: JSON.stringify({ bool: { filter: [] } }, null, 4),
   timeField: '',
   interval: 10,

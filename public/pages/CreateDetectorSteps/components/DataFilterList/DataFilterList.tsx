@@ -14,16 +14,11 @@
  */
 
 import {
-  EuiHorizontalRule,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiButton,
-  EuiBadge,
   EuiSpacer,
   EuiIcon,
   EuiButtonEmpty,
-  EuiPopover,
-  EuiText,
 } from '@elastic/eui';
 import { Field, FieldArray, FieldArrayRenderProps, FormikProps } from 'formik';
 import React, { useState, Fragment } from 'react';
@@ -32,10 +27,6 @@ import { DetectorDefinitionFormikValues } from '../../models/interfaces';
 import { UIFilter } from '../../../../models/interfaces';
 import { DataFilter } from './components/DataFilter';
 
-// import { FILTER_TYPES_OPTIONS } from './utils/constant';
-// import { SimpleFilter } from './SimpleFilter';
-// import { QueryDataFilter } from './QueryDataFilter';
-// import { FILTER_TYPES } from '../../../../models/interfaces';
 import { FormattedFormRow } from '../FormattedFormRow/FormattedFormRow';
 import { EMPTY_UI_FILTER } from '../../utils/constants';
 
@@ -44,9 +35,18 @@ interface DataFilterListProps {
 }
 
 export const DataFilterList = (props: DataFilterListProps) => {
+  const [openPopoverIndex, setOpenPopoverIndex] = useState<number>(-1);
+  const [isCreatingNewFilter, setIsCreatingNewFilter] = useState<boolean>(true);
+
   return (
     <FieldArray name="filters" validateOnChange={true}>
       {({ push, remove, replace, form: { values } }: FieldArrayRenderProps) => {
+        const lastFilterIndex = values.filters.length - 1;
+        if (isCreatingNewFilter && openPopoverIndex !== lastFilterIndex) {
+          setIsCreatingNewFilter(false);
+          remove(values.filters.length - 1);
+        }
+
         return (
           <Fragment>
             <FormattedFormRow
@@ -80,27 +80,45 @@ export const DataFilterList = (props: DataFilterListProps) => {
                       <DataFilter
                         filter={filter}
                         index={index}
-                        values={props.formikProps.values}
+                        values={values}
                         replace={() => replace}
-                        onSave={() => {}}
-                        onCancel={() => {}}
+                        onOpen={() => {}}
+                        onSave={() => {
+                          if (isCreatingNewFilter) {
+                            setIsCreatingNewFilter(false);
+                          }
+                        }}
+                        onCancel={() => {
+                          if (isCreatingNewFilter) {
+                            setIsCreatingNewFilter(false);
+                            remove(lastFilterIndex);
+                          }
+                        }}
                         onDelete={() => remove(index)}
-                        isNewFilter={false}
+                        openPopoverIndex={openPopoverIndex}
+                        setOpenPopoverIndex={setOpenPopoverIndex}
+                        isNewFilter={
+                          isCreatingNewFilter && index === lastFilterIndex
+                            ? true
+                            : false
+                        }
                       />
                     );
                   })}
-                  <EuiFlexItem grow={false} style={{ marginTop: '0px' }}>
-                    <DataFilter
-                      filter={EMPTY_UI_FILTER}
-                      index={values.filters.length}
-                      values={props.formikProps.values}
-                      replace={() => replace}
-                      onSave={() => push(EMPTY_UI_FILTER)}
-                      onCancel={() => {}}
-                      onDelete={() => remove(values.filters.length)}
-                      isNewFilter={true}
-                    />
-                  </EuiFlexItem>
+                  {isCreatingNewFilter && values.filters.length > 0 ? null : (
+                    <EuiFlexItem grow={false} style={{ marginTop: '0px' }}>
+                      <EuiButtonEmpty
+                        size="xs"
+                        onClick={() => {
+                          setIsCreatingNewFilter(true);
+                          push(EMPTY_UI_FILTER);
+                          setOpenPopoverIndex(lastFilterIndex + 1);
+                        }}
+                      >
+                        + Add data filter
+                      </EuiButtonEmpty>
+                    </EuiFlexItem>
+                  )}
                 </EuiFlexGroup>
               </Fragment>
             </FormattedFormRow>

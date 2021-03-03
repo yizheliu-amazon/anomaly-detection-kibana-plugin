@@ -27,6 +27,7 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 import React, { useState } from 'react';
+import { Field, FieldProps, FormikProps } from 'formik';
 import { UIFilter } from '../../../../../models/interfaces';
 import { SimpleFilter } from '../components/SimpleFilter';
 import { CustomFilter } from '../components/CustomFilter';
@@ -38,26 +39,33 @@ interface DataFilterProps {
   index: number;
   values: DetectorDefinitionFormikValues;
   replace(index: number, value: any): void;
+  onOpen(): void;
   onSave(): void;
   onCancel(): void;
   onDelete(): void;
+  openPopoverIndex: number;
+  setOpenPopoverIndex(index: number): void;
   isNewFilter: boolean;
 }
 
 export const DataFilter = (props: DataFilterProps) => {
-  const getFilterLabel = (filter: UIFilter) => {
-    return filter.label ? filter.label : 'Default label';
+  const isPopoverOpen = props.openPopoverIndex === props.index;
+  const openPopover = () => {
+    props.setOpenPopoverIndex(props.index);
   };
-
-  const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
-  const closePopover = () => setIsPopoverOpen(false);
-  const openPopover = () => setIsPopoverOpen(true);
+  const closePopover = () => {
+    props.setOpenPopoverIndex(-1);
+  };
 
   const [isSimple, setIsSimple] = useState<boolean>(true);
   const setToSimple = () => setIsSimple(true);
   const setToCustom = () => setIsSimple(false);
 
   const [isCustomLabel, setIsCustomLabel] = useState<boolean>(false);
+
+  const getFilterLabel = (filter: UIFilter) => {
+    return filter.label && isCustomLabel ? filter.label : 'Default label';
+  };
 
   const badge = (
     <EuiBadge
@@ -66,12 +74,10 @@ export const DataFilter = (props: DataFilterProps) => {
       iconType="cross"
       iconSide="right"
       iconOnClick={() => {
-        console.log('clicking delete here');
         props.onDelete();
       }}
       iconOnClickAriaLabel="onClick event for icon within the button"
       onClick={() => {
-        console.log('clicking edit here');
         openPopover();
       }}
       onClickAriaLabel="onClick event for the button"
@@ -84,6 +90,7 @@ export const DataFilter = (props: DataFilterProps) => {
     <EuiButtonEmpty
       size="xs"
       onClick={() => {
+        props.onOpen();
         openPopover();
       }}
     >
@@ -151,13 +158,24 @@ export const DataFilter = (props: DataFilterProps) => {
             </EuiFlexItem>
             {isCustomLabel ? (
               <EuiFlexItem>
-                <FormattedFormRow title="Custom label">
-                  <EuiFieldText
-                    name="customLabel"
-                    id="customLabel"
-                    placeholder="Enter a value"
-                  />
-                </FormattedFormRow>
+                <Field name={`filters.${props.index}.label`}>
+                  {({ field, form }: FieldProps) => (
+                    <FormattedFormRow title="Custom label">
+                      <EuiFieldText
+                        name="customLabel"
+                        id="customLabel"
+                        placeholder="Enter a value"
+                        onBlur={() => {
+                          form.setFieldTouched(
+                            `filters.${props.index}.label`,
+                            true
+                          );
+                        }}
+                        {...field}
+                      />
+                    </FormattedFormRow>
+                  )}
+                </Field>
               </EuiFlexItem>
             ) : null}
           </EuiFlexGroup>
@@ -166,13 +184,12 @@ export const DataFilter = (props: DataFilterProps) => {
             alignItems="center"
             justifyContent="flexEnd"
             gutterSize="s"
-            //style={{ marginRight: '12px' }}
           >
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
                 data-test-subj={`cancelFilter${props.index}Button`}
                 onClick={() => {
-                  console.log('canceling');
+                  props.onCancel();
                   closePopover();
                 }}
               >
@@ -186,7 +203,6 @@ export const DataFilter = (props: DataFilterProps) => {
                 data-test-subj={`saveFilter${props.index}Button`}
                 //isLoading={formikProps.isSubmitting}
                 onClick={() => {
-                  console.log('saving');
                   props.onSave();
                   closePopover();
                 }}

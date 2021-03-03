@@ -123,10 +123,16 @@ export const SimpleFilter = (props: SimpleFilterProps) => {
                     {...field}
                     onChange={(options) => {
                       //Reset operator and values
-                      props.replace(props.index, cloneDeep(EMPTY_UI_FILTER));
+                      //props.replace(props.index, cloneDeep(EMPTY_UI_FILTER));
                       form.setFieldValue(
                         `filters.${props.index}.fieldInfo`,
                         options
+                      );
+                    }}
+                    onBlur={() => {
+                      form.setFieldTouched(
+                        `filters.${props.index}.fieldInfo`,
+                        true
                       );
                     }}
                     onSearchChange={handleSearchFieldChange}
