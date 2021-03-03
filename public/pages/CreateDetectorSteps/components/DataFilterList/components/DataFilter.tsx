@@ -118,7 +118,12 @@ export const DataFilter = (props: DataFilterProps) => {
             replace={props.replace}
           />
         ) : (
-          <CustomFilter filter={props.filter} />
+          <CustomFilter
+            filter={props.filter}
+            index={props.index}
+            values={props.values}
+            replace={props.replace}
+          />
         )}
         <EuiSpacer />
         <EuiFlexGroup direction="column" style={{ margin: '0px' }}>

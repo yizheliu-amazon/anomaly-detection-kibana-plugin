@@ -16,23 +16,60 @@
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiButton,
-  EuiBadge,
-  EuiButtonEmpty,
-  EuiPopover,
-  EuiText,
+  EuiFormRow,
+  EuiCodeEditor,
 } from '@elastic/eui';
-import React, { useState } from 'react';
+import { Field, FieldProps } from 'formik';
+import React from 'react';
+import { getError, isInvalid, required } from '../../../../../utils/utils';
 import { UIFilter } from '../../../../../models/interfaces';
+import { DetectorDefinitionFormikValues } from '../../../models/interfaces';
 
 interface CustomFilterProps {
   filter: UIFilter;
+  index: number;
+  values: DetectorDefinitionFormikValues;
+  replace(index: number, value: any): void;
 }
 
 export const CustomFilter = (props: CustomFilterProps) => {
   return (
-    <EuiFlexItem>
-      <EuiText>Some code editor here</EuiText>
-    </EuiFlexItem>
+    <EuiFlexGroup
+      style={{ padding: '0px', width: '400px' }}
+      alignItems="stretch"
+      direction="column"
+    >
+      <EuiFlexItem grow={false}>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <Field name={`filters.${props.index}.query`} validate={required}>
+              {({ field, form }: FieldProps) => (
+                <EuiFormRow
+                  fullWidth
+                  label="Elasticsearch query DSL"
+                  isInvalid={isInvalid(field.name, form)}
+                  error={getError(field.name, form)}
+                >
+                  <EuiCodeEditor
+                    name="query"
+                    mode="json"
+                    width="100%"
+                    height="250px"
+                    theme="github"
+                    //isInvalid={isInvalid(field.name, form)}
+                    onChange={(query: string) => {
+                      //Reset operator and values
+                      form.setFieldValue(`filters.${props.index}.query`, query);
+                    }}
+                    onBlur={field.onBlur}
+                    value={field.value}
+                  />
+                </EuiFormRow>
+              )}
+            </Field>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </EuiFlexItem>
+    </EuiFlexGroup>
   );
 };
