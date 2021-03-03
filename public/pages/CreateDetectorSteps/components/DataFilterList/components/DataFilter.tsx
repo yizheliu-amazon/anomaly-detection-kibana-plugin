@@ -26,15 +26,18 @@ import {
   EuiFieldText,
   EuiSpacer,
 } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Field, FieldProps, FormikProps } from 'formik';
+import { get } from 'lodash';
 import { UIFilter } from '../../../../../models/interfaces';
 import { SimpleFilter } from '../components/SimpleFilter';
 import { CustomFilter } from '../components/CustomFilter';
 import { FormattedFormRow } from '../../FormattedFormRow/FormattedFormRow';
 import { DetectorDefinitionFormikValues } from '../../../models/interfaces';
+import { FILTER_TYPES } from '../../../../../models/interfaces';
 
 interface DataFilterProps {
+  formikProps: FormikProps<DetectorDefinitionFormikValues>;
   filter: UIFilter;
   index: number;
   values: DetectorDefinitionFormikValues;
@@ -57,11 +60,24 @@ export const DataFilter = (props: DataFilterProps) => {
     props.setOpenPopoverIndex(-1);
   };
 
-  const [isSimple, setIsSimple] = useState<boolean>(true);
-  const setToSimple = () => setIsSimple(true);
-  const setToCustom = () => setIsSimple(false);
+  const [filterType, setFilterType] = useState<FILTER_TYPES>(
+    get(props, 'filter.filterType', FILTER_TYPES.SIMPLE)
+  );
 
   const [isCustomLabel, setIsCustomLabel] = useState<boolean>(false);
+  const [customLabel, setCustomLabel] = useState<string>(
+    get(props, 'filter.label', '')
+  );
+
+  // Hook to update the custom label state
+  useEffect(() => {
+    setCustomLabel(get(props, 'filter.label', ''));
+  }, [props.filter?.label]);
+
+  // Hook to update the filter type state
+  useEffect(() => {
+    setFilterType(get(props, 'filter.filterType', FILTER_TYPES.SIMPLE));
+  }, [props.filter]);
 
   const getFilterLabel = (filter: UIFilter) => {
     return filter.label && isCustomLabel ? filter.label : 'Default label';
@@ -124,15 +140,25 @@ export const DataFilter = (props: DataFilterProps) => {
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
                 onClick={() => {
-                  isSimple ? setToCustom() : setToSimple();
+                  filterType === FILTER_TYPES.SIMPLE
+                    ? props.formikProps.setFieldValue(
+                        `filters.${props.index}.filterType`,
+                        FILTER_TYPES.CUSTOM
+                      )
+                    : props.formikProps.setFieldValue(
+                        `filters.${props.index}.filterType`,
+                        FILTER_TYPES.SIMPLE
+                      );
                 }}
               >
-                {isSimple ? 'Use query DSL' : 'Use visual editor'}
+                {filterType === FILTER_TYPES.SIMPLE
+                  ? 'Use query DSL'
+                  : 'Use visual editor'}
               </EuiButtonEmpty>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPopoverTitle>
-        {isSimple ? (
+        {filterType === FILTER_TYPES.SIMPLE ? (
           <SimpleFilter
             filter={props.filter}
             index={props.index}
@@ -159,24 +185,17 @@ export const DataFilter = (props: DataFilterProps) => {
             </EuiFlexItem>
             {isCustomLabel ? (
               <EuiFlexItem>
-                <Field name={`filters.${props.index}.label`}>
-                  {({ field, form }: FieldProps) => (
-                    <FormattedFormRow title="Custom label">
-                      <EuiFieldText
-                        name="customLabel"
-                        id="customLabel"
-                        placeholder="Enter a value"
-                        onBlur={() => {
-                          form.setFieldTouched(
-                            `filters.${props.index}.label`,
-                            true
-                          );
-                        }}
-                        {...field}
-                      />
-                    </FormattedFormRow>
-                  )}
-                </Field>
+                <FormattedFormRow title="Custom label">
+                  <EuiFieldText
+                    name="customLabel"
+                    id="customLabel"
+                    placeholder="Enter a value"
+                    value={customLabel}
+                    onChange={(e) => {
+                      setCustomLabel(e.target.value);
+                    }}
+                  />
+                </FormattedFormRow>
               </EuiFlexItem>
             ) : null}
           </EuiFlexGroup>
@@ -205,6 +224,10 @@ export const DataFilter = (props: DataFilterProps) => {
                 //isLoading={formikProps.isSubmitting}
                 onClick={() => {
                   props.onSave();
+                  props.formikProps.setFieldValue(
+                    `filters.${props.index}.label`,
+                    customLabel
+                  );
                   closePopover();
                 }}
               >

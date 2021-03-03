@@ -24,7 +24,7 @@ import { Field, FieldArray, FieldArrayRenderProps, FormikProps } from 'formik';
 import React, { useState, Fragment } from 'react';
 import { getError, isInvalid, required } from '../../../../utils/utils';
 import { DetectorDefinitionFormikValues } from '../../models/interfaces';
-import { UIFilter } from '../../../../models/interfaces';
+import { UIFilter, FILTER_TYPES } from '../../../../models/interfaces';
 import { DataFilter } from './components/DataFilter';
 
 import { FormattedFormRow } from '../FormattedFormRow/FormattedFormRow';
@@ -44,7 +44,7 @@ export const DataFilterList = (props: DataFilterListProps) => {
         const lastFilterIndex = values.filters.length - 1;
         if (isCreatingNewFilter && openPopoverIndex !== lastFilterIndex) {
           setIsCreatingNewFilter(false);
-          remove(values.filters.length - 1);
+          remove(lastFilterIndex);
         }
 
         return (
@@ -78,6 +78,7 @@ export const DataFilterList = (props: DataFilterListProps) => {
                   {values.filters.map((filter: UIFilter, index: number) => {
                     return (
                       <DataFilter
+                        formikProps={props.formikProps}
                         filter={filter}
                         index={index}
                         values={values}

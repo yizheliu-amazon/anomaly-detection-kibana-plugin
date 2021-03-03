@@ -25,7 +25,11 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getAllFields } from '../../../../../redux/selectors/elasticsearch';
 import { cloneDeep, get, debounce, includes } from 'lodash';
-import { getError, isInvalid, required } from '../../../../../utils/utils';
+import {
+  getError,
+  isInvalid,
+  requiredNonEmptyArray,
+} from '../../../../../utils/utils';
 import { UIFilter } from '../../../../../models/interfaces';
 import { DATA_TYPES } from '../../../../../utils/constants';
 import { EMPTY_UI_FILTER } from '../../../utils/constants';
@@ -92,7 +96,8 @@ export const SimpleFilter = (props: SimpleFilterProps) => {
           <EuiFlexItem>
             <Field
               name={`filters.${props.index}.fieldInfo`}
-              validate={required}
+              validate={requiredNonEmptyArray}
+              validateOnChange={true}
             >
               {({ field, form }: FieldProps) => (
                 <EuiFormRow
@@ -130,10 +135,7 @@ export const SimpleFilter = (props: SimpleFilterProps) => {
                       );
                     }}
                     onBlur={() => {
-                      form.setFieldTouched(
-                        `filters.${props.index}.fieldInfo`,
-                        true
-                      );
+                      form.setFieldTouched(`filters.${props.index}.fieldInfo`);
                     }}
                     onSearchChange={handleSearchFieldChange}
                     isInvalid={isInvalid(field.name, form)}
