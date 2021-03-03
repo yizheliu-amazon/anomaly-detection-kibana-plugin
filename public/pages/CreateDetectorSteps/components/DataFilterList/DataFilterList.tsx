@@ -31,7 +31,6 @@ import { getError, isInvalid, required } from '../../../../utils/utils';
 import { DetectorDefinitionFormikValues } from '../../models/interfaces';
 import { UIFilter } from '../../../../models/interfaces';
 import { DataFilter } from './components/DataFilter';
-import { NewDataFilterButton } from './components/NewDataFilterButton';
 
 // import { FILTER_TYPES_OPTIONS } from './utils/constant';
 // import { SimpleFilter } from './SimpleFilter';
@@ -83,13 +82,23 @@ export const DataFilterList = (props: DataFilterListProps) => {
                         index={index}
                         values={props.formikProps.values}
                         replace={() => replace}
+                        onSave={() => {}}
+                        onCancel={() => {}}
                         onDelete={() => remove(index)}
+                        isNewFilter={false}
                       />
                     );
                   })}
                   <EuiFlexItem grow={false} style={{ marginTop: '0px' }}>
-                    <NewDataFilterButton
-                      onCreate={() => push(EMPTY_UI_FILTER)}
+                    <DataFilter
+                      filter={EMPTY_UI_FILTER}
+                      index={values.filters.length}
+                      values={props.formikProps.values}
+                      replace={() => replace}
+                      onSave={() => push(EMPTY_UI_FILTER)}
+                      onCancel={() => {}}
+                      onDelete={() => remove(values.filters.length)}
+                      isNewFilter={true}
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>

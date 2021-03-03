@@ -38,7 +38,10 @@ interface DataFilterProps {
   index: number;
   values: DetectorDefinitionFormikValues;
   replace(index: number, value: any): void;
+  onSave(): void;
+  onCancel(): void;
   onDelete(): void;
+  isNewFilter: boolean;
 }
 
 export const DataFilter = (props: DataFilterProps) => {
@@ -77,11 +80,22 @@ export const DataFilter = (props: DataFilterProps) => {
     </EuiBadge>
   );
 
+  const newFilterButton = (
+    <EuiButtonEmpty
+      size="xs"
+      onClick={() => {
+        openPopover();
+      }}
+    >
+      + Add data filter
+    </EuiButtonEmpty>
+  );
+
   return (
     <EuiFlexItem grow={false} style={{ marginBottom: '8px' }}>
       <EuiPopover
         ownFocus
-        button={badge}
+        button={props.isNewFilter ? newFilterButton : badge}
         isOpen={isPopoverOpen}
         closePopover={closePopover}
         anchorPosition="downCenter"
@@ -173,6 +187,7 @@ export const DataFilter = (props: DataFilterProps) => {
                 //isLoading={formikProps.isSubmitting}
                 onClick={() => {
                   console.log('saving');
+                  props.onSave();
                   closePopover();
                 }}
               >
