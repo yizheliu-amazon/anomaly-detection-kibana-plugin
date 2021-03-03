@@ -81,6 +81,8 @@ export const DataFilterList = (props: DataFilterListProps) => {
                       <DataFilter
                         filter={filter}
                         index={index}
+                        values={props.formikProps.values}
+                        replace={() => replace}
                         onDelete={() => remove(index)}
                       />
                     );

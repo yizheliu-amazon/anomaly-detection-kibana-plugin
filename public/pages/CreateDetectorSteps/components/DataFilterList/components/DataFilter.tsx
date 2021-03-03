@@ -31,10 +31,13 @@ import { UIFilter } from '../../../../../models/interfaces';
 import { SimpleFilter } from '../components/SimpleFilter';
 import { CustomFilter } from '../components/CustomFilter';
 import { FormattedFormRow } from '../../FormattedFormRow/FormattedFormRow';
+import { DetectorDefinitionFormikValues } from '../../../models/interfaces';
 
 interface DataFilterProps {
   filter: UIFilter;
   index: number;
+  values: DetectorDefinitionFormikValues;
+  replace(index: number, value: any): void;
   onDelete(): void;
 }
 
@@ -108,7 +111,12 @@ export const DataFilter = (props: DataFilterProps) => {
           </EuiFlexGroup>
         </EuiPopoverTitle>
         {isSimple ? (
-          <SimpleFilter filter={props.filter} />
+          <SimpleFilter
+            filter={props.filter}
+            index={props.index}
+            values={props.values}
+            replace={props.replace}
+          />
         ) : (
           <CustomFilter filter={props.filter} />
         )}
