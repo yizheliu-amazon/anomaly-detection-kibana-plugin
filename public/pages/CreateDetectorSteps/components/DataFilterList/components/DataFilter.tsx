@@ -27,8 +27,8 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 import React, { useState, useEffect } from 'react';
-import { Field, FieldProps, FormikProps } from 'formik';
-import { get } from 'lodash';
+import { FormikProps } from 'formik';
+import { get, isEmpty } from 'lodash';
 import { UIFilter } from '../../../../../models/interfaces';
 import { SimpleFilter } from '../components/SimpleFilter';
 import { CustomFilter } from '../components/CustomFilter';
@@ -78,7 +78,6 @@ export const DataFilter = (props: DataFilterProps) => {
   };
   const closePopover = () => {
     props.setOpenPopoverIndex(-1);
-    //setIsClosing(true);
   };
 
   // If the user cancels or clicks away without saving: replace any changed
@@ -124,6 +123,35 @@ export const DataFilter = (props: DataFilterProps) => {
     return filter?.label && isCustomLabel ? filter.label : 'Default label';
   };
 
+  const handleFormValidation = async (
+    formikProps: FormikProps<DetectorDefinitionFormikValues>
+  ) => {
+    try {
+      formikProps.setSubmitting(true);
+      if (get(props, 'filter.filterType') === FILTER_TYPES.SIMPLE) {
+        formikProps.setFieldTouched(`filters.${props.index}.fieldInfo`);
+        formikProps.setFieldTouched(`filters.${props.index}.operator`);
+        formikProps.setFieldTouched(`filters.${props.index}.fieldValue`);
+        formikProps.setFieldTouched(`filters.${props.index}.fieldRangeStart`);
+        formikProps.setFieldTouched(`filters.${props.index}.fieldRangeEnd`);
+      } else {
+        formikProps.setFieldTouched(`filters.${props.index}.query`);
+      }
+      formikProps.validateForm().then((errors) => {
+        if (isEmpty(get(errors, `filters.${props.index}`, []))) {
+          setIsSaving(true);
+          props.onSave();
+          closePopover();
+        } else {
+          setIsSaving(false);
+        }
+      });
+    } catch (e) {
+    } finally {
+      formikProps.setSubmitting(false);
+    }
+  };
+
   const badge = (
     <EuiBadge
       key={props.index}
@@ -159,7 +187,7 @@ export const DataFilter = (props: DataFilterProps) => {
   return (
     <EuiFlexItem grow={false} style={{ marginBottom: '2px' }}>
       <EuiPopover
-        ownFocus
+        ownFocus={true}
         button={props.isNewFilter ? newFilterButton : badge}
         isOpen={isPopoverOpen}
         closePopover={closePopover}
@@ -259,13 +287,10 @@ export const DataFilter = (props: DataFilterProps) => {
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButton
-                //type="submit"
                 fill={true}
                 data-test-subj={`saveFilter${props.index}Button`}
-                //isLoading={formikProps.isSubmitting}
+                isLoading={props.formikProps.isSubmitting}
                 onClick={() => {
-                  setIsSaving(true);
-                  props.onSave();
                   props.formikProps.setFieldValue(
                     `filters.${props.index}.filterType`,
                     filterType
@@ -274,7 +299,7 @@ export const DataFilter = (props: DataFilterProps) => {
                     `filters.${props.index}.label`,
                     customLabel
                   );
-                  closePopover();
+                  handleFormValidation(props.formikProps);
                 }}
               >
                 Save

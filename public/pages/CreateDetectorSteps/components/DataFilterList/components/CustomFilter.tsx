@@ -24,6 +24,7 @@ import React from 'react';
 import { getError, isInvalid, required } from '../../../../../utils/utils';
 import { UIFilter } from '../../../../../models/interfaces';
 import { DetectorDefinitionFormikValues } from '../../../models/interfaces';
+import { validFilterQuery } from '../utils/helpers';
 
 interface CustomFilterProps {
   filter: UIFilter;
@@ -42,7 +43,10 @@ export const CustomFilter = (props: CustomFilterProps) => {
       <EuiFlexItem grow={false}>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <Field name={`filters.${props.index}.query`} validate={required}>
+            <Field
+              name={`filters.${props.index}.query`}
+              validate={validFilterQuery}
+            >
               {({ field, form }: FieldProps) => (
                 <EuiFormRow
                   fullWidth
@@ -56,12 +60,14 @@ export const CustomFilter = (props: CustomFilterProps) => {
                     width="100%"
                     height="250px"
                     theme="github"
-                    //isInvalid={isInvalid(field.name, form)}
+                    isInvalid={isInvalid(field.name, form)}
+                    error={getError(field.name, form)}
                     onChange={(query: string) => {
-                      //Reset operator and values
                       form.setFieldValue(`filters.${props.index}.query`, query);
                     }}
-                    onBlur={field.onBlur}
+                    onBlur={() => {
+                      form.setFieldTouched(`filters.${props.index}.query`);
+                    }}
                     value={field.value}
                   />
                 </EuiFormRow>

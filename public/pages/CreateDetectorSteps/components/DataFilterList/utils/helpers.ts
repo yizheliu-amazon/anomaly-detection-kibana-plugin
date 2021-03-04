@@ -101,7 +101,6 @@ export const validFilterQuery = (value: string) => {
   try {
     JSON.parse(value);
   } catch (err) {
-    console.log('Returning error');
     return 'Invalid JSON';
   }
 };

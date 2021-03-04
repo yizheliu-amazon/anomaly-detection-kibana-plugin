@@ -78,6 +78,9 @@ function FilterValue(props: FilterValueProps) {
                   <EuiFieldNumber
                     {...field}
                     isInvalid={isInvalid(field.name, form)}
+                    onBlur={() => {
+                      form.setFieldTouched(`filters.${props.index}.fieldValue`);
+                    }}
                   />
                 </EuiFormRow>
               )}
