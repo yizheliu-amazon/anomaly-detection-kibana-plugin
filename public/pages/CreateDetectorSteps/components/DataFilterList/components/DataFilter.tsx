@@ -53,8 +53,6 @@ interface DataFilterProps {
 }
 
 export const DataFilter = (props: DataFilterProps) => {
-  console.log('filter: ', props.filter);
-
   const isPopoverOpen = props.openPopoverIndex === props.index;
 
   const [isSaving, setIsSaving] = useState<boolean>(false);

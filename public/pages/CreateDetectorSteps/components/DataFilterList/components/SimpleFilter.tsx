@@ -24,17 +24,23 @@ import { Field, FieldProps } from 'formik';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getAllFields } from '../../../../../redux/selectors/elasticsearch';
-import { get, debounce, includes } from 'lodash';
+import { cloneDeep, get, debounce, includes } from 'lodash';
 import {
   getError,
   isInvalid,
   requiredNonEmptyArray,
 } from '../../../../../utils/utils';
-import { UIFilter } from '../../../../../models/interfaces';
+import { UIFilter, OPERATORS_MAP } from '../../../../../models/interfaces';
 import { DATA_TYPES } from '../../../../../utils/constants';
-import { getIndexFields, getOperators, isNullOperator } from '../utils/helpers';
+import {
+  getIndexFields,
+  getOperators,
+  isNullOperator,
+  isRangeOperator,
+} from '../utils/helpers';
 import FilterValue from './FilterValue';
 import { DetectorDefinitionFormikValues } from '../../../models/interfaces';
+import { EMPTY_UI_FILTER } from '../../../utils/constants';
 
 interface SimpleFilterProps {
   filter: UIFilter;
@@ -124,17 +130,21 @@ export const SimpleFilter = (props: SimpleFilterProps) => {
                       );
                       form.setFieldValue(
                         `filter.${props.index}.fieldValue`,
-                        ''
+                        EMPTY_UI_FILTER.fieldValue
                       );
                     }}
                     selectedOptions={field.value}
                     {...field}
                     onChange={(options) => {
                       //Reset operator and values
-                      //props.replace(props.index, cloneDeep(EMPTY_UI_FILTER));
+                      props.replace(props.index, cloneDeep(EMPTY_UI_FILTER));
                       form.setFieldValue(
                         `filters.${props.index}.fieldInfo`,
                         options
+                      );
+                      form.setFieldTouched(
+                        `filters.${props.index}.fieldValue`,
+                        false
                       );
                     }}
                     onBlur={() => {
@@ -158,6 +168,7 @@ export const SimpleFilter = (props: SimpleFilterProps) => {
                   <EuiSelect
                     id={`filters.${props.index}.operator`}
                     placeholder="Choose an operator"
+                    {...field}
                     options={getOperators(
                       get(
                         props.values,
@@ -165,7 +176,30 @@ export const SimpleFilter = (props: SimpleFilterProps) => {
                         DATA_TYPES.NUMBER
                       )
                     )}
-                    {...field}
+                    onChange={(e) => {
+                      const selectedOperator = e.target.value as OPERATORS_MAP;
+
+                      form.setFieldValue(
+                        `filters.${props.index}.operator`,
+                        selectedOperator
+                      );
+                      form.setFieldValue(
+                        `filters.${props.index}.fieldValue`,
+                        EMPTY_UI_FILTER.fieldValue
+                      );
+                      form.setFieldTouched(
+                        `filters.${props.index}.fieldValue`,
+                        false
+                      );
+                      form.setFieldValue(
+                        `filters.${props.index}.fieldRangeStart`,
+                        EMPTY_UI_FILTER.fieldRangeStart
+                      );
+                      form.setFieldValue(
+                        `filters.${props.index}.fieldRangeEnd`,
+                        EMPTY_UI_FILTER.fieldRangeEnd
+                      );
+                    }}
                   />
                 </EuiFormRow>
               )}
@@ -174,7 +208,9 @@ export const SimpleFilter = (props: SimpleFilterProps) => {
         </EuiFlexGroup>
       </EuiFlexItem>
       <EuiFlexItem grow={null}>
-        {isNullOperator(props.filter.operator) ? null : (
+        {isNullOperator(
+          get(props, 'filter.operator', OPERATORS_MAP.IS)
+        ) ? null : (
           <FilterValue
             dataType={get(
               props.values,

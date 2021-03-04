@@ -20,7 +20,7 @@ import {
   COMPARISON_OPERATOR,
 } from './constant';
 import { DATA_TYPES } from '../../../../../utils/constants';
-import { UIFilter } from '../../../../../models/interfaces';
+import { UIFilter, FILTER_TYPES } from '../../../../../models/interfaces';
 
 const allowedFilters = [
   DATA_TYPES.BOOLEAN,
@@ -62,11 +62,8 @@ export const isNullOperator = (selectedOperator: OPERATORS_MAP): boolean =>
   [OPERATORS_MAP.IS_NULL, OPERATORS_MAP.IS_NOT_NULL].includes(selectedOperator);
 
 export const displayText = (filter: UIFilter): string => {
-  const fieldName = get(filter, 'fieldInfo[0].label', undefined);
-  if (!fieldName) {
-    return 'Filter query';
-  }
-  const selectedOperator = filter.operator;
+  const fieldName = get(filter, 'fieldInfo[0].label', '');
+  const selectedOperator = filter.operator as OPERATORS_MAP;
   const operatorObj = COMPARISON_OPERATORS.find(
     (operator) => operator.value === selectedOperator
   ) || { text: '' };
@@ -106,14 +103,7 @@ export const validFilterQuery = (value: string) => {
 };
 
 export const getFilterLabel = (filter: UIFilter) => {
-  if (!filter) {
-    return '-';
-  }
-  return (
-    get(filter, 'fieldInfo.0.label', '') +
-    ' ' +
-    get(filter, 'operator') +
-    ' ' +
-    get(filter, 'fieldValue')
-  );
+  return filter.filterType === FILTER_TYPES.SIMPLE
+    ? displayText(filter)
+    : filter.query;
 };
