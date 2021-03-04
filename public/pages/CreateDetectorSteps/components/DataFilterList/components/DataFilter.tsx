@@ -35,6 +35,7 @@ import { CustomFilter } from '../components/CustomFilter';
 import { FormattedFormRow } from '../../FormattedFormRow/FormattedFormRow';
 import { DetectorDefinitionFormikValues } from '../../../models/interfaces';
 import { FILTER_TYPES } from '../../../../../models/interfaces';
+import { getFilterLabel } from '../utils/helpers';
 
 interface DataFilterProps {
   formikProps: FormikProps<DetectorDefinitionFormikValues>;
@@ -52,6 +53,8 @@ interface DataFilterProps {
 }
 
 export const DataFilter = (props: DataFilterProps) => {
+  console.log('filter: ', props.filter);
+
   const isPopoverOpen = props.openPopoverIndex === props.index;
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -62,6 +65,9 @@ export const DataFilter = (props: DataFilterProps) => {
   );
   const [isCustomLabel, setIsCustomLabel] = useState<boolean>(false);
   const [customLabel, setCustomLabel] = useState<string>(
+    get(props, 'filter.label', '')
+  );
+  const [labelToDisplay, setLabelToDisplay] = useState<string>(
     get(props, 'filter.label', '')
   );
 
@@ -119,9 +125,29 @@ export const DataFilter = (props: DataFilterProps) => {
     }
   }, [isClosing]);
 
-  const getFilterLabel = (filter: UIFilter) => {
-    return filter?.label && isCustomLabel ? filter.label : 'Default label';
-  };
+  // Update the displayed label if the user is saving
+  useEffect(() => {
+    if (isClosing && isSaving) {
+      if (isCustomLabel && customLabel.length > 0) {
+        setLabelToDisplay(customLabel);
+      } else {
+        setLabelToDisplay(getFilterLabel(props.filter));
+      }
+    }
+  }, [isClosing]);
+
+  // Update the displayed label if the filter itself changes (user deletes a filter and
+  // a new one falls into this index)
+  useEffect(() => {
+    if (props.filter) {
+      if (!isEmpty(props.filter.label)) {
+        //@ts-ignore
+        setLabelToDisplay(props.filter.label);
+      } else {
+        setLabelToDisplay(getFilterLabel(props.filter));
+      }
+    }
+  }, [props.filter]);
 
   const handleFormValidation = async (
     formikProps: FormikProps<DetectorDefinitionFormikValues>
@@ -167,7 +193,7 @@ export const DataFilter = (props: DataFilterProps) => {
       }}
       onClickAriaLabel="onClick event for the button"
     >
-      {getFilterLabel(props.filter)}
+      {labelToDisplay}
     </EuiBadge>
   );
 

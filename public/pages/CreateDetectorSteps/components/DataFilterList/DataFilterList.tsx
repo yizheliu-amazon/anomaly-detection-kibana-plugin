@@ -111,7 +111,10 @@ export const DataFilterList = (props: DataFilterListProps) => {
                             remove(lastFilterIndex);
                           }
                         }}
-                        onDelete={() => remove(index)}
+                        onDelete={() => {
+                          remove(index);
+                          setOpenPopoverIndex(-1);
+                        }}
                         openPopoverIndex={openPopoverIndex}
                         setOpenPopoverIndex={setOpenPopoverIndex}
                         isNewFilter={

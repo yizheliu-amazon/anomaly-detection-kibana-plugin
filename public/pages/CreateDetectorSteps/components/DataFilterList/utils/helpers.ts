@@ -104,3 +104,16 @@ export const validFilterQuery = (value: string) => {
     return 'Invalid JSON';
   }
 };
+
+export const getFilterLabel = (filter: UIFilter) => {
+  if (!filter) {
+    return '-';
+  }
+  return (
+    get(filter, 'fieldInfo.0.label', '') +
+    ' ' +
+    get(filter, 'operator') +
+    ' ' +
+    get(filter, 'fieldValue')
+  );
+};
