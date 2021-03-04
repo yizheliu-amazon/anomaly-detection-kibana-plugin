@@ -53,34 +53,75 @@ interface DataFilterProps {
 
 export const DataFilter = (props: DataFilterProps) => {
   const isPopoverOpen = props.openPopoverIndex === props.index;
-  const openPopover = () => {
-    props.setOpenPopoverIndex(props.index);
-  };
-  const closePopover = () => {
-    props.setOpenPopoverIndex(-1);
-  };
 
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [isClosing, setIsClosing] = useState<boolean>(false);
+  const [origFilter, setOrigFilter] = useState<UIFilter | undefined>(undefined);
   const [filterType, setFilterType] = useState<FILTER_TYPES>(
     get(props, 'filter.filterType', FILTER_TYPES.SIMPLE)
   );
-
   const [isCustomLabel, setIsCustomLabel] = useState<boolean>(false);
   const [customLabel, setCustomLabel] = useState<string>(
     get(props, 'filter.label', '')
   );
 
-  // Hook to update the custom label state
-  useEffect(() => {
-    setCustomLabel(get(props, 'filter.label', ''));
-  }, [props.filter?.label]);
-
-  // Hook to update the filter type state
-  useEffect(() => {
+  // When the popover is first opened: save the original filter values to replace in case
+  // the user cancels or clicks away
+  const openPopover = () => {
+    props.setOpenPopoverIndex(props.index);
+    setIsSaving(false);
+    setIsClosing(false);
+    setOrigFilter(props.filter);
     setFilterType(get(props, 'filter.filterType', FILTER_TYPES.SIMPLE));
-  }, [props.filter]);
+    setIsCustomLabel(get(props, 'filter.label', '').length > 0);
+    setCustomLabel(get(props, 'filter.label', ''));
+  };
+  const closePopover = () => {
+    props.setOpenPopoverIndex(-1);
+    //setIsClosing(true);
+  };
+
+  // If the user cancels or clicks away without saving: replace any changed
+  // values with the original filter values
+  useEffect(() => {
+    if (isClosing && !isSaving) {
+      props.formikProps.setFieldValue(
+        `filters.${props.index}.fieldInfo`,
+        origFilter?.fieldInfo
+      );
+      props.formikProps.setFieldValue(
+        `filters.${props.index}.operator`,
+        origFilter?.operator
+      );
+      props.formikProps.setFieldValue(
+        `filters.${props.index}.fieldValue`,
+        origFilter?.fieldValue
+      );
+      props.formikProps.setFieldValue(
+        `filters.${props.index}.fieldRangeStart`,
+        origFilter?.fieldRangeStart
+      );
+      props.formikProps.setFieldValue(
+        `filters.${props.index}.fieldRangeEnd`,
+        origFilter?.fieldRangeEnd
+      );
+      props.formikProps.setFieldValue(
+        `filters.${props.index}.filterType`,
+        origFilter?.filterType
+      );
+      props.formikProps.setFieldValue(
+        `filters.${props.index}.query`,
+        origFilter?.query
+      );
+      props.formikProps.setFieldValue(
+        `filters.${props.index}.label`,
+        origFilter?.label
+      );
+    }
+  }, [isClosing]);
 
   const getFilterLabel = (filter: UIFilter) => {
-    return filter.label && isCustomLabel ? filter.label : 'Default label';
+    return filter?.label && isCustomLabel ? filter.label : 'Default label';
   };
 
   const badge = (
@@ -123,6 +164,9 @@ export const DataFilter = (props: DataFilterProps) => {
         isOpen={isPopoverOpen}
         closePopover={closePopover}
         anchorPosition="downCenter"
+        onTrapDeactivation={() => {
+          setIsClosing(true);
+        }}
       >
         <EuiPopoverTitle>
           <EuiFlexGroup
@@ -141,14 +185,8 @@ export const DataFilter = (props: DataFilterProps) => {
               <EuiButtonEmpty
                 onClick={() => {
                   filterType === FILTER_TYPES.SIMPLE
-                    ? props.formikProps.setFieldValue(
-                        `filters.${props.index}.filterType`,
-                        FILTER_TYPES.CUSTOM
-                      )
-                    : props.formikProps.setFieldValue(
-                        `filters.${props.index}.filterType`,
-                        FILTER_TYPES.SIMPLE
-                      );
+                    ? setFilterType(FILTER_TYPES.CUSTOM)
+                    : setFilterType(FILTER_TYPES.SIMPLE);
                 }}
               >
                 {filterType === FILTER_TYPES.SIMPLE
@@ -180,7 +218,10 @@ export const DataFilter = (props: DataFilterProps) => {
               <EuiSwitch
                 label={<EuiText>Create custom label?</EuiText>}
                 checked={isCustomLabel}
-                onChange={() => setIsCustomLabel(!isCustomLabel)}
+                onChange={() => {
+                  setIsCustomLabel(!isCustomLabel);
+                  setCustomLabel('');
+                }}
               />
             </EuiFlexItem>
             {isCustomLabel ? (
@@ -223,7 +264,12 @@ export const DataFilter = (props: DataFilterProps) => {
                 data-test-subj={`saveFilter${props.index}Button`}
                 //isLoading={formikProps.isSubmitting}
                 onClick={() => {
+                  setIsSaving(true);
                   props.onSave();
+                  props.formikProps.setFieldValue(
+                    `filters.${props.index}.filterType`,
+                    filterType
+                  );
                   props.formikProps.setFieldValue(
                     `filters.${props.index}.label`,
                     customLabel
