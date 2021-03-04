@@ -24,7 +24,7 @@ import { Field, FieldProps } from 'formik';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getAllFields } from '../../../../../redux/selectors/elasticsearch';
-import { cloneDeep, get, debounce, includes } from 'lodash';
+import { get, debounce, includes } from 'lodash';
 import {
   getError,
   isInvalid,
@@ -32,7 +32,6 @@ import {
 } from '../../../../../utils/utils';
 import { UIFilter } from '../../../../../models/interfaces';
 import { DATA_TYPES } from '../../../../../utils/constants';
-import { EMPTY_UI_FILTER } from '../../../utils/constants';
 import { getIndexFields, getOperators, isNullOperator } from '../utils/helpers';
 import FilterValue from './FilterValue';
 import { DetectorDefinitionFormikValues } from '../../../models/interfaces';
@@ -123,6 +122,10 @@ export const SimpleFilter = (props: SimpleFilterProps) => {
                         `filters.${props.index}.fieldInfo`,
                         customOption
                       );
+                      form.setFieldValue(
+                        `filter.${props.index}.fieldValue`,
+                        ''
+                      );
                     }}
                     selectedOptions={field.value}
                     {...field}
@@ -176,7 +179,7 @@ export const SimpleFilter = (props: SimpleFilterProps) => {
             dataType={get(
               props.values,
               `filters.${props.index}.fieldInfo.0.type`,
-              'number'
+              'text'
             )}
             index={props.index}
             operator={props.filter.operator}

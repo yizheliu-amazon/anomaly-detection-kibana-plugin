@@ -19,12 +19,13 @@ import {
   EuiSpacer,
   EuiIcon,
   EuiButtonEmpty,
+  EuiCallOut,
 } from '@elastic/eui';
-import { Field, FieldArray, FieldArrayRenderProps, FormikProps } from 'formik';
+import { FieldArray, FieldArrayRenderProps, FormikProps } from 'formik';
 import React, { useState, Fragment } from 'react';
-import { getError, isInvalid, required } from '../../../../utils/utils';
+import { get } from 'lodash';
 import { DetectorDefinitionFormikValues } from '../../models/interfaces';
-import { UIFilter, FILTER_TYPES } from '../../../../models/interfaces';
+import { UIFilter } from '../../../../models/interfaces';
 import { DataFilter } from './components/DataFilter';
 
 import { FormattedFormRow } from '../FormattedFormRow/FormattedFormRow';
@@ -37,6 +38,9 @@ interface DataFilterListProps {
 export const DataFilterList = (props: DataFilterListProps) => {
   const [openPopoverIndex, setOpenPopoverIndex] = useState<number>(-1);
   const [isCreatingNewFilter, setIsCreatingNewFilter] = useState<boolean>(true);
+
+  const selectedIndex = get(props, 'formikProps.values.index.0.label', '');
+  const isRemoteIndex = selectedIndex.includes(':');
 
   return (
     <FieldArray name="filters" validateOnChange={true}>
@@ -68,6 +72,18 @@ export const DataFilterList = (props: DataFilterListProps) => {
             >
               <Fragment>
                 <EuiSpacer size="m" />
+                {isRemoteIndex ? (
+                  <div>
+                    <EuiCallOut
+                      title="A remote index is selected, so you need to manually input the filter fields."
+                      color="warning"
+                      iconType="alert"
+                      size="s"
+                      style={{ marginTop: '-4px' }}
+                    />
+                    <EuiSpacer size="m" />
+                  </div>
+                ) : null}
                 <EuiFlexGroup direction="row" gutterSize="xs">
                   <EuiFlexItem grow={false}>
                     <EuiIcon
