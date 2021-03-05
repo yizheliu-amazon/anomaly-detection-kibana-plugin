@@ -81,15 +81,20 @@ export const displayText = (filter: UIFilter): string => {
   }
 };
 
-export const validateRange = (
-  value: number | string,
-  filterValues: UIFilter
-): string | undefined => {
-  if (value == null || value === '') return 'Required';
-  if (filterValues.fieldRangeEnd && filterValues.fieldRangeEnd < value) {
+export const validateStart = (startVal: number | string, endVal: number) => {
+  if (startVal === '' || startVal === null || startVal === undefined) {
+    return 'Required';
+  }
+  if (endVal !== null && endVal !== undefined && startVal >= endVal) {
     return 'Start should be less than end';
   }
-  if (filterValues.fieldRangeStart && value < filterValues.fieldRangeStart) {
+};
+
+export const validateEnd = (endVal: number | string, startVal: number) => {
+  if (endVal === '' || endVal === null || endVal === undefined) {
+    return 'Required';
+  }
+  if (startVal !== null && startVal !== undefined && endVal <= startVal) {
     return 'End should be greater than start';
   }
 };

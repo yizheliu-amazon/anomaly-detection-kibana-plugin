@@ -23,11 +23,12 @@ import {
 } from '@elastic/eui';
 import { Field, FieldProps } from 'formik';
 import React from 'react';
+import { get } from 'lodash';
 import { UIFilter } from '../../../../../models/interfaces';
 import { DATA_TYPES } from '../../../../../utils/constants';
 import { getError, isInvalid, required } from '../../../../../utils/utils';
 import { OPERATORS_MAP, WHERE_BOOLEAN_FILTERS } from '../utils/constant';
-import { isRangeOperator, validateRange } from '../utils/helpers';
+import { isRangeOperator, validateStart, validateEnd } from '../utils/helpers';
 
 interface FilterValueProps {
   dataType: string;
@@ -44,8 +45,11 @@ function FilterValue(props: FilterValueProps) {
           <EuiFlexItem>
             <Field
               name={`filters.${props.index}.fieldRangeStart`}
-              validate={(rangeStartValue: number) =>
-                validateRange(rangeStartValue, props.filterValues)
+              validate={(val: number | string) =>
+                validateStart(
+                  val,
+                  get(props, 'filterValues.fieldRangeEnd', undefined)
+                )
               }
             >
               {({ field, form }: FieldProps) => (
@@ -65,8 +69,11 @@ function FilterValue(props: FilterValueProps) {
           <EuiFlexItem>
             <Field
               name={`filters.${props.index}.fieldRangeEnd`}
-              validate={(rangeEndValue: number) =>
-                validateRange(rangeEndValue, props.filterValues)
+              validate={(val: number | string) =>
+                validateEnd(
+                  val,
+                  get(props, 'filterValues.fieldRangeStart', undefined)
+                )
               }
             >
               {({ field, form }: FieldProps) => (
