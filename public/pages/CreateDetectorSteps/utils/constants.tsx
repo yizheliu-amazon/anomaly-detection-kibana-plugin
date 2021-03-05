@@ -71,6 +71,8 @@ export const EMPTY_UI_FILTER: UIFilter = {
   fieldInfo: [],
   operator: OPERATORS_MAP.IS,
   fieldValue: '',
+  query: '',
+  label: '',
 };
 
 export const INITIAL_FEATURE_VALUES: FeaturesFormikValues = {
@@ -91,34 +93,7 @@ export const INITIAL_DETECTOR_DEFINITION_VALUES: DetectorDefinitionFormikValues 
   name: '',
   description: '',
   index: [],
-  //TODO: set filters back to [] when finished testing
   filters: [],
-  // filters: [
-  //   {
-  //     label: 'sample filter',
-  //     filterType: FILTER_TYPES.SIMPLE,
-  //     fieldInfo: [
-  //       {
-  //         label: 'some_field',
-  //         type: DATA_TYPES.BOOLEAN,
-  //       },
-  //     ],
-  //     operator: OPERATORS_MAP.IS,
-  //     fieldValue: 'some_value',
-  //   },
-  //   {
-  //     label: 'sample filter 2',
-  //     filterType: FILTER_TYPES.SIMPLE,
-  //     fieldInfo: [
-  //       {
-  //         label: 'some_field',
-  //         type: DATA_TYPES.BOOLEAN,
-  //       },
-  //     ],
-  //     operator: OPERATORS_MAP.IS,
-  //     fieldValue: 'some_value',
-  //   },
-  // ],
   filterQuery: JSON.stringify({ bool: { filter: [] } }, null, 4),
   timeField: '',
   interval: 10,

@@ -212,6 +212,7 @@ export const DataFilter = (props: DataFilterProps) => {
     <EuiFlexItem grow={false} style={{ marginBottom: '2px' }}>
       <EuiPopover
         ownFocus={true}
+        initialFocus="[id=cancelSaveFilterButton]"
         button={props.isNewFilter ? newFilterButton : badge}
         isOpen={isPopoverOpen}
         closePopover={closePopover}
@@ -300,6 +301,7 @@ export const DataFilter = (props: DataFilterProps) => {
           >
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
+                id="cancelSaveFilterButton"
                 data-test-subj={`cancelFilter${props.index}Button`}
                 onClick={() => {
                   props.onCancel();
@@ -311,6 +313,7 @@ export const DataFilter = (props: DataFilterProps) => {
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButton
+                id="saveFilterButton"
                 fill={true}
                 data-test-subj={`saveFilter${props.index}Button`}
                 isLoading={props.formikProps.isSubmitting}

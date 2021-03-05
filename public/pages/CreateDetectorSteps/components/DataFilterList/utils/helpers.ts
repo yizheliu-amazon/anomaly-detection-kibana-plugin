@@ -21,6 +21,7 @@ import {
 } from './constant';
 import { DATA_TYPES } from '../../../../../utils/constants';
 import { UIFilter, FILTER_TYPES } from '../../../../../models/interfaces';
+import { isEmpty } from 'lodash';
 
 const allowedFilters = [
   DATA_TYPES.BOOLEAN,
@@ -110,5 +111,7 @@ export const validFilterQuery = (value: string) => {
 export const getFilterLabel = (filter: UIFilter) => {
   return filter.filterType === FILTER_TYPES.SIMPLE
     ? displayText(filter)
-    : filter.query;
+    : !isEmpty(filter.query)
+    ? filter.query
+    : 'Custom query';
 };
