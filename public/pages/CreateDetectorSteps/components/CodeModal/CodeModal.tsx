@@ -13,8 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import React, { Component } from 'react';
-
+import React from 'react';
 import {
   EuiModal,
   EuiModalBody,
@@ -28,49 +27,37 @@ interface CodeModalProps {
   code: string;
   title: string;
   subtitle?: string;
-  getModalVisibilityChange: () => boolean;
   closeModal: () => void;
 }
 
-export class CodeModal extends Component<CodeModalProps, {}> {
-  constructor(props: CodeModalProps) {
-    super(props);
-  }
+export const CodeModal = (props: CodeModalProps) => {
+  return (
+    <EuiOverlayMask>
+      <EuiModal onClose={props.closeModal}>
+        <EuiModalHeader>
+          <EuiModalHeaderTitle>
+            <div>
+              <p>{props.title}</p>
+              {props.subtitle ? (
+                <p className="modelSubtitle">{props.subtitle}</p>
+              ) : (
+                {}
+              )}
+            </div>
+          </EuiModalHeaderTitle>
+        </EuiModalHeader>
 
-  render() {
-    let modal;
-
-    if (this.props.getModalVisibilityChange()) {
-      modal = (
-        <EuiOverlayMask>
-          <EuiModal onClose={this.props.closeModal}>
-            <EuiModalHeader>
-              <EuiModalHeaderTitle>
-                <div>
-                  <p>{this.props.title}</p>
-                  {this.props.subtitle ? (
-                    <p className="modelSubtitle">{this.props.subtitle}</p>
-                  ) : (
-                    {}
-                  )}
-                </div>
-              </EuiModalHeaderTitle>
-            </EuiModalHeader>
-
-            <EuiModalBody>
-              <EuiCodeBlock
-                language="json"
-                paddingSize="s"
-                overflowHeight={300}
-                isCopyable
-              >
-                {this.props.code}
-              </EuiCodeBlock>
-            </EuiModalBody>
-          </EuiModal>
-        </EuiOverlayMask>
-      );
-    }
-    return <div>{modal}</div>;
-  }
-}
+        <EuiModalBody>
+          <EuiCodeBlock
+            language="json"
+            paddingSize="s"
+            overflowHeight={300}
+            isCopyable
+          >
+            {props.code}
+          </EuiCodeBlock>
+        </EuiModalBody>
+      </EuiModal>
+    </EuiOverlayMask>
+  );
+};

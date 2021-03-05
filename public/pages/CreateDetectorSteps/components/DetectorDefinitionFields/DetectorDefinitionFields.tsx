@@ -18,7 +18,7 @@ import { EuiFlexGrid, EuiFlexItem, EuiButton } from '@elastic/eui';
 import React from 'react';
 import { get } from 'lodash';
 import { Detector } from '../../../../models/interfaces';
-import { FilterDisplay } from '../FilterDisplay';
+import { FilterDisplayList } from '../FilterDisplayList';
 import { ConfigCell, FixedWidthRow } from '../ConfigCell';
 import { toStringConfigCell } from '../../utils/helpers';
 
@@ -69,7 +69,7 @@ export const DetectorDefinitionFields = (
         </EuiFlexItem>
         <EuiFlexItem>
           <FixedWidthRow label="Data filter">
-            <FilterDisplay {...filterInputs} />
+            <FilterDisplayList {...filterInputs} />
           </FixedWidthRow>
         </EuiFlexItem>
         <EuiFlexItem>

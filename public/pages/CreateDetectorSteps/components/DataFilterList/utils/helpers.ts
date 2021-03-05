@@ -63,6 +63,10 @@ export const isNullOperator = (selectedOperator: OPERATORS_MAP): boolean =>
   [OPERATORS_MAP.IS_NULL, OPERATORS_MAP.IS_NOT_NULL].includes(selectedOperator);
 
 export const displayText = (filter: UIFilter): string => {
+  if (!isEmpty(filter.label)) {
+    //@ts-ignore
+    return filter.label;
+  }
   const fieldName = get(filter, 'fieldInfo[0].label', '');
   const selectedOperator = filter.operator as OPERATORS_MAP;
   const operatorObj = COMPARISON_OPERATORS.find(

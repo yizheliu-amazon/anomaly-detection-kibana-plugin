@@ -13,4 +13,4 @@
  * permissions and limitations under the License.
  */
 
-export { FilterDisplay } from './FilterDisplay';
+export { FilterDisplayList } from './FilterDisplayList';
