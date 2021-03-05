@@ -99,8 +99,9 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
       isEdit={false}
       setStep={setCurStep}
       handleCancelClick={handleCancelClick}
-      initialValues={{ ...step1Fields, ...step2Fields }}
+      initialValues={step2Fields}
       setInitialValues={setStep2Fields}
+      detectorDefinitionValues={step1Fields}
       {...props}
     />
   );

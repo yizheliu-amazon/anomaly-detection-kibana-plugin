@@ -75,8 +75,6 @@ export function SampleAnomalies(props: SampleAnomaliesProps) {
     endDate: initialEndDate.valueOf(),
   });
 
-  console.log('detector passed to SampleAnomalies.tsx: ', props.detector);
-
   const [zoomRange, setZoomRange] = useState<DateRange>({
     startDate: initialStartDate.valueOf(),
     endDate: initialEndDate.valueOf(),

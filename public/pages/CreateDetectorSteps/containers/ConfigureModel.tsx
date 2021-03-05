@@ -50,7 +50,11 @@ import { AdvancedSettings } from '../components/AdvancedSettings';
 import { SampleAnomalies } from './SampleAnomalies';
 import { CoreStart } from '../../../../../../src/core/public';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
-import { ModelConfigurationFormikValues } from '../models/interfaces';
+import {
+  ModelConfigurationFormikValues,
+  DetectorDefinitionFormikValues,
+  CreateDetectorFormikValues,
+} from '../models/interfaces';
 import { DETECTOR_STATE } from '../../../../server/utils/constants';
 
 interface ConfigureModelRouterProps {
@@ -64,6 +68,7 @@ interface ConfigureModelProps
   handleCancelClick(): void;
   initialValues?: ModelConfigurationFormikValues;
   setInitialValues?(initialValues: ModelConfigurationFormikValues): void;
+  detectorDefinitionValues?: DetectorDefinitionFormikValues;
 }
 
 export function ConfigureModel(props: ConfigureModelProps) {
@@ -188,7 +193,10 @@ export function ConfigureModel(props: ConfigureModelProps) {
 
   const detectorToCreate = props.isEdit
     ? detector
-    : formikToDetector(props.initialValues);
+    : formikToDetector({
+        ...props.detectorDefinitionValues,
+        ...props.initialValues,
+      } as CreateDetectorFormikValues);
 
   return (
     <Formik
