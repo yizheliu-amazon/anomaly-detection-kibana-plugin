@@ -35,13 +35,7 @@ export default function adPlugin(Client: any, config: any, components: any) {
 
   ad.previewDetector = ca({
     url: {
-      fmt: `${API.DETECTOR_BASE}/<%=detectorId%>/_preview`,
-      req: {
-        detectorId: {
-          type: 'string',
-          required: true,
-        },
-      },
+      fmt: `${API.DETECTOR_BASE}/_preview`,
     },
     needBody: true,
     method: 'POST',

@@ -41,6 +41,7 @@ import {
   getShingleSizeFromObject,
   focusOnFirstWrongFeature,
   modelConfigurationToFormik,
+  formikToDetector,
   focusOnCategoryField,
 } from '../utils/helpers';
 import { Features } from '../components/Features';
@@ -185,6 +186,10 @@ export function ConfigureModel(props: ConfigureModelProps) {
     }
   };
 
+  const detectorToCreate = props.isEdit
+    ? detector
+    : formikToDetector(props.initialValues);
+
   return (
     <Formik
       initialValues={
@@ -224,10 +229,10 @@ export function ConfigureModel(props: ConfigureModelProps) {
               />
               <EuiSpacer />
               <AdvancedSettings />
-              {!isEmpty(detector) ? <EuiSpacer /> : null}
-              {!isEmpty(detector) ? (
+              {!isEmpty(detectorToCreate) ? <EuiSpacer /> : null}
+              {!isEmpty(detectorToCreate) ? (
                 <SampleAnomalies
-                  detector={detector}
+                  detector={detectorToCreate}
                   featureList={formikProps.values.featureList}
                   shingleSize={formikProps.values.shingleSize}
                   categoryFields={formikProps.values.categoryField}

@@ -75,6 +75,8 @@ export function SampleAnomalies(props: SampleAnomaliesProps) {
     endDate: initialEndDate.valueOf(),
   });
 
+  console.log('detector passed to SampleAnomalies.tsx: ', props.detector);
+
   const [zoomRange, setZoomRange] = useState<DateRange>({
     startDate: initialStartDate.valueOf(),
     endDate: initialEndDate.valueOf(),
@@ -130,7 +132,7 @@ export function SampleAnomalies(props: SampleAnomaliesProps) {
     try {
       setIsLoading(true);
       await dispatch(
-        previewDetector(detector.id, {
+        previewDetector({
           periodStart: dateRange.startDate.valueOf(),
           periodEnd: dateRange.endDate.valueOf(),
           detector: detector,
@@ -176,107 +178,100 @@ export function SampleAnomalies(props: SampleAnomaliesProps) {
   };
 
   return (
-    <EuiPage>
-      <EuiPageBody>
-        <ContentPanel title="Sample anomalies">
-          <EuiCallOut
-            title={'You can preview anomalies based on sample feature input'}
-            iconType="eye"
-          >
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <EuiText>
-                  {firstPreview
-                    ? 'You can preview how your anomalies may look like from sample feature output and adjust the feature settings as needed.'
-                    : 'Use the sample data as a reference to fine tune settings. To see the latest preview with your adjustments, click "Refresh preview". Once you are done with your edits, save your changes and run the detector to see real time anomalies for the new data set.'}{' '}
-                  <EuiLink
-                    href="https://opendistro.github.io/for-elasticsearch-docs/docs/ad/"
-                    target="_blank"
-                  >
-                    Learn more <EuiIcon size="s" type="popout" />
-                  </EuiLink>
-                </EuiText>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-            <EuiFlexGroup>
-              <EuiFlexItem grow={false}>
-                <EuiButton
-                  type="button"
-                  data-test-subj="previewDetector"
-                  onClick={() => {
-                    if (
-                      !focusOnFirstWrongFeature(
-                        props.errors,
-                        props.setFieldTouched
-                      )
-                    ) {
-                      getSampleAnomalies();
-                    }
-                  }}
-                  fill={!firstPreview}
-                  isLoading={isLoading}
-                >
-                  {firstPreview ? 'Preview anomalies' : 'Refresh preview'}
-                </EuiButton>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiCallOut>
+    <ContentPanel title="Sample anomalies">
+      <EuiCallOut
+        title={'You can preview anomalies based on sample feature input'}
+        iconType="eye"
+      >
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiText>
+              {firstPreview
+                ? 'You can preview how your anomalies may look like from sample feature output and adjust the feature settings as needed.'
+                : 'Use the sample data as a reference to fine tune settings. To see the latest preview with your adjustments, click "Refresh preview". Once you are done with your edits, save your changes and run the detector to see real time anomalies for the new data set.'}{' '}
+              <EuiLink
+                href="https://opendistro.github.io/for-elasticsearch-docs/docs/ad/"
+                target="_blank"
+              >
+                Learn more <EuiIcon size="s" type="popout" />
+              </EuiLink>
+            </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem grow={false}>
+            <EuiButton
+              type="button"
+              data-test-subj="previewDetector"
+              onClick={() => {
+                if (
+                  !focusOnFirstWrongFeature(props.errors, props.setFieldTouched)
+                ) {
+                  getSampleAnomalies();
+                }
+              }}
+              fill={!firstPreview}
+              isLoading={isLoading}
+            >
+              {firstPreview ? 'Preview anomalies' : 'Refresh preview'}
+            </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </EuiCallOut>
+      <EuiSpacer />
+      {previewDone && !anomaliesResult.anomalies.length ? (
+        <EuiCallOut
+          title={`No sample anomaly result generated. Please check detector interval and make sure you have >400 data points${
+            isHCDetector ? ' for some entities ' : ' '
+          }during preview date range`}
+          color="warning"
+          iconType="alert"
+        ></EuiCallOut>
+      ) : null}
+      {!firstPreview ? (
+        <Fragment>
+          <AnomaliesChart
+            title={getAnomalyHistoryWording(false)}
+            onDateRangeChange={handleDateRangeChange}
+            onZoomRangeChange={handleZoomChange}
+            isLoading={isLoading}
+            dateRange={dateRange}
+            detector={props.detector}
+            isHCDetector={isHCDetector}
+            detectorCategoryField={newDetector.categoryField}
+            onHeatmapCellSelected={handleHeatmapCellSelected}
+            selectedHeatmapCell={selectedHeatmapCell}
+            newDetector={newDetector}
+            zoomRange={zoomRange}
+            anomaliesResult={anomaliesResult}
+            showAlerts={false}
+            isNotSample={false}
+          />
           <EuiSpacer />
-          {previewDone && !anomaliesResult.anomalies.length ? (
-            <EuiCallOut
-              title={`No sample anomaly result generated. Please check detector interval and make sure you have >400 data points${
-                isHCDetector ? ' for some entities ' : ' '
-              }during preview date range`}
-              color="warning"
-              iconType="alert"
-            ></EuiCallOut>
-          ) : null}
-          {!firstPreview ? (
-            <Fragment>
-              <AnomaliesChart
-                title={getAnomalyHistoryWording(false)}
-                onDateRangeChange={handleDateRangeChange}
-                onZoomRangeChange={handleZoomChange}
-                isLoading={isLoading}
-                dateRange={dateRange}
-                detector={props.detector}
-                isHCDetector={isHCDetector}
-                detectorCategoryField={newDetector.categoryField}
-                onHeatmapCellSelected={handleHeatmapCellSelected}
-                selectedHeatmapCell={selectedHeatmapCell}
-                newDetector={newDetector}
-                zoomRange={zoomRange}
-                anomaliesResult={anomaliesResult}
-                showAlerts={false}
-                isNotSample={false}
-              />
-              <EuiSpacer />
-              {isLoading ? (
-                <EuiFlexGroup
-                  justifyContent="spaceAround"
-                  style={{ height: '200px', paddingTop: '100px' }}
-                >
-                  <EuiFlexItem grow={false}>
-                    <EuiLoadingSpinner size="xl" />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              ) : isHCDetector ? null : (
-                <FeatureBreakDown
-                  title={getFeatureBreakdownWording(false)}
-                  detector={newDetector}
-                  anomaliesResult={anomaliesResult}
-                  annotations={generateAnomalyAnnotations(
-                    get(anomaliesResult, 'anomalies', [])
-                  )}
-                  isLoading={isLoading}
-                  dateRange={zoomRange}
-                  featureDataSeriesName={getFeatureDataWording(false)}
-                />
+          {isLoading ? (
+            <EuiFlexGroup
+              justifyContent="spaceAround"
+              style={{ height: '200px', paddingTop: '100px' }}
+            >
+              <EuiFlexItem grow={false}>
+                <EuiLoadingSpinner size="xl" />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          ) : isHCDetector ? null : (
+            <FeatureBreakDown
+              title={getFeatureBreakdownWording(false)}
+              detector={newDetector}
+              anomaliesResult={anomaliesResult}
+              annotations={generateAnomalyAnnotations(
+                get(anomaliesResult, 'anomalies', [])
               )}
-            </Fragment>
-          ) : null}
-        </ContentPanel>
-      </EuiPageBody>
-    </EuiPage>
+              isLoading={isLoading}
+              dateRange={zoomRange}
+              featureDataSeriesName={getFeatureDataWording(false)}
+            />
+          )}
+        </Fragment>
+      ) : null}
+    </ContentPanel>
   );
 }

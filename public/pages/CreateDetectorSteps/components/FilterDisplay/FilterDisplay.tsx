@@ -17,7 +17,7 @@ import { EuiText, EuiLink } from '@elastic/eui';
 import React, { Component } from 'react';
 import { FILTER_TYPES, UIFilter } from '../../../../models/interfaces';
 import { CodeModal } from '../CodeModal/CodeModal';
-import { displayText } from '../DataFilters/utils/helpers';
+import { displayText } from '../DataFilterList/utils/helpers';
 
 interface FilterDisplayProps {
   uiMetadata: any;

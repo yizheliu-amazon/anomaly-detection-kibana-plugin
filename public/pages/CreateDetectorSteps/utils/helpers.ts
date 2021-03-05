@@ -25,6 +25,7 @@ import {
   FeatureAttributes,
   Detector,
   UIFilter,
+  UiFeature,
 } from '../../../models/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
@@ -286,8 +287,6 @@ export function modelConfigurationToFormik(
       get(detector, 'categoryField.0', []).length > 0 ? true : false,
     categoryField: get(detector, 'categoryField.0', []),
     shingleSize: get(detector, 'shingleSize', 4),
-    //startTime: get(detector, 'detectionDateRange.startTime'),
-    //endTime: get(detector, 'detectionDateRange.endTime'),
   };
 }
 
@@ -366,6 +365,12 @@ function featuresToFormik(detector: Detector): FeaturesFormikValues[] {
 // Modified to include all detector fields
 // Used in create detector flow
 export function formikToDetector(values: CreateDetectorFormikValues): Detector {
+  const detectionDateRange = values.historical
+    ? {
+        startTime: convertTimestampToNumber(values.startTime),
+        endTime: convertTimestampToNumber(values.endTime),
+      }
+    : undefined;
   let detectorBody = {
     name: values.name,
     description: values.description,
@@ -384,10 +389,7 @@ export function formikToDetector(values: CreateDetectorFormikValues): Detector {
       period: { interval: values.windowDelay, unit: UNITS.MINUTES },
     },
     shingleSize: values.shingleSize,
-    detectionDateRange: {
-      startTime: convertTimestampToNumber(values.startTime),
-      endTime: convertTimestampToNumber(values.endTime),
-    },
+    detectionDateRange: detectionDateRange,
     categoryField: get(values, 'categoryField', []),
   } as Detector;
 
@@ -479,7 +481,7 @@ export function prepareDetector(
     categoryField: isEmpty(categoryFields) ? undefined : categoryFields,
     uiMetadata: {
       ...detector.uiMetadata,
-      features: { ...formikToUIMetadata(featureValues) },
+      features: { ...featuresToUIMetadata(featureValues) },
     },
   };
 }

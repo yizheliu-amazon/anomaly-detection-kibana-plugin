@@ -81,7 +81,7 @@ export function registerADRoutes(apiRouter: Router, adService: AdService) {
   apiRouter.post('/detectors/results/_search', adService.searchResults);
   apiRouter.get('/detectors/{detectorId}', adService.getDetector);
   apiRouter.get('/detectors', adService.getDetectors);
-  apiRouter.post('/detectors/{detectorId}/preview', adService.previewDetector);
+  apiRouter.post('/detectors/preview', adService.previewDetector);
   apiRouter.get(
     '/detectors/{id}/results/{isHistorical}',
     adService.getAnomalyResults
@@ -140,14 +140,12 @@ export default class AdService {
     kibanaResponse: KibanaResponseFactory
   ): Promise<IKibanaResponse<any>> => {
     try {
-      const { detectorId } = request.params as { detectorId: string };
       const requestBody = JSON.stringify(
         convertPreviewInputKeysToSnakeCase(request.body)
       );
       const response = await this.client
         .asScoped(request)
         .callAsCurrentUser('ad.previewDetector', {
-          detectorId,
           body: requestBody,
         });
       const transformedKeys = mapKeysDeep(response, toCamel);

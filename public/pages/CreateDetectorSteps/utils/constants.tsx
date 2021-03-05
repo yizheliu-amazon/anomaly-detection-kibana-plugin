@@ -18,7 +18,7 @@ import {
   FILTER_TYPES,
   UIFilter,
 } from '../../../models/interfaces';
-import { OPERATORS_MAP } from '../components/DataFilters/utils/constant';
+import { OPERATORS_MAP } from '../components/DataFilterList/utils/constant';
 import {
   CreateDetectorFormikValues,
   DetectorDefinitionFormikValues,
@@ -26,7 +26,6 @@ import {
   DetectorJobsFormikValues,
   FeaturesFormikValues,
 } from '../models/interfaces';
-import { DATA_TYPES } from '../../../utils/constants';
 
 export type STEP_STATUS =
   | 'incomplete'
