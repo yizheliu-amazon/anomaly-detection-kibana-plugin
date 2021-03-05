@@ -84,43 +84,6 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
     console.log('Placeholder for creating detector');
   };
 
-  const step1Body = (
-    <DefineDetector
-      isEdit={false}
-      setStep={setCurStep}
-      handleCancelClick={handleCancelClick}
-      initialValues={step1Fields}
-      setInitialValues={setStep1Fields}
-      {...props}
-    />
-  );
-  const step2Body = (
-    <ConfigureModel
-      isEdit={false}
-      setStep={setCurStep}
-      handleCancelClick={handleCancelClick}
-      initialValues={step2Fields}
-      setInitialValues={setStep2Fields}
-      detectorDefinitionValues={step1Fields}
-      {...props}
-    />
-  );
-  const step3Body = (
-    <DetectorJobs
-      setStep={setCurStep}
-      handleCancelClick={handleCancelClick}
-      initialValues={step3Fields}
-      setInitialValues={setStep3Fields}
-    />
-  );
-  const step4Body = (
-    <ReviewAndCreate
-      setStep={setCurStep}
-      handleCancelClick={handleCancelClick}
-      values={step4Fields}
-    />
-  );
-
   // Hook to update the field values needed for the review step
   useEffect(() => {
     setStep4Fields({
@@ -191,15 +154,39 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
           <EuiSteps steps={createSteps} />
         </EuiFlexItem>
         <EuiFlexItem>
-          {curStep === 1
-            ? step1Body
-            : curStep === 2
-            ? step2Body
-            : curStep === 3
-            ? step3Body
-            : curStep === 4
-            ? step4Body
-            : null}
+          {curStep === 1 ? (
+            <DefineDetector
+              isEdit={false}
+              setStep={setCurStep}
+              handleCancelClick={handleCancelClick}
+              initialValues={step1Fields}
+              setInitialValues={setStep1Fields}
+              {...props}
+            />
+          ) : curStep === 2 ? (
+            <ConfigureModel
+              isEdit={false}
+              setStep={setCurStep}
+              handleCancelClick={handleCancelClick}
+              initialValues={step2Fields}
+              setInitialValues={setStep2Fields}
+              detectorDefinitionValues={step1Fields}
+              {...props}
+            />
+          ) : curStep === 3 ? (
+            <DetectorJobs
+              setStep={setCurStep}
+              handleCancelClick={handleCancelClick}
+              initialValues={step3Fields}
+              setInitialValues={setStep3Fields}
+            />
+          ) : curStep === 4 ? (
+            <ReviewAndCreate
+              setStep={setCurStep}
+              handleCancelClick={handleCancelClick}
+              values={step4Fields}
+            />
+          ) : null}
         </EuiFlexItem>
       </EuiFlexGroup>
     </Fragment>
