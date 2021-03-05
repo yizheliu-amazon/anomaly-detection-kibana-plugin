@@ -37,7 +37,9 @@ interface DataFilterListProps {
 
 export const DataFilterList = (props: DataFilterListProps) => {
   const [openPopoverIndex, setOpenPopoverIndex] = useState<number>(-1);
-  const [isCreatingNewFilter, setIsCreatingNewFilter] = useState<boolean>(true);
+  const [isCreatingNewFilter, setIsCreatingNewFilter] = useState<boolean>(
+    false
+  );
 
   const selectedIndex = get(props, 'formikProps.values.index.0.label', '');
   const isRemoteIndex = selectedIndex.includes(':');
