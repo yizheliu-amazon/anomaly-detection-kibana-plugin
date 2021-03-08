@@ -14,9 +14,7 @@
  */
 
 //@ts-ignore
-import get from 'lodash/get';
-import orderBy from 'lodash/orderBy';
-import pullAll from 'lodash/pullAll';
+import { get, orderBy, pullAll, isEmpty } from 'lodash';
 import { AnomalyResults, SearchResponse } from '../models/interfaces';
 import {
   AnomalyResult,
@@ -346,11 +344,24 @@ export default class AdService {
   ): Promise<IKibanaResponse<any>> => {
     try {
       const { detectorId } = request.params as { detectorId: string };
+      //@ts-ignore
+      const startTime = request.body?.startTime;
+      //@ts-ignore
+      const endTime = request.body?.endTime;
+      let requestBody = { detectorId: detectorId } as {};
+      let requestPath = 'ad.startDetector';
+      if (isNumber(startTime) && isNumber(endTime)) {
+        requestBody = {
+          ...requestBody,
+          startTime: startTime,
+          endTime: endTime,
+        };
+        requestPath = 'ad.startHistoricalDetector';
+      }
+
       const response = await this.client
         .asScoped(request)
-        .callAsCurrentUser('ad.startDetector', {
-          detectorId,
-        });
+        .callAsCurrentUser(requestPath, requestBody);
       return kibanaResponse.ok({
         body: {
           ok: true,

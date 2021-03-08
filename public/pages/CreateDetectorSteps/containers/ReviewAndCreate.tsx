@@ -25,7 +25,12 @@ import {
   EuiButtonEmpty,
   EuiSpacer,
 } from '@elastic/eui';
-import { createDetector, getDetectorCount } from '../../../redux/reducers/ad';
+import {
+  createDetector,
+  getDetectorCount,
+  startDetector,
+  startHistoricalDetector,
+} from '../../../redux/reducers/ad';
 import { Formik, FormikHelpers } from 'formik';
 import { get } from 'lodash';
 import React, { Fragment, useEffect } from 'react';
@@ -39,7 +44,10 @@ import { CreateDetectorFormikValues } from '../models/interfaces';
 import { DetectorDefinitionFields } from '../components/DetectorDefinitionFields';
 import { ModelConfigurationFields } from '../components/ModelConfigurationFields';
 import { formikToDetector } from '../utils/helpers';
-import { getErrorMessage } from '../../../utils/utils';
+import {
+  getErrorMessage,
+  convertTimestampToNumber,
+} from '../../../utils/utils';
 import { prettifyErrorMessage } from '../../../../server/utils/helpers';
 import { DetectorScheduleFields } from '../components/DetectorScheduleFields';
 
@@ -74,6 +82,55 @@ export function ReviewAndCreate(props: ReviewAndCreateProps) {
           core.notifications.toasts.addSuccess(
             `Detector created: ${detectorToCreate.name}`
           );
+          // Optionally start RT job
+          if (get(props, 'values.realTime', true)) {
+            dispatch(startDetector(response.response.id))
+              .then((response: any) => {
+                core.notifications.toasts.addSuccess(
+                  `Successfully started the real-time detector`
+                );
+              })
+              .catch((err: any) => {
+                core.notifications.toasts.addDanger(
+                  prettifyErrorMessage(
+                    getErrorMessage(
+                      err,
+                      'There was a problem starting the real-time detector'
+                    )
+                  )
+                );
+              });
+          }
+
+          // Optionally start historical job
+          if (get(props, 'values.historical', false)) {
+            const startTime = convertTimestampToNumber(
+              get(props, 'values.startTime')
+            );
+            const endTime = convertTimestampToNumber(
+              get(props, 'values.endTime')
+            );
+            dispatch(
+              //@ts-ignore
+              startHistoricalDetector(response.response.id, startTime, endTime)
+            )
+              .then((response: any) => {
+                core.notifications.toasts.addSuccess(
+                  `Successfully started the historical detector`
+                );
+              })
+              .catch((err: any) => {
+                core.notifications.toasts.addDanger(
+                  prettifyErrorMessage(
+                    getErrorMessage(
+                      err,
+                      'There was a problem starting the historical detector'
+                    )
+                  )
+                );
+              });
+          }
+
           props.history.push(
             `/detectors/${response.response.id}/configurations/`
           );

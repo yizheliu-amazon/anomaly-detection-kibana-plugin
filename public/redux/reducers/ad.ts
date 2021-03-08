@@ -397,6 +397,22 @@ export const startDetector = (detectorId: string): APIAction => ({
   detectorId,
 });
 
+export const startHistoricalDetector = (
+  detectorId: string,
+  startTime: number,
+  endTime: number
+): APIAction => ({
+  type: START_DETECTOR,
+  request: (client: HttpSetup) =>
+    client.post(`..${AD_NODE_API.DETECTOR}/${detectorId}/start`, {
+      body: JSON.stringify({
+        startTime: startTime,
+        endTime: endTime,
+      }),
+    }),
+  detectorId,
+});
+
 export const stopDetector = (detectorId: string): APIAction => ({
   type: STOP_DETECTOR,
   request: (client: HttpSetup) =>

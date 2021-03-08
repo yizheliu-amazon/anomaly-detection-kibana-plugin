@@ -108,6 +108,28 @@ export default function adPlugin(Client: any, config: any, components: any) {
     method: 'POST',
   });
 
+  ad.startHistoricalDetector = ca({
+    url: {
+      fmt: `${API.DETECTOR_BASE}/<%=detectorId%>/_start`,
+      req: {
+        detectorId: {
+          type: 'string',
+          required: true,
+        },
+        startTime: {
+          type: 'number',
+          required: true,
+        },
+        endTime: {
+          type: 'number',
+          required: true,
+        },
+      },
+      needBody: true,
+    },
+    method: 'POST',
+  });
+
   ad.stopDetector = ca({
     url: {
       fmt: `${API.DETECTOR_BASE}/<%=detectorId%>/_stop`,
