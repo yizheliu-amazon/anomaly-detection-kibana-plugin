@@ -16,6 +16,7 @@
 import React, { useEffect } from 'react';
 import { MetaData } from './MetaData';
 import { Features } from './Features';
+import { DetectorJobs } from './DetectorJobs';
 import { EuiSpacer, EuiPage, EuiPageBody } from '@elastic/eui';
 import { RouteComponentProps } from 'react-router';
 import { AppState } from '../../../redux/reducers';
@@ -55,6 +56,8 @@ export function DetectorConfig(props: DetectorConfigProps) {
             detector={detector}
             onEditFeatures={props.onEditFeatures}
           />
+          <EuiSpacer />
+          <DetectorJobs detector={detector} />
         </EuiPageBody>
       ) : (
         <div>

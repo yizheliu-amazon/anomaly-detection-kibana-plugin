@@ -20,7 +20,6 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiTitle,
-  EuiHealth,
   EuiOverlayMask,
   EuiCallOut,
   EuiSpacer,
@@ -43,16 +42,14 @@ import {
 import { getErrorMessage, Listener } from '../../../utils/utils';
 import { darkModeEnabled } from '../../../utils/kibanaUtils';
 import { BREADCRUMBS } from '../../../utils/constants';
-import { DETECTOR_STATE } from '../../../../server/utils/constants';
 import { DetectorControls } from '../components/DetectorControls';
-import moment from 'moment';
 import { ConfirmModal } from '../components/ConfirmModal/ConfirmModal';
 import { useFetchMonitorInfo } from '../hooks/useFetchMonitorInfo';
 import { MonitorCallout } from '../components/MonitorCallout/MonitorCallout';
 import { DETECTOR_DETAIL_TABS } from '../utils/constants';
 import { DetectorConfig } from '../../DetectorConfig/containers/DetectorConfig';
 import { AnomalyResults } from '../../DetectorResults/containers/AnomalyResults';
-import { DETECTOR_STATE_COLOR } from '../../utils/constants';
+import { getDetectorStateDetails } from '../utils/helpers';
 import {
   NO_PERMISSIONS_KEY_WORD,
   prettifyErrorMessage,
@@ -295,47 +292,12 @@ export const DetectorDetail = (props: DetectorDetailProps) => {
           >
             <EuiFlexItem grow={false}>
               <EuiTitle size="l">
-                <h1>
-                  {detector && detector.name}{' '}
-                  {detector &&
-                  detector.enabled &&
-                  detector.curState === DETECTOR_STATE.RUNNING ? (
-                    <EuiHealth color={DETECTOR_STATE_COLOR.RUNNING}>
-                      Running since{' '}
-                      {detector.enabledTime
-                        ? moment(detector.enabledTime).format('MM/DD/YY h:mm A')
-                        : '?'}
-                    </EuiHealth>
-                  ) : detector.enabled &&
-                    detector.curState === DETECTOR_STATE.INIT ? (
-                    <EuiHealth color={DETECTOR_STATE_COLOR.INIT}>
-                      {detector.initProgress?.estimatedMinutesLeft &&
-                      !isHCDetector
-                        ? //@ts-ignore
-                          `Initializing (${detector.initProgress.percentageStr} complete)`
-                        : 'Initializing'}
-                    </EuiHealth>
-                  ) : detector.curState === DETECTOR_STATE.INIT_FAILURE ||
-                    detector.curState === DETECTOR_STATE.UNEXPECTED_FAILURE ? (
-                    <EuiHealth color={DETECTOR_STATE_COLOR.INIT_FAILURE}>
-                      Initialization failure
-                    </EuiHealth>
-                  ) : detector.curState === DETECTOR_STATE.DISABLED ? (
-                    <EuiHealth color={DETECTOR_STATE_COLOR.DISABLED}>
-                      {detector.disabledTime
-                        ? `Stopped at ${moment(detector.disabledTime).format(
-                            'MM/DD/YY h:mm A'
-                          )}`
-                        : 'Detector is stopped'}
-                    </EuiHealth>
-                  ) : detector.curState === DETECTOR_STATE.FEATURE_REQUIRED ? (
-                    <EuiHealth color={DETECTOR_STATE_COLOR.FEATURE_REQUIRED}>
-                      Feature required to start the detector
-                    </EuiHealth>
-                  ) : (
-                    ''
-                  )}
-                </h1>
+                {
+                  <h1>
+                    {detector && detector.name}{' '}
+                    {getDetectorStateDetails(detector, isHCDetector)}
+                  </h1>
+                }
               </EuiTitle>
             </EuiFlexItem>
 
