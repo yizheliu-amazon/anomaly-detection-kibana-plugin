@@ -14,7 +14,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { MetaData } from './MetaData';
+import { DetectorDefinitionFields } from '../../CreateDetectorSteps/components/DetectorDefinitionFields';
 import { Features } from './Features';
 import { DetectorJobs } from './DetectorJobs';
 import { EuiSpacer, EuiPage, EuiPageBody } from '@elastic/eui';
@@ -23,7 +23,6 @@ import { AppState } from '../../../redux/reducers';
 import { useSelector, useDispatch } from 'react-redux';
 import { getDetector } from '../../../redux/reducers/ad';
 import { EuiLoadingSpinner } from '@elastic/eui';
-
 interface DetectorConfigProps extends RouteComponentProps {
   detectorId: string;
   onEditFeatures(): void;
@@ -45,10 +44,10 @@ export function DetectorConfig(props: DetectorConfigProps) {
       {detector ? (
         <EuiPageBody>
           <EuiSpacer size="l" />
-          <MetaData
-            detectorId={props.detectorId}
+          <DetectorDefinitionFields
             detector={detector}
-            onEditDetector={props.onEditDetector}
+            onEditDetectorDefinition={props.onEditDetector}
+            isCreate={false}
           />
           <EuiSpacer />
           <Features

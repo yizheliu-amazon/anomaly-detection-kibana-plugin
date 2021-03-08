@@ -54,7 +54,7 @@ export const DetectorDefinitionFields = (
         </EuiButton>,
       ]}
     >
-      <EuiFlexGrid columns={4} gutterSize="l" style={{ border: 'none' }}>
+      <EuiFlexGrid columns={0} gutterSize="l" style={{ border: 'none' }}>
         <EuiFlexItem>
           <ConfigCell
             title="Name"
