@@ -16,7 +16,6 @@
 import { Switch, Route, RouteComponentProps, Redirect } from 'react-router-dom';
 import React from 'react';
 import { AppState } from '../../redux/reducers';
-import { CreateDetector } from '../createDetector';
 import { DetectorList } from '../DetectorsList';
 import { SampleData } from '../SampleData';
 import { ListRouterParams } from '../DetectorsList/containers/List/List';
@@ -30,6 +29,7 @@ import { EuiSideNav, EuiPage, EuiPageBody, EuiPageSideBar } from '@elastic/eui';
 import { useSelector } from 'react-redux';
 import { APP_PATH } from '../../utils/constants';
 import { DetectorDetail } from '../DetectorDetail';
+import { DefineDetector } from '../CreateDetectorSteps/containers/DefineDetector';
 import { EditFeatures } from '../EditFeatures/containers/EditFeatures';
 import { DashboardOverview } from '../Dashboard/Container/DashboardOverview';
 import { CoreServicesConsumer } from '../../components/CoreServices/CoreServices';
@@ -136,14 +136,14 @@ export function Main(props: MainProps) {
                   exact
                   path={APP_PATH.CREATE_DETECTOR}
                   render={(props: RouteComponentProps) => (
-                    <CreateDetector {...props} isEdit={false} />
+                    <CreateDetectorSteps {...props} />
                   )}
                 />
                 <Route
                   exact
                   path={APP_PATH.EDIT_DETECTOR}
                   render={(props: RouteComponentProps) => (
-                    <CreateDetector {...props} isEdit={true} />
+                    <DefineDetector {...props} isEdit={true} />
                   )}
                 />
                 <Route
@@ -193,7 +193,7 @@ export function Main(props: MainProps) {
                   exact
                   path={APP_PATH.CREATE_DETECTOR_STEPS}
                   render={(props: RouteComponentProps) => (
-                    <CreateDetectorSteps {...props} isEdit={false} />
+                    <CreateDetectorSteps {...props} />
                   )}
                 />
                 <Redirect from="/" to={APP_PATH.DASHBOARD} />

@@ -16,15 +16,9 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { EuiSteps, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
-import { useDispatch } from 'react-redux';
-import { Dispatch } from 'redux';
-import { CoreStart } from '../../../../../../src/core/public';
-import { APIAction } from '../../../redux/middleware/types';
-import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
 import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
 import {
   STEP_STATUS,
-  INITIAL_DETECTOR_VALUES,
   INITIAL_DETECTOR_DEFINITION_VALUES,
   INITIAL_MODEL_CONFIGURATION_VALUES,
   INITIAL_DETECTOR_JOB_VALUES,
@@ -40,19 +34,10 @@ import {
   CreateDetectorFormikValues,
 } from '../models/interfaces';
 
-interface CreateDetectorRouterProps {
-  detectorId?: string;
-}
-
-interface CreateDetectorStepsProps
-  extends RouteComponentProps<CreateDetectorRouterProps> {
-  isEdit: boolean;
-}
+interface CreateDetectorStepsProps extends RouteComponentProps {}
 
 export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
-  const core = React.useContext(CoreServicesContext) as CoreStart;
   useHideSideNavBar(true, false);
-  const dispatch = useDispatch<Dispatch<APIAction>>();
 
   const [step1Status, setStep1Status] = useState<STEP_STATUS>(undefined);
   const [step2Status, setStep2Status] = useState<STEP_STATUS>('disabled');
@@ -75,14 +60,6 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
   });
 
   const [curStep, setCurStep] = useState<number>(1);
-
-  const handleCancelClick = () => {
-    props.history.push('/detectors');
-  };
-
-  const onCreate = () => {
-    console.log('Placeholder for creating detector');
-  };
 
   // Hook to update the field values needed for the review step
   useEffect(() => {
@@ -158,7 +135,6 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
             <DefineDetector
               isEdit={false}
               setStep={setCurStep}
-              handleCancelClick={handleCancelClick}
               initialValues={step1Fields}
               setInitialValues={setStep1Fields}
               {...props}
@@ -167,7 +143,6 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
             <ConfigureModel
               isEdit={false}
               setStep={setCurStep}
-              handleCancelClick={handleCancelClick}
               initialValues={step2Fields}
               setInitialValues={setStep2Fields}
               detectorDefinitionValues={step1Fields}
@@ -176,14 +151,13 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
           ) : curStep === 3 ? (
             <DetectorJobs
               setStep={setCurStep}
-              handleCancelClick={handleCancelClick}
               initialValues={step3Fields}
               setInitialValues={setStep3Fields}
+              {...props}
             />
           ) : curStep === 4 ? (
             <ReviewAndCreate
               setStep={setCurStep}
-              handleCancelClick={handleCancelClick}
               values={step4Fields}
               {...props}
             />

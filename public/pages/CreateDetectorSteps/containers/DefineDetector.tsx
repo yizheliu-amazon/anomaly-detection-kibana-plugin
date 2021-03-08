@@ -31,10 +31,7 @@ import {
   EuiPageHeaderSection,
   EuiTitle,
 } from '@elastic/eui';
-import {
-  updateDetector,
-  matchDetector,
-} from '../../../redux/reducers/ad';
+import { updateDetector, matchDetector } from '../../../redux/reducers/ad';
 import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
 import { useFetchDetectorInfo } from '../hooks/useFetchDetectorInfo';
 import { CoreStart } from '../../../../../../src/core/public';
@@ -62,8 +59,7 @@ interface DefineDetectorRouterProps {
 interface DefineDetectorProps
   extends RouteComponentProps<DefineDetectorRouterProps> {
   isEdit: boolean;
-  setStep(stepNumber: number): void;
-  handleCancelClick(): void;
+  setStep?(stepNumber: number): void;
   initialValues?: DetectorDefinitionFormikValues;
   setInitialValues?(initialValues: DetectorDefinitionFormikValues): void;
 }
@@ -150,13 +146,14 @@ export const DefineDetector = (props: DefineDetectorProps) => {
         formikProps.validateForm().then((errors) => {
           if (isEmpty(errors)) {
             if (props.isEdit) {
-              const apiRequest = formikToDetectorDefinition(
+              const detectorToUpdate = formikToDetectorDefinition(
                 formikProps.values,
                 detector
               );
-              handleUpdate(apiRequest);
+              handleUpdateDetector(detectorToUpdate);
             } else {
               optionallySaveValues(formikProps.values);
+              //@ts-ignore
               props.setStep(2);
             }
           } else {
@@ -173,34 +170,28 @@ export const DefineDetector = (props: DefineDetectorProps) => {
     }
   };
 
-  const handleUpdate = async (detectorToBeUpdated: Detector) => {
-    try {
-      await dispatch(updateDetector(detectorId, detectorToBeUpdated));
-      core.notifications.toasts.addSuccess(
-        `Detector updated: ${detectorToBeUpdated.name}`
-      );
-      props.history.push(`/detectors/${detectorId}/configurations/`);
-    } catch (err) {
-      core.notifications.toasts.addDanger(
-        prettifyErrorMessage(
-          getErrorMessage(err, 'There was a problem updating the detector')
-        )
-      );
-    }
-  };
-
-  const handleSubmit = async (
-    values: DetectorDefinitionFormikValues,
-    formikProps: any
-  ) => {
+  const handleUpdateDetector = async (detectorToUpdate: Detector) => {
     try {
       if (props.isEdit) {
-        // TODO: submit the update here
+        dispatch(updateDetector(detectorId, detectorToUpdate))
+          .then((response: any) => {
+            core.notifications.toasts.addSuccess(
+              `Detector updated: ${response.response.name}`
+            );
+            props.history.push(`/detectors/${detectorId}/configurations/`);
+          })
+          .catch((err: any) => {
+            core.notifications.toasts.addDanger(
+              prettifyErrorMessage(
+                getErrorMessage(
+                  err,
+                  'There was a problem updating the detector'
+                )
+              )
+            );
+          });
       }
-    } catch (e) {
-    } finally {
-      formikProps.setSubmitting(false);
-    }
+    } catch (e) {}
   };
 
   const optionallySaveValues = (values: DetectorDefinitionFormikValues) => {
@@ -216,7 +207,7 @@ export const DefineDetector = (props: DefineDetectorProps) => {
           ? props.initialValues
           : detectorDefinitionToFormik(detector)
       }
-      onSubmit={handleSubmit}
+      onSubmit={() => {}}
       validateOnMount={props.isEdit ? false : true}
     >
       {(formikProps) => (
@@ -231,7 +222,9 @@ export const DefineDetector = (props: DefineDetectorProps) => {
                 <EuiPageHeaderSection>
                   <EuiTitle size="l">
                     <h1>
-                      {props.isEdit ? 'Edit detector' : 'Define detector'}{' '}
+                      {props.isEdit
+                        ? 'Edit detector settings'
+                        : 'Define detector'}{' '}
                     </h1>
                   </EuiTitle>
                 </EuiPageHeaderSection>
@@ -262,25 +255,43 @@ export const DefineDetector = (props: DefineDetectorProps) => {
             style={{ marginRight: '12px' }}
           >
             <EuiFlexItem grow={false}>
-              <EuiButtonEmpty onClick={props.handleCancelClick}>
+              <EuiButtonEmpty
+                onClick={() => {
+                  props.history.push('/detectors');
+                }}
+              >
                 Cancel
               </EuiButtonEmpty>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiButton
-                type="submit"
-                iconSide="right"
-                iconType="arrowRight"
-                fill={true}
-                data-test-subj="defineDetectorNextButton"
-                isLoading={formikProps.isSubmitting}
-                //@ts-ignore
-                onClick={() => {
-                  handleFormValidation(formikProps);
-                }}
-              >
-                Next
-              </EuiButton>
+              {props.isEdit ? (
+                <EuiButton
+                  type="submit"
+                  fill={true}
+                  data-test-subj="updateDetectorButton"
+                  //@ts-ignore
+                  onClick={() => {
+                    handleFormValidation(formikProps);
+                  }}
+                >
+                  Save
+                </EuiButton>
+              ) : (
+                <EuiButton
+                  type="submit"
+                  iconSide="right"
+                  iconType="arrowRight"
+                  fill={true}
+                  data-test-subj="defineDetectorNextButton"
+                  isLoading={formikProps.isSubmitting}
+                  //@ts-ignore
+                  onClick={() => {
+                    handleFormValidation(formikProps);
+                  }}
+                >
+                  Next
+                </EuiButton>
+              )}
             </EuiFlexItem>
           </EuiFlexGroup>
         </React.Fragment>

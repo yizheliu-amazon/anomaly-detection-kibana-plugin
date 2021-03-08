@@ -64,8 +64,7 @@ interface ConfigureModelRouterProps {
 interface ConfigureModelProps
   extends RouteComponentProps<ConfigureModelRouterProps> {
   isEdit: boolean;
-  setStep(stepNumber: number): void;
-  handleCancelClick(): void;
+  setStep?(stepNumber: number): void;
   initialValues?: ModelConfigurationFormikValues;
   setInitialValues?(initialValues: ModelConfigurationFormikValues): void;
   detectorDefinitionValues?: DetectorDefinitionFormikValues;
@@ -149,6 +148,7 @@ export function ConfigureModel(props: ConfigureModelProps) {
                 ...formikProps.values,
                 categoryFieldEnabled: isHCDetector,
               });
+              //@ts-ignore
               props.setStep(3);
             }
           } else {
@@ -258,7 +258,11 @@ export function ConfigureModel(props: ConfigureModelProps) {
             style={{ marginRight: '12px' }}
           >
             <EuiFlexItem grow={false}>
-              <EuiButtonEmpty onClick={props.handleCancelClick}>
+              <EuiButtonEmpty
+                onClick={() => {
+                  props.history.push('/detectors');
+                }}
+              >
                 Cancel
               </EuiButtonEmpty>
             </EuiFlexItem>
@@ -275,6 +279,7 @@ export function ConfigureModel(props: ConfigureModelProps) {
                     ...formikProps.values,
                     categoryFieldEnabled: isHCDetector,
                   });
+                  //@ts-ignore
                   props.setStep(1);
                 }}
               >

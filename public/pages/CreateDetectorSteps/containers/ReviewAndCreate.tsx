@@ -53,7 +53,6 @@ import { DetectorScheduleFields } from '../components/DetectorScheduleFields';
 
 interface ReviewAndCreateProps extends RouteComponentProps {
   setStep(stepNumber: number): void;
-  handleCancelClick(): void;
   values: CreateDetectorFormikValues;
 }
 
@@ -211,7 +210,11 @@ export function ReviewAndCreate(props: ReviewAndCreateProps) {
             style={{ marginRight: '12px' }}
           >
             <EuiFlexItem grow={false}>
-              <EuiButtonEmpty onClick={props.handleCancelClick}>
+              <EuiButtonEmpty
+                onClick={() => {
+                  props.history.push('/detectors');
+                }}
+              >
                 Cancel
               </EuiButtonEmpty>
             </EuiFlexItem>

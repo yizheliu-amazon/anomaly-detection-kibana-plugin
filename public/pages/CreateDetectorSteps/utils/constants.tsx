@@ -20,7 +20,6 @@ import {
 } from '../../../models/interfaces';
 import { OPERATORS_MAP } from '../components/DataFilterList/utils/constant';
 import {
-  CreateDetectorFormikValues,
   DetectorDefinitionFormikValues,
   ModelConfigurationFormikValues,
   DetectorJobsFormikValues,
@@ -111,12 +110,6 @@ export const INITIAL_DETECTOR_JOB_VALUES: DetectorJobsFormikValues = {
   historical: false,
   startTime: 'now-30d',
   endTime: 'now',
-};
-
-export const INITIAL_DETECTOR_VALUES: CreateDetectorFormikValues = {
-  ...INITIAL_DETECTOR_DEFINITION_VALUES,
-  ...INITIAL_MODEL_CONFIGURATION_VALUES,
-  ...INITIAL_DETECTOR_JOB_VALUES,
 };
 
 export const HISTORICAL_DATE_RANGE_COMMON_OPTIONS = [

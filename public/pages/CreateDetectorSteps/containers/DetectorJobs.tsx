@@ -36,10 +36,10 @@ import { DetectorJobsFormikValues } from '../models/interfaces';
 import { RealTimeJob } from '../components/RealTimeJob';
 import { HistoricalJob } from '../components/HistoricalJob';
 import { convertTimestampToNumber } from '../../../utils/utils';
+import { RouteComponentProps } from 'react-router-dom';
 
-interface DetectorJobsProps {
-  setStep(stepNumber: number): void;
-  handleCancelClick(): void;
+interface DetectorJobsProps extends RouteComponentProps {
+  setStep?(stepNumber: number): void;
   initialValues: DetectorJobsFormikValues;
   setInitialValues(initialValues: DetectorJobsFormikValues): void;
 }
@@ -87,6 +87,7 @@ export function DetectorJobs(props: DetectorJobsProps) {
             realTime: realTime,
             historical: historical,
           });
+          //@ts-ignore
           props.setStep(4);
         } else {
           // TODO: can add focus to all components or possibly customize error message too
@@ -147,7 +148,11 @@ export function DetectorJobs(props: DetectorJobsProps) {
             style={{ marginRight: '12px' }}
           >
             <EuiFlexItem grow={false}>
-              <EuiButtonEmpty onClick={props.handleCancelClick}>
+              <EuiButtonEmpty
+                onClick={() => {
+                  props.history.push('/detectors');
+                }}
+              >
                 Cancel
               </EuiButtonEmpty>
             </EuiFlexItem>
@@ -165,6 +170,7 @@ export function DetectorJobs(props: DetectorJobsProps) {
                     realTime: realTime,
                     historical: historical,
                   });
+                  //@ts-ignore
                   props.setStep(2);
                 }}
               >
