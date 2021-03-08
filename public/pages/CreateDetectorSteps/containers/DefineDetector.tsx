@@ -171,27 +171,20 @@ export const DefineDetector = (props: DefineDetectorProps) => {
   };
 
   const handleUpdateDetector = async (detectorToUpdate: Detector) => {
-    try {
-      if (props.isEdit) {
-        dispatch(updateDetector(detectorId, detectorToUpdate))
-          .then((response: any) => {
-            core.notifications.toasts.addSuccess(
-              `Detector updated: ${response.response.name}`
-            );
-            props.history.push(`/detectors/${detectorId}/configurations/`);
-          })
-          .catch((err: any) => {
-            core.notifications.toasts.addDanger(
-              prettifyErrorMessage(
-                getErrorMessage(
-                  err,
-                  'There was a problem updating the detector'
-                )
-              )
-            );
-          });
-      }
-    } catch (e) {}
+    dispatch(updateDetector(detectorId, detectorToUpdate))
+      .then((response: any) => {
+        core.notifications.toasts.addSuccess(
+          `Detector updated: ${response.response.name}`
+        );
+        props.history.push(`/detectors/${detectorId}/configurations/`);
+      })
+      .catch((err: any) => {
+        core.notifications.toasts.addDanger(
+          prettifyErrorMessage(
+            getErrorMessage(err, 'There was a problem updating the detector')
+          )
+        );
+      });
   };
 
   const optionallySaveValues = (values: DetectorDefinitionFormikValues) => {
@@ -257,7 +250,13 @@ export const DefineDetector = (props: DefineDetectorProps) => {
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
                 onClick={() => {
-                  props.history.push('/detectors');
+                  if (props.isEdit) {
+                    props.history.push(
+                      `/detectors/${detectorId}/configurations/`
+                    );
+                  } else {
+                    props.history.push('/detectors');
+                  }
                 }}
               >
                 Cancel

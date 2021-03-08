@@ -35,6 +35,7 @@ import { getMappings } from '../../../redux/reducers/elasticsearch';
 import { useFetchDetectorInfo } from '../hooks/useFetchDetectorInfo';
 import { BREADCRUMBS } from '../../../utils/constants';
 import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
+import { updateDetector } from '../../../redux/reducers/ad';
 import {
   validateFeatures,
   getCategoryFields,
@@ -43,6 +44,7 @@ import {
   modelConfigurationToFormik,
   formikToDetector,
   focusOnCategoryField,
+  formikToModelConfiguration,
 } from '../utils/helpers';
 import { Features } from '../components/Features';
 import { CategoryField } from '../components/CategoryField';
@@ -50,12 +52,15 @@ import { AdvancedSettings } from '../components/AdvancedSettings';
 import { SampleAnomalies } from './SampleAnomalies';
 import { CoreStart } from '../../../../../../src/core/public';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
+import { Detector } from '../../../models/interfaces';
+import { prettifyErrorMessage } from '../../../../server/utils/helpers';
 import {
   ModelConfigurationFormikValues,
   DetectorDefinitionFormikValues,
   CreateDetectorFormikValues,
 } from '../models/interfaces';
 import { DETECTOR_STATE } from '../../../../server/utils/constants';
+import { getErrorMessage } from '../../../utils/utils';
 
 interface ConfigureModelRouterProps {
   detectorId?: string;
@@ -140,9 +145,13 @@ export function ConfigureModel(props: ConfigureModelProps) {
         formikProps.validateForm().then((errors) => {
           if (isEmpty(errors)) {
             if (props.isEdit) {
-              // TODO: need to figure out logic for saving and starting the detector from here
-              // const apiRequest = formikToDetector(formikProps.values, detector);
-              // handleUpdate(apiRequest);
+              // TODO: possibly add logic to also start RT and/or historical from here. Need to think
+              // about adding similar logic from edit detector definition page
+              const detectorToUpdate = formikToModelConfiguration(
+                formikProps.values,
+                detector
+              );
+              handleUpdateDetector(detectorToUpdate);
             } else {
               optionallySaveValues({
                 ...formikProps.values,
@@ -171,18 +180,21 @@ export function ConfigureModel(props: ConfigureModelProps) {
     }
   };
 
-  const handleSubmit = async (
-    values: ModelConfigurationFormikValues,
-    formikProps: any
-  ) => {
-    try {
-      if (props.isEdit) {
-        // TODO: submit the update here
-      }
-    } catch (e) {
-    } finally {
-      formikProps.setSubmitting(false);
-    }
+  const handleUpdateDetector = async (detectorToUpdate: Detector) => {
+    dispatch(updateDetector(detectorId, detectorToUpdate))
+      .then((response: any) => {
+        core.notifications.toasts.addSuccess(
+          `Detector updated: ${response.response.name}`
+        );
+        props.history.push(`/detectors/${detectorId}/configurations/`);
+      })
+      .catch((err: any) => {
+        core.notifications.toasts.addDanger(
+          prettifyErrorMessage(
+            getErrorMessage(err, 'There was a problem updating the detector')
+          )
+        );
+      });
   };
 
   const optionallySaveValues = (values: ModelConfigurationFormikValues) => {
@@ -205,7 +217,7 @@ export function ConfigureModel(props: ConfigureModelProps) {
           ? props.initialValues
           : modelConfigurationToFormik(detector)
       }
-      onSubmit={handleSubmit}
+      onSubmit={() => {}}
       validateOnMount={props.isEdit ? false : true}
       validate={validateFeatures}
     >
@@ -260,47 +272,69 @@ export function ConfigureModel(props: ConfigureModelProps) {
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
                 onClick={() => {
-                  props.history.push('/detectors');
+                  if (props.isEdit) {
+                    props.history.push(
+                      `/detectors/${detectorId}/configurations/`
+                    );
+                  } else {
+                    props.history.push('/detectors');
+                  }
                 }}
               >
                 Cancel
               </EuiButtonEmpty>
             </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiButton
-                iconSide="left"
-                iconType="arrowLeft"
-                fill={false}
-                data-test-subj="configureModelPreviousButton"
-                //isLoading={formikProps.isSubmitting}
-                //@ts-ignore
-                onClick={() => {
-                  optionallySaveValues({
-                    ...formikProps.values,
-                    categoryFieldEnabled: isHCDetector,
-                  });
+            {props.isEdit ? null : (
+              <EuiFlexItem grow={false}>
+                <EuiButton
+                  iconSide="left"
+                  iconType="arrowLeft"
+                  fill={false}
+                  data-test-subj="configureModelPreviousButton"
+                  //isLoading={formikProps.isSubmitting}
                   //@ts-ignore
-                  props.setStep(1);
-                }}
-              >
-                Previous
-              </EuiButton>
-            </EuiFlexItem>
+                  onClick={() => {
+                    optionallySaveValues({
+                      ...formikProps.values,
+                      categoryFieldEnabled: isHCDetector,
+                    });
+                    //@ts-ignore
+                    props.setStep(1);
+                  }}
+                >
+                  Previous
+                </EuiButton>
+              </EuiFlexItem>
+            )}
             <EuiFlexItem grow={false}>
-              <EuiButton
-                type="submit"
-                iconSide="right"
-                iconType="arrowRight"
-                fill={true}
-                data-test-subj="configureModelNextButton"
-                isLoading={formikProps.isSubmitting}
-                //@ts-ignore
-                onClick={() => {
-                  handleFormValidation(formikProps);
-                }}
-              >
-                Next
-              </EuiButton>
+              {props.isEdit ? (
+                <EuiButton
+                  type="submit"
+                  fill={true}
+                  data-test-subj="updateDetectorButton"
+                  //@ts-ignore
+                  onClick={() => {
+                    handleFormValidation(formikProps);
+                  }}
+                >
+                  Save
+                </EuiButton>
+              ) : (
+                <EuiButton
+                  type="submit"
+                  iconSide="right"
+                  iconType="arrowRight"
+                  fill={true}
+                  data-test-subj="configureModelNextButton"
+                  isLoading={formikProps.isSubmitting}
+                  //@ts-ignore
+                  onClick={() => {
+                    handleFormValidation(formikProps);
+                  }}
+                >
+                  Next
+                </EuiButton>
+              )}
             </EuiFlexItem>
           </EuiFlexGroup>
         </Fragment>

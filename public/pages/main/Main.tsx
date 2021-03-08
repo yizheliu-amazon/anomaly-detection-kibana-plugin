@@ -24,13 +24,12 @@ import { HistoricalDetectorListRouterParams } from '../HistoricalDetectorList/co
 import { CreateHistoricalDetector } from '../CreateHistoricalDetector';
 import { HistoricalDetectorDetail } from '../HistoricalDetectorDetail';
 import { CreateDetectorSteps } from '../CreateDetectorSteps';
-// @ts-ignore
 import { EuiSideNav, EuiPage, EuiPageBody, EuiPageSideBar } from '@elastic/eui';
 import { useSelector } from 'react-redux';
 import { APP_PATH } from '../../utils/constants';
 import { DetectorDetail } from '../DetectorDetail';
 import { DefineDetector } from '../CreateDetectorSteps/containers/DefineDetector';
-import { EditFeatures } from '../EditFeatures/containers/EditFeatures';
+import { ConfigureModel } from '../CreateDetectorSteps/containers/ConfigureModel';
 import { DashboardOverview } from '../Dashboard/Container/DashboardOverview';
 import { CoreServicesConsumer } from '../../components/CoreServices/CoreServices';
 import { CoreStart } from '../../../../../src/core/public';
@@ -150,7 +149,7 @@ export function Main(props: MainProps) {
                   exact
                   path={APP_PATH.EDIT_FEATURES}
                   render={(props: RouteComponentProps) => (
-                    <EditFeatures {...props} />
+                    <ConfigureModel {...props} isEdit={true} />
                   )}
                 />
                 <Route
