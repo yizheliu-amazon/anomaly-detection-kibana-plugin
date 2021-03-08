@@ -34,7 +34,6 @@ import {
 import {
   updateDetector,
   matchDetector,
-  getDetectorCount,
 } from '../../../redux/reducers/ad';
 import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
 import { useFetchDetectorInfo } from '../hooks/useFetchDetectorInfo';

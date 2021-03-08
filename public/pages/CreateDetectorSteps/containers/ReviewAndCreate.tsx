@@ -25,11 +25,13 @@ import {
   EuiButtonEmpty,
   EuiSpacer,
 } from '@elastic/eui';
-import { FormikProps, Formik } from 'formik';
-import { isEmpty } from 'lodash';
-import React, { Fragment, useState, useEffect } from 'react';
+import { createDetector, getDetectorCount } from '../../../redux/reducers/ad';
+import { Formik, FormikHelpers } from 'formik';
+import { get } from 'lodash';
+import React, { Fragment, useEffect } from 'react';
+import { RouteComponentProps } from 'react-router';
 import { useDispatch } from 'react-redux';
-import { BREADCRUMBS } from '../../../utils/constants';
+import { BREADCRUMBS, MAX_DETECTORS } from '../../../utils/constants';
 import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
 import { CoreStart } from '../../../../../../src/core/public';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
@@ -37,9 +39,11 @@ import { CreateDetectorFormikValues } from '../models/interfaces';
 import { DetectorDefinitionFields } from '../components/DetectorDefinitionFields';
 import { ModelConfigurationFields } from '../components/ModelConfigurationFields';
 import { formikToDetector } from '../utils/helpers';
+import { getErrorMessage } from '../../../utils/utils';
+import { prettifyErrorMessage } from '../../../../server/utils/helpers';
 import { DetectorScheduleFields } from '../components/DetectorScheduleFields';
 
-interface ReviewAndCreateProps {
+interface ReviewAndCreateProps extends RouteComponentProps {
   setStep(stepNumber: number): void;
   handleCancelClick(): void;
   values: CreateDetectorFormikValues;
@@ -58,28 +62,56 @@ export function ReviewAndCreate(props: ReviewAndCreateProps) {
     ]);
   }, []);
 
-  const handleFormValidation = async (
-    formikProps: FormikProps<CreateDetectorFormikValues>
+  const handleSubmit = async (
+    values: CreateDetectorFormikValues,
+    formikHelpers: FormikHelpers<CreateDetectorFormikValues>
   ) => {
     try {
-      formikProps.setSubmitting(true);
-
-      // TODO: do the submission here - look at existing create logic for doing this
+      formikHelpers.setSubmitting(true);
+      const detectorToCreate = formikToDetector(values);
+      dispatch(createDetector(detectorToCreate))
+        .then((response: any) => {
+          core.notifications.toasts.addSuccess(
+            `Detector created: ${detectorToCreate.name}`
+          );
+          props.history.push(
+            `/detectors/${response.response.id}/configurations/`
+          );
+        })
+        .catch((err: any) => {
+          dispatch(getDetectorCount()).then((response: any) => {
+            const totalDetectors = get(response, 'response.count', 0);
+            if (totalDetectors === MAX_DETECTORS) {
+              core.notifications.toasts.addDanger(
+                'Cannot create detector - limit of ' +
+                  MAX_DETECTORS +
+                  ' detectors reached'
+              );
+            } else {
+              core.notifications.toasts.addDanger(
+                prettifyErrorMessage(
+                  getErrorMessage(
+                    err,
+                    'There was a problem creating the detector'
+                  )
+                )
+              );
+            }
+          });
+        });
     } catch (e) {
     } finally {
-      formikProps.setSubmitting(false);
+      formikHelpers.setSubmitting(false);
     }
   };
 
   // Converting to detector for passing to the fields
   const detectorToCreate = formikToDetector(props.values);
 
-  console.log('detector to create: ', detectorToCreate);
-
   return (
     <Formik
       initialValues={props.values}
-      onSubmit={() => {}}
+      onSubmit={handleSubmit}
       validateOnMount={true}
     >
       {(formikProps) => (
@@ -132,7 +164,6 @@ export function ReviewAndCreate(props: ReviewAndCreateProps) {
                 iconType="arrowLeft"
                 fill={false}
                 data-test-subj="reviewAndCreatePreviousButton"
-                //isLoading={formikProps.isSubmitting}
                 //@ts-ignore
                 onClick={() => {
                   props.setStep(3);
@@ -148,9 +179,7 @@ export function ReviewAndCreate(props: ReviewAndCreateProps) {
                 data-test-subj="createDetectorButton"
                 isLoading={formikProps.isSubmitting}
                 //@ts-ignore
-                onClick={() => {
-                  console.log('Placeholder for creating');
-                }}
+                onClick={formikProps.handleSubmit}
               >
                 Create detector
               </EuiButton>

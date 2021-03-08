@@ -185,6 +185,7 @@ export const CreateDetectorSteps = (props: CreateDetectorStepsProps) => {
               setStep={setCurStep}
               handleCancelClick={handleCancelClick}
               values={step4Fields}
+              {...props}
             />
           ) : null}
         </EuiFlexItem>
