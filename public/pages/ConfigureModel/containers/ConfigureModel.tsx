@@ -215,6 +215,7 @@ export function ConfigureModel(props: ConfigureModelProps) {
           ? props.initialValues
           : modelConfigurationToFormik(detector)
       }
+      enableReinitialize={true}
       onSubmit={() => {}}
       validateOnMount={props.isEdit ? false : true}
       validate={validateFeatures}

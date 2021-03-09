@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { useDispatch } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -198,6 +198,7 @@ export const DefineDetector = (props: DefineDetectorProps) => {
           ? props.initialValues
           : detectorDefinitionToFormik(detector)
       }
+      enableReinitialize={true}
       onSubmit={() => {}}
       validateOnMount={props.isEdit ? false : true}
     >
