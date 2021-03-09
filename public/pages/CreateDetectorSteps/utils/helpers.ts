@@ -256,7 +256,7 @@ export function detectorDefinitionToFormik(
     name: ad.name,
     description: ad.description,
     index: [{ label: ad.indices[0] }], // Currently we support only one index
-    filters: filtersToFormik(get(ad, 'uiMetadata.filters', [])),
+    filters: filtersToFormik(ad),
     filterQuery: JSON.stringify(
       get(ad, 'filterQuery', { match_all: {} }),
       null,
@@ -584,7 +584,7 @@ export const formikToFilterQuery = (
       if (filter.filterType === FILTER_TYPES.SIMPLE) {
         filterArr.push(
           //@ts-ignore
-          OPERATORS_QUERY_MAP[filter.operator].query(filter)
+          OPERATORS_QUERY_MAP[filter.operator]?.query(filter)
         );
       } else {
         filterArr.push(

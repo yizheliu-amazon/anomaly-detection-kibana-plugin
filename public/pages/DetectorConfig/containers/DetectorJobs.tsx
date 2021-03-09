@@ -18,10 +18,7 @@ import { EuiFlexGrid, EuiFlexItem, EuiText } from '@elastic/eui';
 import React from 'react';
 import moment from 'moment';
 import { get, isEmpty } from 'lodash';
-import {
-  ConfigCell,
-  FixedWidthRow,
-} from '../../CreateDetectorSteps/components/ConfigCell';
+import { ConfigCell, FixedWidthRow } from '../../../components/ConfigCell';
 import { convertTimestampToNumber } from '../../../utils/utils';
 import { Detector } from '../../../models/interfaces';
 import { getDetectorStateDetails } from '../../DetectorDetail/utils/helpers';
@@ -33,6 +30,7 @@ interface DetectorJobsProps {
 export const DetectorJobs = (props: DetectorJobsProps) => {
   const isHCDetector = !isEmpty(get(props, 'detector.categoryField', []));
   const historicalEnabled = !isEmpty(get(props, 'detector.detectionDateRange'));
+  console.log('detector: ', props.detector);
   const startTimeAsNumber = convertTimestampToNumber(
     get(props, 'detector.detectionDateRange.startTime', 0)
   );

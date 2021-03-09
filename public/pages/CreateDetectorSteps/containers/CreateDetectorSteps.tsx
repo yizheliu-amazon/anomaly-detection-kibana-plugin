@@ -23,10 +23,10 @@ import {
   INITIAL_MODEL_CONFIGURATION_VALUES,
   INITIAL_DETECTOR_JOB_VALUES,
 } from '../utils/constants';
-import { DefineDetector } from './DefineDetector';
-import { ConfigureModel } from './ConfigureModel';
-import { DetectorJobs } from './DetectorJobs';
-import { ReviewAndCreate } from './ReviewAndCreate';
+import { DefineDetector } from '../../DefineDetector/containers/DefineDetector';
+import { ConfigureModel } from '../../ConfigureModel/containers/ConfigureModel';
+import { DetectorJobs } from '../../DetectorJobs/containers/DetectorJobs';
+import { ReviewAndCreate } from '../../ReviewAndCreate/containers/ReviewAndCreate';
 import {
   DetectorDefinitionFormikValues,
   ModelConfigurationFormikValues,

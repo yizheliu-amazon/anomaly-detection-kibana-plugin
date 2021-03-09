@@ -14,7 +14,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { DetectorDefinitionFields } from '../../CreateDetectorSteps/components/DetectorDefinitionFields';
+import { DetectorDefinitionFields } from '../../ReviewAndCreate/components/DetectorDefinitionFields';
 import { Features } from './Features';
 import { DetectorJobs } from './DetectorJobs';
 import { EuiSpacer, EuiPage, EuiPageBody } from '@elastic/eui';

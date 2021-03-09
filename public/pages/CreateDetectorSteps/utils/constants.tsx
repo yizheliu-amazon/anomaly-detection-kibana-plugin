@@ -18,7 +18,7 @@ import {
   FILTER_TYPES,
   UIFilter,
 } from '../../../models/interfaces';
-import { OPERATORS_MAP } from '../components/DataFilterList/utils/constant';
+import { OPERATORS_MAP } from '../../DefineDetector/components/DataFilterList/utils/constant';
 import {
   DetectorDefinitionFormikValues,
   ModelConfigurationFormikValues,

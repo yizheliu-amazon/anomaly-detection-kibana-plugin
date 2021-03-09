@@ -15,7 +15,7 @@
 
 import { UIFilter } from '../../../models/interfaces';
 import { DATA_TYPES } from '../../../utils/constants';
-import { OPERATORS_MAP } from '../components/DataFilterList/utils/constant';
+import { OPERATORS_MAP } from '../../DefineDetector/components/DataFilterList/utils/constant';
 
 //TODO:: Breakdown to factory pattern for rules in-case we support multiple filters. This is just ease for the single one
 export const OPERATORS_QUERY_MAP = {
