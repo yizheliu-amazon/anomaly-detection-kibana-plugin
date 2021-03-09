@@ -33,7 +33,7 @@ import ContentPanel from '../../../components/ContentPanel/ContentPanel';
 import { CodeModal } from '../components/CodeModal/CodeModal';
 import { getTitleWithCount } from '../../../utils/utils';
 import { AdditionalSettings } from '../components/AdditionalSettings/AdditionalSettings';
-import { getShingleSizeFromObject } from '../../../pages/EditFeatures/utils/helpers';
+import { getShingleSizeFromObject } from '../../ConfigureModel/utils/helpers';
 
 interface FeaturesProps {
   detectorId: string;

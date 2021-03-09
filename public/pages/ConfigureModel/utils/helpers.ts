@@ -20,27 +20,21 @@ import {
 } from '../../../utils/constants';
 import {
   FEATURE_TYPE,
-  FILTER_TYPES,
-  UNITS,
   FeatureAttributes,
   Detector,
-  UIFilter,
-  UiFeature,
 } from '../../../models/interfaces';
 import { v4 as uuidv4 } from 'uuid';
-import moment from 'moment';
-import { get, forOwn, cloneDeep, isEmpty, snakeCase } from 'lodash';
+import { get, forOwn, cloneDeep, isEmpty } from 'lodash';
 import { DataTypes } from '../../../redux/reducers/elasticsearch';
-import { DetectorDefinitionFormikValues } from '../../DefineDetector/models/interfaces';
 import {
   ModelConfigurationFormikValues,
   FeaturesFormikValues,
 } from '../../ConfigureModel/models/interfaces';
-import { CreateDetectorFormikValues } from '../models/interfaces';
-import { INITIAL_DETECTOR_DEFINITION_VALUES } from '../../DefineDetector/utils/constants';
 import { INITIAL_MODEL_CONFIGURATION_VALUES } from '../../ConfigureModel/utils/constants';
-import { OPERATORS_QUERY_MAP } from './whereFilters';
-import { convertTimestampToNumber } from '../../../utils/utils';
+import {
+  featuresToUIMetadata,
+  formikToFeatureAttributes,
+} from '../../ReviewAndCreate/utils/helpers';
 
 export const getFieldOptions = (
   allFields: { [key: string]: string[] },
@@ -241,36 +235,6 @@ export function clearModelConfiguration(ad: Detector): Detector {
   };
 }
 
-//****** Originally in detectorToFormik.ts, renamed to detectorDefinitionToFormik ******
-
-export function detectorDefinitionToFormik(
-  ad: Detector
-): DetectorDefinitionFormikValues {
-  const initialValues = cloneDeep(INITIAL_DETECTOR_DEFINITION_VALUES);
-  if (isEmpty(ad)) return initialValues;
-
-  return {
-    ...initialValues,
-    name: ad.name,
-    description: ad.description,
-    index: [{ label: ad.indices[0] }], // Currently we support only one index
-    filters: filtersToFormik(ad),
-    filterQuery: JSON.stringify(
-      get(ad, 'filterQuery', { match_all: {} }),
-      null,
-      4
-    ),
-    timeField: ad.timeField,
-    interval: get(ad, 'detectionInterval.period.interval', 10),
-    windowDelay: get(ad, 'windowDelay.period.interval', 0),
-    // shingleSize: getShingleSizeFromObject(
-    //   ad,
-    //   !isEmpty(get(ad, 'categoryField', []))
-    // ),
-  };
-}
-
-// **** added the following 2 fns - need to make sure these work as expected
 export function modelConfigurationToFormik(
   detector: Detector
 ): ModelConfigurationFormikValues {
@@ -286,47 +250,6 @@ export function modelConfigurationToFormik(
     categoryField: get(detector, 'categoryField.0', []),
     shingleSize: get(detector, 'shingleSize', 4),
   };
-}
-
-function filtersToFormik(detector: Detector): UIFilter[] {
-  // Detectors created or updated using the API will not have metadata - create a custom filter in this case.
-  const noMetadata =
-    get(detector, 'uiMetadata.filterType') === undefined &&
-    get(detector, 'uiMetadata.filters') === undefined;
-  if (noMetadata) {
-    return [
-      {
-        filterType: FILTER_TYPES.CUSTOM,
-        query: JSON.stringify(
-          get(detector, 'filterQuery', { match_all: {} }),
-          null,
-          4
-        ),
-      },
-    ];
-  }
-
-  const curFilterType = get(detector, 'uiMetadata.filterType');
-  const curFilters = get(detector, 'uiMetadata.filters', []);
-  const curFilterQuery = JSON.stringify(
-    get(detector, 'filterQuery', { match_all: {} }),
-    null,
-    4
-  );
-
-  // If this is an old detector (has a base filter type): modify it by injecting that
-  // filter type into each existing filter
-  if (curFilterType !== undefined) {
-    curFilters.forEach((filter: UIFilter) => {
-      return {
-        ...filter,
-        filterType: curFilterType,
-        query:
-          curFilterType === FILTER_TYPES.CUSTOM ? curFilterQuery : undefined,
-      };
-    });
-  }
-  return curFilters;
 }
 
 function featuresToFormik(detector: Detector): FeaturesFormikValues[] {
@@ -358,70 +281,6 @@ function featuresToFormik(detector: Detector): FeaturesFormikValues[] {
   });
 }
 
-//********** Originally in formikToDetector.ts *************
-
-// Modified to include all detector fields
-// Used in create detector flow
-export function formikToDetector(values: CreateDetectorFormikValues): Detector {
-  const detectionDateRange = values.historical
-    ? {
-        startTime: convertTimestampToNumber(values.startTime),
-        endTime: convertTimestampToNumber(values.endTime),
-      }
-    : undefined;
-  let detectorBody = {
-    name: values.name,
-    description: values.description,
-    indices: formikToIndices(values.index),
-    filterQuery: formikToFilterQuery(values),
-    uiMetadata: {
-      features: { ...featuresToUIMetadata(values.featureList) },
-      filters: get(values, 'filters', []),
-    },
-    featureAttributes: formikToFeatureAttributes(values.featureList),
-    timeField: values.timeField,
-    detectionInterval: {
-      period: { interval: values.interval, unit: UNITS.MINUTES },
-    },
-    windowDelay: {
-      period: { interval: values.windowDelay, unit: UNITS.MINUTES },
-    },
-    shingleSize: values.shingleSize,
-    detectionDateRange: detectionDateRange,
-    categoryField: get(values, 'categoryField', []),
-  } as Detector;
-
-  return detectorBody;
-}
-
-// Used when editing detector definition
-export function formikToDetectorDefinition(
-  values: DetectorDefinitionFormikValues,
-  detector: Detector
-): Detector {
-  let detectorBody = {
-    ...detector,
-    name: values.name,
-    description: values.description,
-    indices: formikToIndices(values.index),
-    filterQuery: formikToFilterQuery(values),
-    uiMetadata: {
-      ...detector.uiMetadata,
-      filters: get(values, 'filters', []),
-    },
-    timeField: values.timeField,
-    detectionInterval: {
-      period: { interval: values.interval, unit: UNITS.MINUTES },
-    },
-    windowDelay: {
-      period: { interval: values.windowDelay, unit: UNITS.MINUTES },
-    },
-  } as Detector;
-
-  return detectorBody;
-}
-
-// Used when editing model configuration
 export function formikToModelConfiguration(
   values: ModelConfigurationFormikValues,
   detector: Detector
@@ -439,28 +298,6 @@ export function formikToModelConfiguration(
 
   return detectorBody;
 }
-
-export const formikToSimpleFilterQuery = (
-  filters: UIFilter[]
-): { [key: string]: any } => {
-  if (filters.length > 0) {
-    const esFilters = filters.map((filter: UIFilter) => {
-      return OPERATORS_QUERY_MAP[filter.operator].query(filter);
-    });
-    return {
-      bool: {
-        filter: [...esFilters],
-      },
-    };
-  } else {
-    return { match_all: {} };
-  }
-};
-
-const formikToIndices = (indices: { label: string }[]) =>
-  indices.map((index) => index.label);
-
-// ********* Originally in formikToFeatures.ts **********
 
 export function prepareDetector(
   featureValues: FeaturesFormikValues[],
@@ -484,6 +321,11 @@ export function prepareDetector(
   };
 }
 
+function formikToFeatures(values: FeaturesFormikValues[], forPreview: boolean) {
+  const featureAttribute = formikToFeatureAttributes(values, forPreview);
+  return featureAttribute;
+}
+
 export function formikToSimpleAggregation(value: FeaturesFormikValues) {
   if (
     value.aggregationBy &&
@@ -498,117 +340,4 @@ export function formikToSimpleAggregation(value: FeaturesFormikValues) {
   } else {
     return {};
   }
-}
-
-export function formikToAggregation(values: FeaturesFormikValues) {
-  if (values.featureType === FEATURE_TYPE.SIMPLE) {
-    return values.aggregationBy &&
-      values.aggregationOf &&
-      values.aggregationOf.length > 0
-      ? {
-          [snakeCase(values.featureName)]: {
-            [values.aggregationBy]: { field: values.aggregationOf[0].label },
-          },
-        }
-      : {};
-  }
-  return JSON.parse(values.aggregationQuery);
-}
-
-export function formikToFeatures(
-  values: FeaturesFormikValues[],
-  forPreview: boolean
-) {
-  const featureAttribute = formikToFeatureAttributes(values, forPreview);
-  return featureAttribute;
-}
-
-export function featuresToUIMetadata(values: FeaturesFormikValues[]) {
-  // TODO:: Delete Stale metadata if name is changed
-  let features: {
-    [key: string]: UiFeature;
-  } = {};
-  values.forEach((value) => {
-    if (value.featureType === FEATURE_TYPE.SIMPLE) {
-      features[value.featureName] = {
-        featureType: value.featureType,
-        aggregationBy: value.aggregationBy,
-        aggregationOf:
-          value.aggregationOf && value.aggregationOf.length
-            ? value.aggregationOf[0].label
-            : undefined,
-      };
-    } else {
-      features[value.featureName] = {
-        featureType: value.featureType,
-      };
-    }
-  });
-  return features;
-}
-
-function formikToFeatureAttributes(
-  values: FeaturesFormikValues[],
-  forPreview: boolean = false
-): FeatureAttributes[] {
-  return values.map(function (value) {
-    const id = forPreview
-      ? value.featureId
-      : value.newFeature
-      ? undefined
-      : value.featureId;
-    return {
-      featureId: id,
-      featureName: value.featureName,
-      featureEnabled: value.featureEnabled,
-      importance: 1,
-      aggregationQuery: formikToAggregation(value),
-    };
-  });
-}
-
-// ********** added the following helper fns ************
-export const formikToFilterQuery = (
-  values: CreateDetectorFormikValues | DetectorDefinitionFormikValues
-) => {
-  let filterQuery = {};
-  const filters = get(values, 'filters', []);
-
-  // If we have filters: need to combine into a single filter query.
-  // Need to handle each filter type differently when converting
-  if (filters.length > 0) {
-    let filterArr = [] as any[];
-    filters.forEach((filter) => {
-      if (filter.filterType === FILTER_TYPES.SIMPLE) {
-        filterArr.push(
-          //@ts-ignore
-          OPERATORS_QUERY_MAP[filter.operator]?.query(filter)
-        );
-      } else {
-        filterArr.push(
-          //@ts-ignore
-          JSON.parse(filter.query)
-        );
-      }
-    });
-    filterQuery = {
-      bool: {
-        filter: [...filterArr],
-      },
-    };
-  }
-  return filterQuery;
-};
-
-export function toStringConfigCell(obj: any): string {
-  if (typeof obj != 'undefined') {
-    if (obj.hasOwnProperty('period')) {
-      let period = obj.period;
-      return period.interval + ' ' + period.unit;
-    } else if (typeof obj == 'number') {
-      // epoch
-      return moment(obj).format('MM/DD/YY hh:mm A');
-    }
-  }
-  return '-';
 }

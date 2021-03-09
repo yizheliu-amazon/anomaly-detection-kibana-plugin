@@ -43,7 +43,7 @@ import { CoreServicesContext } from '../../../components/CoreServices/CoreServic
 import { CreateDetectorFormikValues } from '../../CreateDetectorSteps/models/interfaces';
 import { DetectorDefinitionFields } from '../components/DetectorDefinitionFields';
 import { ModelConfigurationFields } from '../components/ModelConfigurationFields';
-import { formikToDetector } from '../../CreateDetectorSteps/utils/helpers';
+import { formikToDetector } from '../utils/helpers';
 import {
   getErrorMessage,
   convertTimestampToNumber,

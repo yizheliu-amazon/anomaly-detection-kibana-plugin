@@ -43,10 +43,8 @@ import { DetectorInfo } from '../components/DetectorInfo';
 import { DataSource } from '../components/Datasource/DataSource';
 import { Timestamp } from '../components/Timestamp';
 import { Settings } from '../components/Settings';
-import {
-  detectorDefinitionToFormik,
-  formikToDetectorDefinition,
-} from '../../CreateDetectorSteps/utils/helpers';
+import { detectorDefinitionToFormik } from '../utils/helpers';
+import { formikToDetectorDefinition } from '../utils/helpers';
 import { DetectorDefinitionFormikValues } from '../models/interfaces';
 import { Detector } from '../../../models/interfaces';
 import { prettifyErrorMessage } from '../../../../server/utils/helpers';

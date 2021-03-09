@@ -25,13 +25,17 @@ import {
   EuiFieldText,
   EuiCheckbox,
 } from '@elastic/eui';
-import { validateFeatureName } from '../../../../utils/utils';
 import { Field, FieldProps } from 'formik';
-import { required, isInvalid, getError } from '../../../../utils/utils';
+import {
+  required,
+  isInvalid,
+  getError,
+  validateFeatureName,
+} from '../../../../utils/utils';
 import { get } from 'lodash';
 import { FEATURE_TYPE_OPTIONS } from '../../utils/constants';
 import { FEATURE_TYPE } from '../../../../models/interfaces';
-import { formikToSimpleAggregation } from '../../../CreateDetectorSteps/utils/helpers';
+import { formikToSimpleAggregation } from '../../utils/helpers';
 import { AggregationSelector } from '../AggregationSelector';
 import { CustomAggregation } from '../CustomAggregation';
 

@@ -19,12 +19,12 @@ import {
   SINGLE_ENTITY_SHINGLE_SIZE,
 } from '../../../../utils/constants';
 import { getRandomDetector } from '../../../../redux/reducers/__tests__/utils';
+import { detectorDefinitionToFormik } from '../../../DefineDetector/utils/helpers';
 import {
-  detectorDefinitionToFormik,
   formikToDetector,
   formikToFilterQuery,
-  prepareDetector,
-} from '../helpers';
+} from '../../../ReviewAndCreate/utils/helpers';
+import { prepareDetector } from '../../../ConfigureModel/utils/helpers';
 import {
   Detector,
   FEATURE_TYPE,

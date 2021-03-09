@@ -20,7 +20,7 @@ import { get } from 'lodash';
 import { Detector } from '../../../../models/interfaces';
 import { FilterDisplayList } from '../FilterDisplayList';
 import { ConfigCell, FixedWidthRow } from '../../../../components/ConfigCell';
-import { toStringConfigCell } from '../../../CreateDetectorSteps/utils/helpers';
+import { toStringConfigCell } from '../../utils/helpers';
 
 interface DetectorDefinitionFieldsProps {
   onEditDetectorDefinition(): void;

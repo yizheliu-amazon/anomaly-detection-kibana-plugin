@@ -24,7 +24,7 @@ import ContentPanel from '../../../../components/ContentPanel/ContentPanel';
 import { CodeModal } from '../../../../components/CodeModal/CodeModal';
 import { AdditionalSettings } from '../AdditionalSettings/AdditionalSettings';
 import { getTitleWithCount } from '../../../../utils/utils';
-import { getShingleSizeFromObject } from '../../../CreateDetectorSteps/utils/helpers';
+import { getShingleSizeFromObject } from '../../../ConfigureModel/utils/helpers';
 
 interface ModelConfigurationFieldsProps {
   detector: Detector;

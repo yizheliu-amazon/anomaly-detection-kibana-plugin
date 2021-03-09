@@ -38,14 +38,14 @@ import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
 import { updateDetector } from '../../../redux/reducers/ad';
 import {
   validateFeatures,
-  getCategoryFields,
-  getShingleSizeFromObject,
   focusOnFirstWrongFeature,
-  modelConfigurationToFormik,
-  formikToDetector,
+  getCategoryFields,
   focusOnCategoryField,
-  formikToModelConfiguration,
-} from '../../CreateDetectorSteps/utils/helpers';
+  getShingleSizeFromObject,
+  modelConfigurationToFormik,
+} from '../utils/helpers';
+import { formikToDetector } from '../../ReviewAndCreate/utils/helpers';
+import { formikToModelConfiguration } from '../utils/helpers';
 import { Features } from '../components/Features';
 import { CategoryField } from '../components/CategoryField';
 import { AdvancedSettings } from '../components/AdvancedSettings';

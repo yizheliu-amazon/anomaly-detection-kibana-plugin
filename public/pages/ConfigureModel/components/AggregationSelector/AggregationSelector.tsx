@@ -21,7 +21,7 @@ import { getAllFields } from '../../../../redux/selectors/elasticsearch';
 import {
   getNumberFieldOptions,
   getCountableFieldOptions,
-} from '../../../CreateDetectorSteps/utils/helpers';
+} from '../../utils/helpers';
 import { Field, FieldProps } from 'formik';
 import { AGGREGATION_TYPES } from '../../utils/constants';
 import {
