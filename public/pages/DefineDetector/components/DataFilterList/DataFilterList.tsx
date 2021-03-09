@@ -69,8 +69,6 @@ export const DataFilterList = (props: DataFilterListProps) => {
               hintLink={
                 'https://opendistro.github.io/for-elasticsearch-docs/docs/ad/'
               }
-              // isInvalid={isInvalid(field.name, form)}
-              // error={getError(field.name, form)}
             >
               <Fragment>
                 <EuiSpacer size="m" />

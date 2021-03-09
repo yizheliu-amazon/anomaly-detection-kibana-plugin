@@ -49,6 +49,7 @@ import { MonitorCallout } from '../components/MonitorCallout/MonitorCallout';
 import { DETECTOR_DETAIL_TABS } from '../utils/constants';
 import { DetectorConfig } from '../../DetectorConfig/containers/DetectorConfig';
 import { AnomalyResults } from '../../DetectorResults/containers/AnomalyResults';
+import { HistoricalDetectorResults } from '../../HistoricalDetectorResults/containers/HistoricalDetectorResults';
 import { getDetectorStateDetails } from '../utils/helpers';
 import {
   NO_PERMISSIONS_KEY_WORD,
@@ -66,6 +67,11 @@ const tabs = [
     id: DETECTOR_DETAIL_TABS.RESULTS,
     name: 'Anomaly results',
     route: DETECTOR_DETAIL_TABS.RESULTS,
+  },
+  {
+    id: DETECTOR_DETAIL_TABS.HISTORICAL,
+    name: 'Historical analysis',
+    route: DETECTOR_DETAIL_TABS.HISTORICAL,
   },
   {
     id: DETECTOR_DETAIL_TABS.CONFIGURATIONS,
@@ -463,6 +469,16 @@ export const DetectorDetail = (props: DetectorDetailProps) => {
               detectorId={detectorId}
               onStartDetector={() => handleStartAdJob(detectorId)}
               onSwitchToConfiguration={handleSwitchToConfigurationTab}
+            />
+          )}
+        />
+        <Route
+          exact
+          path="/detectors/:detectorId/historical"
+          render={(configProps) => (
+            <HistoricalDetectorResults
+              {...configProps}
+              detectorId={detectorId}
             />
           )}
         />

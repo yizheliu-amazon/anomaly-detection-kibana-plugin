@@ -120,7 +120,6 @@ export function DataSource(props: DataSourceProps) {
           );
         }}
       </Field>
-      {/* <DataFilter formikProps={props.formikProps} /> */}
       <DataFilterList formikProps={props.formikProps} />
     </ContentPanel>
   );
