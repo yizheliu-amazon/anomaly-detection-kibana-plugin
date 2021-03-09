@@ -25,6 +25,7 @@ import {
   EuiIcon,
   EuiButtonEmpty,
   EuiOverlayMask,
+  EuiBadge,
 } from '@elastic/eui';
 import { isEmpty } from 'lodash';
 import React, { useEffect, Fragment, useState } from 'react';
@@ -84,40 +85,19 @@ export function HistoricalDetectorResults(
                   </EuiTitle>
                 </EuiFlexItem>
                 <EuiFlexGroup direction="row" gutterSize="xs">
-                  <EuiFlexItem grow={false}>
-                    <EuiIcon
-                      type="calendar"
-                      style={{
-                        marginLeft: '14px',
-                        marginRight: '8px',
-                        marginTop: '3px',
-                      }}
-                    />
+                  <EuiFlexItem grow={false} style={{ marginLeft: '16px' }}>
+                    <EuiBadge
+                      iconType="calendar"
+                      iconSide="left"
+                      color="#D4DAE5"
+                    >
+                      Some date here
+                    </EuiBadge>
                   </EuiFlexItem>
-                  <EuiFlexItem grow={false}>
-                    <EuiText size="s">
-                      <p>
-                        <b>Some date here</b>
-                      </p>
-                    </EuiText>
-                  </EuiFlexItem>
-                  <EuiFlexItem grow={false} style={{ color: '#483D8B' }}>
-                    <EuiIcon
-                      type="gear"
-                      color="0000ff"
-                      title="something"
-                      style={{
-                        marginLeft: '14px',
-                        marginRight: '8px',
-                        marginTop: '3px',
-                      }}
-                    />
-                  </EuiFlexItem>
-                  <EuiFlexItem
-                    grow={false}
-                    style={{ marginTop: '0px', marginLeft: '-12px' }}
-                  >
+                  <EuiFlexItem grow={false} style={{ marginTop: '0px' }}>
                     <EuiButtonEmpty
+                      iconType="gear"
+                      iconSide="left"
                       size="xs"
                       onClick={() => {
                         setHistoricalRangeModalOpen(true);
