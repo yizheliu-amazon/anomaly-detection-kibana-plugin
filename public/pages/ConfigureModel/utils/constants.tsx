@@ -14,6 +14,31 @@
  */
 
 import { FEATURE_TYPE } from '../../../models/interfaces';
+import {
+  ModelConfigurationFormikValues,
+  FeaturesFormikValues,
+} from '../../ConfigureModel/models/interfaces';
+
+export const INITIAL_MODEL_CONFIGURATION_VALUES: ModelConfigurationFormikValues = {
+  featureList: [],
+  categoryFieldEnabled: false,
+  categoryField: [],
+  shingleSize: 4,
+};
+
+export const INITIAL_FEATURE_VALUES: FeaturesFormikValues = {
+  featureId: '',
+  featureName: '',
+  featureEnabled: true,
+  featureType: FEATURE_TYPE.SIMPLE,
+  aggregationQuery: JSON.stringify(
+    { aggregation_name: { sum: { field: 'field_name' } } },
+    null,
+    4
+  ),
+  aggregationBy: '',
+  aggregationOf: [],
+};
 
 export const FEATURE_TYPES = [
   { text: 'Custom Aggregation', value: FEATURE_TYPE.CUSTOM },

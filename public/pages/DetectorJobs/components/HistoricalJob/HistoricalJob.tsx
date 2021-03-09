@@ -28,7 +28,7 @@ import React, { useState } from 'react';
 import ContentPanel from '../../../../components/ContentPanel/ContentPanel';
 import { FormattedFormRow } from '../../../../components/FormattedFormRow/FormattedFormRow';
 import { DetectorJobsFormikValues } from '../../models/interfaces';
-import { HISTORICAL_DATE_RANGE_COMMON_OPTIONS } from '../../../CreateDetectorSteps/utils/constants';
+import { HISTORICAL_DATE_RANGE_COMMON_OPTIONS } from '../../utils/constants';
 import {
   isInvalid,
   getError,

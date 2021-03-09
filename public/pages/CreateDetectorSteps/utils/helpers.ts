@@ -37,10 +37,8 @@ import {
   FeaturesFormikValues,
 } from '../../ConfigureModel/models/interfaces';
 import { CreateDetectorFormikValues } from '../models/interfaces';
-import {
-  INITIAL_DETECTOR_DEFINITION_VALUES,
-  INITIAL_MODEL_CONFIGURATION_VALUES,
-} from './constants';
+import { INITIAL_DETECTOR_DEFINITION_VALUES } from '../../DefineDetector/utils/constants';
+import { INITIAL_MODEL_CONFIGURATION_VALUES } from '../../ConfigureModel/utils/constants';
 import { OPERATORS_QUERY_MAP } from './whereFilters';
 import { convertTimestampToNumber } from '../../../utils/utils';
 

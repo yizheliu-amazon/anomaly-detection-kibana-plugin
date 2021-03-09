@@ -20,7 +20,7 @@ import { Provider } from 'react-redux';
 import { mockedStore } from '../../../../../redux/utils/testUtils';
 import { Formik } from 'formik';
 import { FeaturesFormikValues } from '../../../models/interfaces';
-import { INITIAL_FEATURE_VALUES } from '../../../../CreateDetectorSteps/utils/constants';
+import { INITIAL_FEATURE_VALUES } from '../../../utils/constants';
 import { CoreServicesContext } from '../../../../../components/CoreServices/CoreServices';
 import { coreServicesMock } from '../../../../../../test/mocks';
 

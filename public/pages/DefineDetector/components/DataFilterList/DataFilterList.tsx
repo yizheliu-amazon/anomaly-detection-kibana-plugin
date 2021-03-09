@@ -29,7 +29,7 @@ import { UIFilter } from '../../../../models/interfaces';
 import { DataFilter } from './components/DataFilter';
 
 import { FormattedFormRow } from '../../../../components/FormattedFormRow/FormattedFormRow';
-import { EMPTY_UI_FILTER } from '../../../CreateDetectorSteps/utils/constants';
+import { EMPTY_UI_FILTER } from '../../utils/constants';
 
 interface DataFilterListProps {
   formikProps: FormikProps<DetectorDefinitionFormikValues>;

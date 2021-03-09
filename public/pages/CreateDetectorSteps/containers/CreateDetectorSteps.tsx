@@ -17,12 +17,10 @@ import React, { Fragment, useState, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { EuiSteps, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
-import {
-  STEP_STATUS,
-  INITIAL_DETECTOR_DEFINITION_VALUES,
-  INITIAL_MODEL_CONFIGURATION_VALUES,
-  INITIAL_DETECTOR_JOB_VALUES,
-} from '../utils/constants';
+import { INITIAL_DETECTOR_DEFINITION_VALUES } from '../../DefineDetector/utils/constants';
+import { INITIAL_MODEL_CONFIGURATION_VALUES } from '../../ConfigureModel/utils/constants';
+import { INITIAL_DETECTOR_JOB_VALUES } from '../../DetectorJobs/utils/constants';
+import { STEP_STATUS } from '../utils/constants';
 import { DefineDetector } from '../../DefineDetector/containers/DefineDetector';
 import { ConfigureModel } from '../../ConfigureModel/containers/ConfigureModel';
 import { DetectorJobs } from '../../DetectorJobs/containers/DetectorJobs';

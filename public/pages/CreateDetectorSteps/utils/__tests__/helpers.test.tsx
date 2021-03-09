@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import { INITIAL_DETECTOR_DEFINITION_VALUES } from '../constants';
+import { INITIAL_DETECTOR_DEFINITION_VALUES } from '../../../DefineDetector/utils/constants';
 import {
   MULTI_ENTITY_SHINGLE_SIZE,
   SINGLE_ENTITY_SHINGLE_SIZE,
