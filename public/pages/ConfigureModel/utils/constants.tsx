@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  */
 
 import { FEATURE_TYPE } from '../../../models/interfaces';
-import { FeaturesFormikValues } from '../containers/utils/formikToFeatures';
 
 export const FEATURE_TYPES = [
   { text: 'Custom Aggregation', value: FEATURE_TYPE.CUSTOM },
@@ -45,17 +44,3 @@ export const FEATURE_FIELDS = [
   'aggregationBy',
   'aggregationQuery',
 ];
-
-export const INITIAL_VALUES: FeaturesFormikValues = {
-  featureId: '',
-  featureName: '',
-  featureEnabled: true,
-  featureType: FEATURE_TYPE.SIMPLE,
-  aggregationQuery: JSON.stringify(
-    { aggregation_name: { sum: { field: 'field_name' } } },
-    null,
-    4
-  ),
-  aggregationBy: '',
-  aggregationOf: [],
-};

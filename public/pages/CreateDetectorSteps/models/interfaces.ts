@@ -13,49 +13,12 @@
  * permissions and limitations under the License.
  */
 
-import { UIFilter, FEATURE_TYPE } from '../../../models/interfaces';
-import { AggregationOption } from './types';
+import { DetectorDefinitionFormikValues } from '../../DefineDetector/models/interfaces';
+import { ModelConfigurationFormikValues } from '../../ConfigureModel/models/interfaces';
+import { DetectorJobsFormikValues } from '../../DetectorJobs/models/interfaces';
 
 // Formik values used upon creation (includes all fields + those related to historical detector date range)
 export interface CreateDetectorFormikValues
   extends DetectorDefinitionFormikValues,
     ModelConfigurationFormikValues,
     DetectorJobsFormikValues {}
-
-// Formik values used when creating/editing the detector definition
-export interface DetectorDefinitionFormikValues {
-  name: string;
-  description: string;
-  index: { label: string }[];
-  filters: UIFilter[];
-  filterQuery: string;
-  timeField: string;
-  interval: number;
-  windowDelay: number;
-}
-
-// Formik values used when creating/editing the model configuration
-export interface ModelConfigurationFormikValues {
-  featureList: FeaturesFormikValues[];
-  categoryFieldEnabled: boolean;
-  categoryField: string[];
-  shingleSize: number;
-}
-
-export interface DetectorJobsFormikValues {
-  realTime: boolean;
-  historical: boolean;
-  startTime: number | string;
-  endTime: number | string;
-}
-
-export interface FeaturesFormikValues {
-  featureId: string;
-  featureName: string | undefined;
-  featureType: FEATURE_TYPE;
-  featureEnabled: boolean;
-  aggregationQuery: string;
-  aggregationBy?: string;
-  aggregationOf?: AggregationOption[];
-  newFeature?: boolean;
-}

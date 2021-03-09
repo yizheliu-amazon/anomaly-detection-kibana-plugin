@@ -47,7 +47,7 @@ import {
   detectorDefinitionToFormik,
   formikToDetectorDefinition,
 } from '../../CreateDetectorSteps/utils/helpers';
-import { DetectorDefinitionFormikValues } from '../../CreateDetectorSteps/models/interfaces';
+import { DetectorDefinitionFormikValues } from '../models/interfaces';
 import { Detector } from '../../../models/interfaces';
 import { prettifyErrorMessage } from '../../../../server/utils/helpers';
 import { DETECTOR_STATE } from '../../../../server/utils/constants';

@@ -32,7 +32,7 @@ import { BREADCRUMBS } from '../../../utils/constants';
 import { useHideSideNavBar } from '../../main/hooks/useHideSideNavBar';
 import { CoreStart } from '../../../../../../src/core/public';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
-import { DetectorJobsFormikValues } from '../../CreateDetectorSteps/models/interfaces';
+import { DetectorJobsFormikValues } from '../models/interfaces';
 import { RealTimeJob } from '../components/RealTimeJob';
 import { HistoricalJob } from '../components/HistoricalJob';
 import { convertTimestampToNumber } from '../../../utils/utils';

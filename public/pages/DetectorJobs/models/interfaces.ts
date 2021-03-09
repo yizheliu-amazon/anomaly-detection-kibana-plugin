@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,4 +13,9 @@
  * permissions and limitations under the License.
  */
 
-export { AggregationSelector } from './AggregationSelector';
+export interface DetectorJobsFormikValues {
+  realTime: boolean;
+  historical: boolean;
+  startTime: number | string;
+  endTime: number | string;
+}

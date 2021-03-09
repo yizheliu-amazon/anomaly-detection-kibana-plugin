@@ -24,7 +24,7 @@ import {
 import { FieldArray, FieldArrayRenderProps, FormikProps } from 'formik';
 import React, { useState, Fragment } from 'react';
 import { get } from 'lodash';
-import { DetectorDefinitionFormikValues } from '../../../CreateDetectorSteps/models/interfaces';
+import { DetectorDefinitionFormikValues } from '../../models/interfaces';
 import { UIFilter } from '../../../../models/interfaces';
 import { DataFilter } from './components/DataFilter';
 

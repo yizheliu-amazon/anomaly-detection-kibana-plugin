@@ -21,9 +21,9 @@ import {
 } from '@elastic/eui';
 import { Field, FieldProps } from 'formik';
 import React from 'react';
-import { getError, isInvalid, required } from '../../../../../utils/utils';
+import { getError, isInvalid } from '../../../../../utils/utils';
 import { UIFilter } from '../../../../../models/interfaces';
-import { DetectorDefinitionFormikValues } from '../../../../CreateDetectorSteps/models/interfaces';
+import { DetectorDefinitionFormikValues } from '../../../models/interfaces';
 import { validFilterQuery } from '../utils/helpers';
 
 interface CustomFilterProps {

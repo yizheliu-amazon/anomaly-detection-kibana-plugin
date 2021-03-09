@@ -23,10 +23,9 @@ import {
   getCountableFieldOptions,
 } from '../../../CreateDetectorSteps/utils/helpers';
 import { Field, FieldProps } from 'formik';
-import { AGGREGATION_TYPES } from '../../../CreateDetectorSteps/utils/constants';
+import { AGGREGATION_TYPES } from '../../utils/constants';
 import {
   requiredSelectField,
-  requiredNonEmptyArray,
   requiredNonEmptyFieldSelected,
   isInvalid,
   getError,

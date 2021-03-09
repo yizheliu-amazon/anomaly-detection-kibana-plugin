@@ -19,7 +19,7 @@ import { CustomAggregation, validateQuery } from '../CustomAggregation';
 import { Provider } from 'react-redux';
 import { mockedStore } from '../../../../../redux/utils/testUtils';
 import { Formik } from 'formik';
-import { FeaturesFormikValues } from '../../../../CreateDetectorSteps/models/interfaces';
+import { FeaturesFormikValues } from '../../../models/interfaces';
 import { INITIAL_FEATURE_VALUES } from '../../../../CreateDetectorSteps/utils/constants';
 import { CoreServicesContext } from '../../../../../components/CoreServices/CoreServices';
 import { coreServicesMock } from '../../../../../../test/mocks';

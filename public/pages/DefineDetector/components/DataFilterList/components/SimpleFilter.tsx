@@ -34,7 +34,7 @@ import { UIFilter, OPERATORS_MAP } from '../../../../../models/interfaces';
 import { DATA_TYPES } from '../../../../../utils/constants';
 import { getIndexFields, getOperators, isNullOperator } from '../utils/helpers';
 import FilterValue from './FilterValue';
-import { DetectorDefinitionFormikValues } from '../../../../CreateDetectorSteps/models/interfaces';
+import { DetectorDefinitionFormikValues } from '../../../models/interfaces';
 import { EMPTY_UI_FILTER } from '../../../../CreateDetectorSteps/utils/constants';
 
 interface SimpleFilterProps {

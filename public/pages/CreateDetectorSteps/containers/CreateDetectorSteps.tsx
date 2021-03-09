@@ -27,12 +27,10 @@ import { DefineDetector } from '../../DefineDetector/containers/DefineDetector';
 import { ConfigureModel } from '../../ConfigureModel/containers/ConfigureModel';
 import { DetectorJobs } from '../../DetectorJobs/containers/DetectorJobs';
 import { ReviewAndCreate } from '../../ReviewAndCreate/containers/ReviewAndCreate';
-import {
-  DetectorDefinitionFormikValues,
-  ModelConfigurationFormikValues,
-  DetectorJobsFormikValues,
-  CreateDetectorFormikValues,
-} from '../models/interfaces';
+import { DetectorDefinitionFormikValues } from '../../DefineDetector/models/interfaces';
+import { ModelConfigurationFormikValues } from '../../ConfigureModel/models/interfaces';
+import { DetectorJobsFormikValues } from '../../DetectorJobs/models/interfaces';
+import { CreateDetectorFormikValues } from '../models/interfaces';
 
 interface CreateDetectorStepsProps extends RouteComponentProps {}
 

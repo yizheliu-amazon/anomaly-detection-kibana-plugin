@@ -24,7 +24,7 @@ import { Field, FieldProps, FormikProps } from 'formik';
 import { get } from 'lodash';
 import React, { useState } from 'react';
 import ContentPanel from '../../../../components/ContentPanel/ContentPanel';
-import { DetectorJobsFormikValues } from '../../../CreateDetectorSteps/models/interfaces';
+import { DetectorJobsFormikValues } from '../../models/interfaces';
 
 interface RealTimeJobProps {
   formikProps: FormikProps<DetectorJobsFormikValues>;

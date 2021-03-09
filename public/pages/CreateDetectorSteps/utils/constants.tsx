@@ -19,12 +19,12 @@ import {
   UIFilter,
 } from '../../../models/interfaces';
 import { OPERATORS_MAP } from '../../DefineDetector/components/DataFilterList/utils/constant';
+import { DetectorDefinitionFormikValues } from '../../DefineDetector/models/interfaces';
 import {
-  DetectorDefinitionFormikValues,
   ModelConfigurationFormikValues,
-  DetectorJobsFormikValues,
   FeaturesFormikValues,
-} from '../models/interfaces';
+} from '../../ConfigureModel/models/interfaces';
+import { DetectorJobsFormikValues } from '../../DetectorJobs/models/interfaces';
 
 export type STEP_STATUS =
   | 'incomplete'
@@ -33,36 +33,6 @@ export type STEP_STATUS =
   | 'danger'
   | 'disabled'
   | undefined;
-
-export const FEATURE_TYPES = [
-  { text: 'Custom Aggregation', value: FEATURE_TYPE.CUSTOM },
-  { text: 'Defined Aggregation', value: FEATURE_TYPE.SIMPLE },
-];
-
-export const FEATURE_TYPE_OPTIONS = [
-  { text: 'Field value', value: FEATURE_TYPE.SIMPLE },
-  { text: 'Custom expression', value: FEATURE_TYPE.CUSTOM },
-];
-
-export enum SAVE_FEATURE_OPTIONS {
-  START_AD_JOB = 'start_ad_job',
-  KEEP_AD_JOB_STOPPED = 'keep_ad_job_stopped',
-}
-
-export const AGGREGATION_TYPES = [
-  { value: 'avg', text: 'average()' },
-  { value: 'value_count', text: 'count()' },
-  { value: 'sum', text: 'sum()' },
-  { value: 'min', text: 'min()' },
-  { value: 'max', text: 'max()' },
-];
-
-export const FEATURE_FIELDS = [
-  'featureName',
-  'aggregationOf',
-  'aggregationBy',
-  'aggregationQuery',
-];
 
 export const EMPTY_UI_FILTER: UIFilter = {
   filterType: FILTER_TYPES.SIMPLE,

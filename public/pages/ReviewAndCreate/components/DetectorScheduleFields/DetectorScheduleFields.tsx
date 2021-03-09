@@ -20,7 +20,7 @@ import moment from 'moment';
 import { get } from 'lodash';
 import { ConfigCell, FixedWidthRow } from '../../../../components/ConfigCell';
 import { convertTimestampToNumber } from '../../../../utils/utils';
-import { DetectorJobsFormikValues } from '../../../CreateDetectorSteps/models/interfaces';
+import { DetectorJobsFormikValues } from '../../../DetectorJobs/models/interfaces';
 
 interface DetectorScheduleFieldsProps {
   onEditDetectorSchedule(): void;

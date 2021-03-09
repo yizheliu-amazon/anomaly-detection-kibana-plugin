@@ -31,12 +31,12 @@ import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import { get, forOwn, cloneDeep, isEmpty, snakeCase } from 'lodash';
 import { DataTypes } from '../../../redux/reducers/elasticsearch';
+import { DetectorDefinitionFormikValues } from '../../DefineDetector/models/interfaces';
 import {
-  DetectorDefinitionFormikValues,
   ModelConfigurationFormikValues,
   FeaturesFormikValues,
-  CreateDetectorFormikValues,
-} from '../models/interfaces';
+} from '../../ConfigureModel/models/interfaces';
+import { CreateDetectorFormikValues } from '../models/interfaces';
 import {
   INITIAL_DETECTOR_DEFINITION_VALUES,
   INITIAL_MODEL_CONFIGURATION_VALUES,

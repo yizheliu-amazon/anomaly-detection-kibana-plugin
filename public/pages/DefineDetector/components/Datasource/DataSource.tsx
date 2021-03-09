@@ -32,7 +32,7 @@ import { getVisibleOptions, sanitizeSearchText } from '../../../utils/helpers';
 import { validateIndex } from '../../../utils/validate';
 import { DataFilterList } from '../DataFilterList/DataFilterList';
 import { FormattedFormRow } from '../../../../components/FormattedFormRow/FormattedFormRow';
-import { DetectorDefinitionFormikValues } from '../../../CreateDetectorSteps/models/interfaces';
+import { DetectorDefinitionFormikValues } from '../../models/interfaces';
 
 interface DataSourceProps {
   formikProps: FormikProps<DetectorDefinitionFormikValues>;

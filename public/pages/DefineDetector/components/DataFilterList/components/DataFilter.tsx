@@ -33,7 +33,7 @@ import { UIFilter } from '../../../../../models/interfaces';
 import { SimpleFilter } from './SimpleFilter';
 import { CustomFilter } from './CustomFilter';
 import { FormattedFormRow } from '../../../../../components/FormattedFormRow/FormattedFormRow';
-import { DetectorDefinitionFormikValues } from '../../../../CreateDetectorSteps/models/interfaces';
+import { DetectorDefinitionFormikValues } from '../../../models/interfaces';
 import { FILTER_TYPES } from '../../../../../models/interfaces';
 import { getFilterLabel } from '../utils/helpers';
 

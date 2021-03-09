@@ -33,7 +33,7 @@ import {
   UIFilter,
   UNITS,
 } from '../../../../models/interfaces';
-import { FeaturesFormikValues } from '../../models/interfaces';
+import { FeaturesFormikValues } from '../../../ConfigureModel/models/interfaces';
 import { DATA_TYPES } from '../../../../utils/constants';
 
 describe('adToFormik', () => {

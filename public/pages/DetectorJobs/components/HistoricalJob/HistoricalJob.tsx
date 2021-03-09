@@ -27,7 +27,7 @@ import { get } from 'lodash';
 import React, { useState } from 'react';
 import ContentPanel from '../../../../components/ContentPanel/ContentPanel';
 import { FormattedFormRow } from '../../../../components/FormattedFormRow/FormattedFormRow';
-import { DetectorJobsFormikValues } from '../../../CreateDetectorSteps/models/interfaces';
+import { DetectorJobsFormikValues } from '../../models/interfaces';
 import { HISTORICAL_DATE_RANGE_COMMON_OPTIONS } from '../../../CreateDetectorSteps/utils/constants';
 import {
   isInvalid,

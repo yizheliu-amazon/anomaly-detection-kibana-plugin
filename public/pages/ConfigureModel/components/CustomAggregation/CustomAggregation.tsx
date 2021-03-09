@@ -14,7 +14,6 @@
  */
 
 import React from 'react';
-//@ts-ignore
 import { EuiFormRow, EuiCodeEditor } from '@elastic/eui';
 import { Field, FieldProps } from 'formik';
 import { isInvalid, getError } from '../../../../utils/utils';

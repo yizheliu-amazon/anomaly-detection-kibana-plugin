@@ -54,11 +54,9 @@ import { CoreStart } from '../../../../../../src/core/public';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
 import { Detector } from '../../../models/interfaces';
 import { prettifyErrorMessage } from '../../../../server/utils/helpers';
-import {
-  ModelConfigurationFormikValues,
-  DetectorDefinitionFormikValues,
-  CreateDetectorFormikValues,
-} from '../../CreateDetectorSteps/models/interfaces';
+import { DetectorDefinitionFormikValues } from '../../DefineDetector/models/interfaces';
+import { ModelConfigurationFormikValues } from '../models/interfaces';
+import { CreateDetectorFormikValues } from '../../CreateDetectorSteps/models/interfaces';
 import { DETECTOR_STATE } from '../../../../server/utils/constants';
 import { getErrorMessage } from '../../../utils/utils';
 

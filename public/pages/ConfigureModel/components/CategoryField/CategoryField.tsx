@@ -36,7 +36,7 @@ import {
   getError,
   validateCategoryField,
 } from '../../../../utils/utils';
-import { ModelConfigurationFormikValues } from '../../../CreateDetectorSteps/models/interfaces';
+import { ModelConfigurationFormikValues } from '../../models/interfaces';
 
 interface CategoryFieldProps {
   isEdit: boolean;

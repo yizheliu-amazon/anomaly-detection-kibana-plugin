@@ -24,7 +24,7 @@ import { getPrioritizedIndices } from '../../../../redux/reducers/elasticsearch'
 import { FormattedFormRow } from '../../../../components/FormattedFormRow/FormattedFormRow';
 import { sanitizeSearchText } from '../../../utils/helpers';
 import { getError, isInvalid, required } from '../../../../utils/utils';
-import { DetectorDefinitionFormikValues } from '../../../CreateDetectorSteps/models/interfaces';
+import { DetectorDefinitionFormikValues } from '../../models/interfaces';
 
 interface TimestampProps {
   formikProps: FormikProps<DetectorDefinitionFormikValues>;
