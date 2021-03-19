@@ -32,7 +32,7 @@ import {
   EntityData,
 } from '../../../models/interfaces';
 import { NoFeaturePrompt } from '../components/FeatureChart/NoFeaturePrompt';
-import { focusOnFeatureAccordion } from '../../EditFeatures/utils/helpers';
+import { focusOnFeatureAccordion } from '../../ConfigureModel/utils/helpers';
 import moment from 'moment';
 import { HeatmapCell } from './AnomalyHeatmapChart';
 import { filterWithHeatmapFilter } from '../../utils/anomalyResultUtils';

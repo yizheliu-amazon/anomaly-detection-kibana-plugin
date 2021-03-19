@@ -21,7 +21,6 @@ import { SampleData } from '../SampleData';
 import { ListRouterParams } from '../DetectorsList/containers/List/List';
 import { HistoricalDetectorList } from '../HistoricalDetectorList';
 import { HistoricalDetectorListRouterParams } from '../HistoricalDetectorList/containers/HistoricalDetectorList';
-import { CreateHistoricalDetector } from '../CreateHistoricalDetector';
 import { HistoricalDetectorDetail } from '../HistoricalDetectorDetail';
 import { CreateDetectorSteps } from '../CreateDetectorSteps';
 import { EuiSideNav, EuiPage, EuiPageBody, EuiPageSideBar } from '@elastic/eui';
@@ -166,20 +165,6 @@ export function Main(props: MainProps) {
                       HistoricalDetectorListRouterParams
                     >
                   ) => <HistoricalDetectorList {...props} />}
-                />
-                <Route
-                  exact
-                  path={APP_PATH.CREATE_HISTORICAL_DETECTOR}
-                  render={(props: RouteComponentProps) => (
-                    <CreateHistoricalDetector {...props} isEdit={false} />
-                  )}
-                />
-                <Route
-                  exact
-                  path={APP_PATH.EDIT_HISTORICAL_DETECTOR}
-                  render={(props: RouteComponentProps) => (
-                    <CreateHistoricalDetector {...props} isEdit={true} />
-                  )}
                 />
                 <Route
                   exact
