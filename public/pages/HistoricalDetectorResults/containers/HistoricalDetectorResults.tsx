@@ -36,9 +36,10 @@ import { AppState } from '../../../redux/reducers';
 import { getDetector } from '../../../redux/reducers/ad';
 import { getDetectorStateDetails } from '../../DetectorDetail/utils/helpers';
 import { HistoricalRangeModal } from '../components/HistoricalRangeModal';
-import { getCallout, waitForMs } from '../utils/helpers';
+import { getCallout } from '../utils/helpers';
 import { CoreStart } from '../../../../../../src/core/public';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
+import { getHistoricalRangeString } from '../../../utils/utils';
 
 interface HistoricalDetectorResultsProps extends RouteComponentProps {
   detectorId: string;
@@ -62,6 +63,9 @@ export function HistoricalDetectorResults(
   const [historicalRangeModalOpen, setHistoricalRangeModalOpen] = useState<
     boolean
   >(false);
+
+  const isHCDetector = !isEmpty(get(props, 'detector.categoryField', []));
+  const historicalEnabled = !isEmpty(get(props, 'detector.detectionDateRange'));
 
   const callout = getCallout(detector, isStoppingDetector);
 
@@ -102,7 +106,7 @@ export function HistoricalDetectorResults(
                       iconSide="left"
                       color="#D4DAE5"
                     >
-                      Some date here
+                      {getHistoricalRangeString(detector)}
                     </EuiBadge>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false} style={{ marginTop: '0px' }}>

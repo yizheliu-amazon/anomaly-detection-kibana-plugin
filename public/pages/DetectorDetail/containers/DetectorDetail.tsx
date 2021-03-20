@@ -83,6 +83,8 @@ const tabs = [
 const getSelectedTabId = (pathname: string) => {
   return pathname.includes(DETECTOR_DETAIL_TABS.CONFIGURATIONS)
     ? DETECTOR_DETAIL_TABS.CONFIGURATIONS
+    : pathname.includes(DETECTOR_DETAIL_TABS.HISTORICAL)
+    ? DETECTOR_DETAIL_TABS.HISTORICAL
     : DETECTOR_DETAIL_TABS.RESULTS;
 };
 
@@ -159,7 +161,7 @@ export const DetectorDetail = (props: DetectorDetailProps) => {
       ...detectorDetailModel,
       selectedTab: route,
     });
-    props.history.push(route);
+    props.history.push(`/detectors/${detectorId}/${route}`);
   };
 
   const hideMonitorCalloutModal = () => {

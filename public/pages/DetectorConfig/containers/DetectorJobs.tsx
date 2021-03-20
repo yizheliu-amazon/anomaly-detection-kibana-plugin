@@ -16,10 +16,9 @@
 import ContentPanel from '../../../components/ContentPanel/ContentPanel';
 import { EuiFlexGrid, EuiFlexItem, EuiText } from '@elastic/eui';
 import React from 'react';
-import moment from 'moment';
 import { get, isEmpty } from 'lodash';
 import { ConfigCell, FixedWidthRow } from '../../../components/ConfigCell';
-import { convertTimestampToNumber } from '../../../utils/utils';
+import { getHistoricalRangeString } from '../../../utils/utils';
 import { Detector } from '../../../models/interfaces';
 import { getDetectorStateDetails } from '../../DetectorDetail/utils/helpers';
 
@@ -30,18 +29,6 @@ interface DetectorJobsProps {
 export const DetectorJobs = (props: DetectorJobsProps) => {
   const isHCDetector = !isEmpty(get(props, 'detector.categoryField', []));
   const historicalEnabled = !isEmpty(get(props, 'detector.detectionDateRange'));
-  console.log('detector: ', props.detector);
-  const startTimeAsNumber = convertTimestampToNumber(
-    get(props, 'detector.detectionDateRange.startTime', 0)
-  );
-  const endTimeAsNumber = convertTimestampToNumber(
-    get(props, 'detector.detectionDateRange.endTime', 0)
-  );
-
-  const historicalRangeString =
-    moment(startTimeAsNumber).format('MM/DD/YYYY hh:mm A') +
-    ' - ' +
-    moment(endTimeAsNumber).format('MM/DD/YYYY hh:mm A');
 
   return (
     <ContentPanel
@@ -71,7 +58,9 @@ export const DetectorJobs = (props: DetectorJobsProps) => {
           <FixedWidthRow label={'Historical analysis detector'}>
             {historicalEnabled ? (
               <EuiText>
-                <p className="enabled">{historicalRangeString}</p>
+                <p className="enabled">
+                  {getHistoricalRangeString(props.detector)}
+                </p>
               </EuiText>
             ) : (
               <EuiText>

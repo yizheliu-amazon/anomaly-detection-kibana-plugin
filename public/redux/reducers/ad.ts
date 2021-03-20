@@ -38,6 +38,7 @@ const UPDATE_DETECTOR = 'ad/UPDATE_DETECTOR';
 const SEARCH_DETECTOR = 'ad/SEARCH_DETECTOR';
 const DELETE_DETECTOR = 'ad/DELETE_DETECTOR';
 const START_DETECTOR = 'ad/START_DETECTOR';
+const START_HISTORICAL_DETECTOR = 'ad/START_HISTORICAL_DETECTOR';
 const STOP_DETECTOR = 'ad/STOP_DETECTOR';
 const GET_DETECTOR_PROFILE = 'ad/GET_DETECTOR_PROFILE';
 const MATCH_DETECTOR = 'ad/MATCH_DETECTOR';
@@ -131,7 +132,33 @@ const reducer = handleActions<Detectors>(
         errorMessage: action.error,
       }),
     },
-
+    [START_HISTORICAL_DETECTOR]: {
+      REQUEST: (state: Detectors): Detectors => {
+        const newState = { ...state, requesting: true, errorMessage: '' };
+        return newState;
+      },
+      SUCCESS: (state: Detectors, action: APIResponseAction): Detectors => ({
+        ...state,
+        requesting: false,
+        detectors: {
+          ...state.detectors,
+          [action.detectorId]: {
+            ...state.detectors[action.detectorId],
+            taskState: DETECTOR_STATE.INIT,
+            detectionDateRange: {
+              startTime: action.startTime,
+              endTime: action.endTime,
+            },
+            taskError: '',
+          },
+        },
+      }),
+      FAILURE: (state: Detectors, action: APIErrorAction): Detectors => ({
+        ...state,
+        requesting: false,
+        errorMessage: action.error,
+      }),
+    },
     [STOP_DETECTOR]: {
       REQUEST: (state: Detectors): Detectors => {
         const newState = { ...state, requesting: true, errorMessage: '' };
@@ -402,7 +429,7 @@ export const startHistoricalDetector = (
   startTime: number,
   endTime: number
 ): APIAction => ({
-  type: START_DETECTOR,
+  type: START_HISTORICAL_DETECTOR,
   request: (client: HttpSetup) =>
     client.post(`..${AD_NODE_API.DETECTOR}/${detectorId}/start`, {
       body: JSON.stringify({
@@ -411,6 +438,8 @@ export const startHistoricalDetector = (
       }),
     }),
   detectorId,
+  startTime,
+  endTime,
 });
 
 export const stopDetector = (detectorId: string): APIAction => ({
