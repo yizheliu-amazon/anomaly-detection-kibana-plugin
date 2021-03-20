@@ -38,7 +38,6 @@ import {
   startHistoricalDetector,
 } from '../../../redux/reducers/ad';
 import { DETECTOR_STATE } from '../../../../server/utils/constants';
-
 import { getDetectorStateDetails } from '../../DetectorDetail/utils/helpers';
 import { HistoricalRangeModal } from '../components/HistoricalRangeModal';
 import { getCallout } from '../utils/helpers';
@@ -68,6 +67,7 @@ export function HistoricalDetectorResults(
   const allDetectors = adState.detectors;
   const errorGettingDetectors = adState.errorMessage;
   const detector = allDetectors[detectorId];
+  const [taskId, setTaskId] = useState<string>(get(detector, 'taskId', ''));
 
   const [isStoppingDetector, setIsStoppingDetector] = useState<boolean>(false);
 
@@ -109,12 +109,14 @@ export function HistoricalDetectorResults(
         clearInterval(intervalId);
       };
     }
+    setTaskId(get(detector, 'taskId', ''));
   }, [detector]);
 
   const startHistoricalTask = async (startTime: number, endTime: number) => {
     try {
       dispatch(startHistoricalDetector(props.detectorId, startTime, endTime))
         .then((response: any) => {
+          setTaskId(get(response, 'response._id'));
           core.notifications.toasts.addSuccess(
             `Successfully started the historical detector`
           );
@@ -200,14 +202,19 @@ export function HistoricalDetectorResults(
                   </div>
                 ) : null}
                 <EuiFlexItem>
-                  <AnomalyHistory
-                    detector={detector}
-                    monitor={undefined}
-                    isFeatureDataMissing={false}
-                    isHistorical={true}
-                    taskId={detector?.taskId}
-                    isNotSample={true}
-                  />
+                  {
+                    // If intializing a new task: clear out any saved state in the anomaly history by rendering null here
+                  }
+                  {detector?.taskState === DETECTOR_STATE.INIT ? null : (
+                    <AnomalyHistory
+                      detector={detector}
+                      monitor={undefined}
+                      isFeatureDataMissing={false}
+                      isHistorical={true}
+                      taskId={taskId}
+                      isNotSample={true}
+                    />
+                  )}
                 </EuiFlexItem>
               </EuiFlexGroup>
             </Fragment>

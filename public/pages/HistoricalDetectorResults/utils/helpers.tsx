@@ -75,7 +75,10 @@ export const getCallout = (detector: Detector, isStoppingDetector: boolean) => {
               <EuiFlexGroup direction="row" gutterSize="xs">
                 <EuiLoadingSpinner size="l" style={{ marginRight: '8px' }} />
                 <EuiText>
-                  <p>Initializing the historical detector</p>
+                  <p>
+                    Initializing the historical detector. This will only take a
+                    few seconds.
+                  </p>
                 </EuiText>
               </EuiFlexGroup>
             </div>
