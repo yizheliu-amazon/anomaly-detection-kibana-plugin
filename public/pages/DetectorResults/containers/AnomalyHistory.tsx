@@ -107,6 +107,9 @@ export const AnomalyHistory = (props: AnomalyHistoryProps) => {
   const core = React.useContext(CoreServicesContext) as CoreStart;
 
   const taskId = useAsyncRef(props.taskId);
+
+  console.log('task id: ', taskId);
+
   const [isLoading, setIsLoading] = useState(false);
   const initialStartDate =
     props.isHistorical && props.detector?.detectionDateRange

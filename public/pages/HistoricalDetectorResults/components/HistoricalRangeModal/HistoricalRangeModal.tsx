@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -28,13 +28,31 @@ import {
   EuiButton,
   EuiSuperDatePicker,
 } from '@elastic/eui';
+import { get } from 'lodash';
+import { Detector } from '../../../../models/interfaces';
+import {
+  convertTimestampToString,
+  convertTimestampToNumber,
+} from '../../../../utils/utils';
+import { HISTORICAL_DATE_RANGE_COMMON_OPTIONS } from '../../../DetectorJobs/utils/constants';
 
 interface HistoricalRangeModalProps {
+  detector: Detector;
   onClose(): void;
-  onConfirm(): void;
+  onConfirm(startTime: number, endTime: number): void;
 }
 
 export const HistoricalRangeModal = (props: HistoricalRangeModalProps) => {
+  const [startTime, setStartTime] = useState<string>(
+    convertTimestampToString(
+      get(props, 'detector.detectionDateRange.startTime', 'now')
+    )
+  );
+  const [endTime, setEndTime] = useState<string>(
+    convertTimestampToString(
+      get(props, 'detector.detectionDateRange.endTime', 'now')
+    )
+  );
   return (
     <EuiModal onClose={props.onClose}>
       <EuiModalHeader>
@@ -52,9 +70,14 @@ export const HistoricalRangeModal = (props: HistoricalRangeModalProps) => {
         </EuiFlexGroup>
         <EuiSpacer size="s" />
         <EuiSuperDatePicker
+          isPaused={true}
           showUpdateButton={false}
-          onTimeChange={() => {
-            console.log('changing the time here');
+          commonlyUsedRanges={HISTORICAL_DATE_RANGE_COMMON_OPTIONS}
+          start={startTime}
+          end={endTime}
+          onTimeChange={({ start, end, isInvalid, isQuickSelection }) => {
+            setStartTime(start);
+            setEndTime(end);
           }}
         />
       </EuiModalBody>
@@ -67,7 +90,13 @@ export const HistoricalRangeModal = (props: HistoricalRangeModalProps) => {
         <EuiButton
           data-test-subj="confirmButton"
           fill
-          onClick={props.onConfirm}
+          onClick={() => {
+            props.onConfirm(
+              //@ts-ignore
+              convertTimestampToNumber(startTime),
+              convertTimestampToNumber(endTime)
+            );
+          }}
         >
           Run historical analysis
         </EuiButton>

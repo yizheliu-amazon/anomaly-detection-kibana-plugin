@@ -33,13 +33,24 @@ import { RouteComponentProps } from 'react-router';
 import { useSelector, useDispatch } from 'react-redux';
 import { darkModeEnabled } from '../../../utils/kibanaUtils';
 import { AppState } from '../../../redux/reducers';
-import { getDetector } from '../../../redux/reducers/ad';
+import {
+  getDetector,
+  startHistoricalDetector,
+} from '../../../redux/reducers/ad';
+import { DETECTOR_STATE } from '../../../../server/utils/constants';
+
 import { getDetectorStateDetails } from '../../DetectorDetail/utils/helpers';
 import { HistoricalRangeModal } from '../components/HistoricalRangeModal';
 import { getCallout } from '../utils/helpers';
+import { HISTORICAL_DETECTOR_RESULT_REFRESH_RATE } from '../utils/constants';
 import { CoreStart } from '../../../../../../src/core/public';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
-import { getHistoricalRangeString } from '../../../utils/utils';
+import { AnomalyHistory } from '../../DetectorResults/containers/AnomalyHistory';
+import {
+  getHistoricalRangeString,
+  getErrorMessage,
+} from '../../../utils/utils';
+import { prettifyErrorMessage } from '../../../../server/utils/helpers';
 
 interface HistoricalDetectorResultsProps extends RouteComponentProps {
   detectorId: string;
@@ -67,11 +78,63 @@ export function HistoricalDetectorResults(
   const isHCDetector = !isEmpty(get(props, 'detector.categoryField', []));
   const historicalEnabled = !isEmpty(get(props, 'detector.detectionDateRange'));
 
-  const callout = getCallout(detector, isStoppingDetector);
+  const fetchDetector = async () => {
+    try {
+      await dispatch(getDetector(detectorId));
+    } catch {
+      core.notifications.toasts.addDanger(
+        'Unable to find the historical detector'
+      );
+    }
+  };
 
+  // Try to get the detector initially
   useEffect(() => {
-    dispatch(getDetector(props.detectorId));
+    if (detectorId) {
+      fetchDetector();
+    }
   }, []);
+
+  // If detector is initializing or running: keep fetching every 10 seconds to quickly update state/results/percentage bar, etc.
+  useEffect(() => {
+    if (
+      detector?.taskState === DETECTOR_STATE.RUNNING ||
+      detector?.taskState === DETECTOR_STATE.INIT
+    ) {
+      const intervalId = setInterval(
+        fetchDetector,
+        HISTORICAL_DETECTOR_RESULT_REFRESH_RATE
+      );
+      return () => {
+        clearInterval(intervalId);
+      };
+    }
+  }, [detector]);
+
+  const startHistoricalTask = async (startTime: number, endTime: number) => {
+    try {
+      dispatch(startHistoricalDetector(props.detectorId, startTime, endTime))
+        .then((response: any) => {
+          core.notifications.toasts.addSuccess(
+            `Successfully started the historical detector`
+          );
+        })
+        .catch((err: any) => {
+          core.notifications.toasts.addDanger(
+            prettifyErrorMessage(
+              getErrorMessage(
+                err,
+                'There was a problem starting the historical detector'
+              )
+            )
+          );
+        });
+    } finally {
+      setHistoricalRangeModalOpen(false);
+    }
+  };
+
+  const callout = getCallout(detector, isStoppingDetector);
 
   return (
     <Fragment>
@@ -83,10 +146,9 @@ export function HistoricalDetectorResults(
               {historicalRangeModalOpen ? (
                 <EuiOverlayMask>
                   <HistoricalRangeModal
+                    detector={detector}
                     onClose={() => setHistoricalRangeModalOpen(false)}
-                    onConfirm={() => {
-                      console.log('placeholder for running the analysis here');
-                    }}
+                    onConfirm={startHistoricalTask}
                   />
                 </EuiOverlayMask>
               ) : null}
@@ -123,13 +185,30 @@ export function HistoricalDetectorResults(
                   </EuiFlexItem>
                 </EuiFlexGroup>
                 {callout ? (
-                  <EuiFlexItem
-                    grow={false}
-                    style={{ marginLeft: '12px', marginRight: '12px' }}
-                  >
-                    {callout}
-                  </EuiFlexItem>
+                  <div>
+                    <EuiSpacer size="m" />
+                    <EuiFlexItem
+                      grow={false}
+                      style={{
+                        marginLeft: '12px',
+                        marginRight: '12px',
+                      }}
+                    >
+                      {callout}
+                    </EuiFlexItem>
+                    <EuiSpacer size="xs" />
+                  </div>
                 ) : null}
+                <EuiFlexItem>
+                  <AnomalyHistory
+                    detector={detector}
+                    monitor={undefined}
+                    isFeatureDataMissing={false}
+                    isHistorical={true}
+                    taskId={detector?.taskId}
+                    isNotSample={true}
+                  />
+                </EuiFlexItem>
               </EuiFlexGroup>
             </Fragment>
           ) : (
