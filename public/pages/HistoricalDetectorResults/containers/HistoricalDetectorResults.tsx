@@ -27,14 +27,18 @@ import {
   EuiOverlayMask,
   EuiBadge,
 } from '@elastic/eui';
-import { isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import React, { useEffect, Fragment, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { useSelector, useDispatch } from 'react-redux';
+import { darkModeEnabled } from '../../../utils/kibanaUtils';
 import { AppState } from '../../../redux/reducers';
 import { getDetector } from '../../../redux/reducers/ad';
 import { getDetectorStateDetails } from '../../DetectorDetail/utils/helpers';
 import { HistoricalRangeModal } from '../components/HistoricalRangeModal';
+import { getCallout, waitForMs } from '../utils/helpers';
+import { CoreStart } from '../../../../../../src/core/public';
+import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
 
 interface HistoricalDetectorResultsProps extends RouteComponentProps {
   detectorId: string;
@@ -43,16 +47,23 @@ interface HistoricalDetectorResultsProps extends RouteComponentProps {
 export function HistoricalDetectorResults(
   props: HistoricalDetectorResultsProps
 ) {
+  const core = React.useContext(CoreServicesContext) as CoreStart;
+  const isDark = darkModeEnabled();
   const dispatch = useDispatch();
-  const detector = useSelector(
-    (state: AppState) => state.ad.detectors[props.detectorId]
-  );
+  const detectorId: string = get(props, 'match.params.detectorId', '');
+
+  const adState = useSelector((state: AppState) => state.ad);
+  const allDetectors = adState.detectors;
+  const errorGettingDetectors = adState.errorMessage;
+  const detector = allDetectors[detectorId];
+
+  const [isStoppingDetector, setIsStoppingDetector] = useState<boolean>(false);
 
   const [historicalRangeModalOpen, setHistoricalRangeModalOpen] = useState<
     boolean
   >(false);
 
-  console.log('detector: ', detector);
+  const callout = getCallout(detector, isStoppingDetector);
 
   useEffect(() => {
     dispatch(getDetector(props.detectorId));
@@ -80,7 +91,7 @@ export function HistoricalDetectorResults(
                   <EuiTitle size="m">
                     <div>
                       {'Historical analysis'}&nbsp;
-                      {getDetectorStateDetails(detector, false)}
+                      {getDetectorStateDetails(detector, false, true)}
                     </div>
                   </EuiTitle>
                 </EuiFlexItem>
@@ -107,6 +118,14 @@ export function HistoricalDetectorResults(
                     </EuiButtonEmpty>
                   </EuiFlexItem>
                 </EuiFlexGroup>
+                {callout ? (
+                  <EuiFlexItem
+                    grow={false}
+                    style={{ marginLeft: '12px', marginRight: '12px' }}
+                  >
+                    {callout}
+                  </EuiFlexItem>
+                ) : null}
               </EuiFlexGroup>
             </Fragment>
           ) : (

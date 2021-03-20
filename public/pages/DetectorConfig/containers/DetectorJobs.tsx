@@ -60,6 +60,7 @@ export const DetectorJobs = (props: DetectorJobsProps) => {
                 {getDetectorStateDetails(
                   props.detector,
                   isHCDetector,
+                  false,
                   'enabled'
                 )}
               </p>

@@ -235,9 +235,7 @@ export default class AdService {
           detectorId,
         });
 
-      // Considering any detector with no detection date range to be a realtime detector
-      const isRealtimeDetector =
-        get(response, 'anomaly_detector.detection_date_range', null) === null;
+      // Getting the historical detection task info
       const task = get(response, 'anomaly_detection_task', null);
       const taskId = get(response, 'anomaly_detection_task.task_id', null);
       const taskProgress = get(
@@ -248,32 +246,32 @@ export default class AdService {
       const taskError = processTaskError(
         get(response, 'anomaly_detection_task.error', '')
       );
+      const detectionDateRange = get(
+        response,
+        'anomaly_detection_task.detection_date_range',
+        {}
+      );
 
-      // Getting detector state, depending on realtime or historical
       let detectorState;
-      if (isRealtimeDetector) {
-        try {
-          const detectorStateResp = await this.client
-            .asScoped(request)
-            .callAsCurrentUser('ad.detectorProfile', {
-              detectorId: detectorId,
-            });
-          const detectorStates = getFinalDetectorStates(
-            [detectorStateResp],
-            [convertDetectorKeysToCamelCase(response.anomaly_detector)]
-          );
-          detectorState = detectorStates[0];
-        } catch (err) {
-          console.log(
-            'Anomaly detector - Unable to retrieve detector state',
-            err
-          );
-        }
-      } else {
-        detectorState = { state: getHistoricalDetectorState(task) };
+      try {
+        const detectorStateResp = await this.client
+          .asScoped(request)
+          .callAsCurrentUser('ad.detectorProfile', {
+            detectorId: detectorId,
+          });
+        const detectorStates = getFinalDetectorStates(
+          [detectorStateResp],
+          [convertDetectorKeysToCamelCase(response.anomaly_detector)]
+        );
+        detectorState = detectorStates[0];
+      } catch (err) {
+        console.log(
+          'Anomaly detector - Unable to retrieve detector state',
+          err
+        );
       }
 
-      // Getting the detector job, depending on realtime or historical
+      // Getting the real-time detector job info
       let adJob = get(response, 'anomaly_detector_job', null);
       if (task && adJob === null) {
         adJob = {
@@ -302,22 +300,14 @@ export default class AdService {
         primaryTerm: response._primary_term,
         seqNo: response._seq_no,
         adJob: { ...adJob },
-        ...(isRealtimeDetector
-          ? {
-              curState: detectorState.state,
-              stateError: detectorState.error,
-              initProgress: getDetectorInitProgress(detectorState),
-            }
-          : {
-              curState: detectorState.state,
-            }),
-        ...(!isRealtimeDetector
-          ? {
-              taskId: taskId,
-              taskProgress: taskProgress,
-              taskError: taskError,
-            }
-          : {}),
+        curState: detectorState.state,
+        stateError: detectorState.error,
+        initProgress: getDetectorInitProgress(detectorState),
+        taskId: taskId,
+        taskState: getHistoricalDetectorState(task),
+        taskProgress: taskProgress,
+        taskError: taskError,
+        detectionDateRange: detectionDateRange,
       };
 
       return kibanaResponse.ok({
@@ -348,20 +338,22 @@ export default class AdService {
       const startTime = request.body?.startTime;
       //@ts-ignore
       const endTime = request.body?.endTime;
-      let requestBody = { detectorId: detectorId } as {};
+      let requestParams = { detectorId: detectorId } as {};
       let requestPath = 'ad.startDetector';
       if (isNumber(startTime) && isNumber(endTime)) {
-        requestBody = {
-          ...requestBody,
-          startTime: startTime,
-          endTime: endTime,
+        requestParams = {
+          ...requestParams,
+          body: {
+            start_time: startTime,
+            end_time: endTime,
+          },
         };
         requestPath = 'ad.startHistoricalDetector';
       }
 
       const response = await this.client
         .asScoped(request)
-        .callAsCurrentUser(requestPath, requestBody);
+        .callAsCurrentUser(requestPath, requestParams);
       return kibanaResponse.ok({
         body: {
           ok: true,

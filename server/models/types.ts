@@ -70,6 +70,7 @@ export type Detector = {
   categoryField?: string[];
   detectionDateRange?: DetectionDateRange;
   taskId?: string;
+  taskState?: DETECTOR_STATE;
   taskProgress?: number;
   taskError?: string;
 };

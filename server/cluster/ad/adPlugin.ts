@@ -116,14 +116,6 @@ export default function adPlugin(Client: any, config: any, components: any) {
           type: 'string',
           required: true,
         },
-        startTime: {
-          type: 'number',
-          required: true,
-        },
-        endTime: {
-          type: 'number',
-          required: true,
-        },
       },
       needBody: true,
     },

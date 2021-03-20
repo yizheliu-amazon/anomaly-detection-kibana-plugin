@@ -301,7 +301,7 @@ export const DetectorDetail = (props: DetectorDetailProps) => {
                 {
                   <h1>
                     {detector && detector.name}{' '}
-                    {getDetectorStateDetails(detector, isHCDetector)}
+                    {getDetectorStateDetails(detector, isHCDetector, false)}
                   </h1>
                 }
               </EuiTitle>
