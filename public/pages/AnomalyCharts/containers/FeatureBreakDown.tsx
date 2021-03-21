@@ -201,7 +201,7 @@ export const FeatureBreakDown = React.memo((props: FeatureBreakDownProps) => {
       )}
       {!props.isLoading &&
       get(props, 'detector.featureAttributes.length', 0) === 0 ? (
-        <NoFeaturePrompt detectorId={props.detector.id} />
+        <NoFeaturePrompt detectorId={props.detector?.id} />
       ) : null}
     </React.Fragment>
   );

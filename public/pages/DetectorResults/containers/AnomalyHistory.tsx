@@ -298,7 +298,9 @@ export const AnomalyHistory = (props: AnomalyHistoryProps) => {
       dateRange.endDate,
       props.detector.id,
       heatmapDisplayOption.entityOption.value,
-      heatmapDisplayOption.sortType
+      heatmapDisplayOption.sortType,
+      props.isHistorical,
+      taskId.current
     );
     const result = await dispatch(searchResults(query));
     const topEnityAnomalySummaries = parseTopEntityAnomalySummaryResults(
@@ -313,7 +315,9 @@ export const AnomalyHistory = (props: AnomalyHistoryProps) => {
         props.detector.id,
         NUM_CELLS,
         get(props.detector, 'categoryField[0]', ''),
-        entity.value
+        entity.value,
+        props.isHistorical,
+        taskId.current
       );
       return dispatch(searchResults(entityResultQuery));
     });
@@ -380,7 +384,7 @@ export const AnomalyHistory = (props: AnomalyHistoryProps) => {
 
     const entityAnomalyResultResponse = await dispatch(
       getDetectorResults(
-        props.detector.id,
+        props.isHistorical ? taskId.current : props.detector?.id,
         params,
         props.isHistorical ? true : false
       )

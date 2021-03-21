@@ -210,7 +210,7 @@ export function HistoricalDetectorResults(
                 ) : null}
                 <EuiFlexItem>
                   {
-                    // If intializing a new task: clear out any saved state in the anomaly history by rendering null here
+                    // If intializing a new task: clear out any saved local state in the anomaly history by rendering null here
                   }
                   {detector?.taskState === DETECTOR_STATE.INIT ? null : (
                     <AnomalyHistory

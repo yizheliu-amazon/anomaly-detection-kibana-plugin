@@ -943,8 +943,13 @@ export const getTopAnomalousEntitiesQuery = (
   endTime: number,
   detectorId: string,
   size: number,
-  sortType: AnomalyHeatmapSortType
+  sortType: AnomalyHeatmapSortType,
+  isHistorical?: boolean,
+  taskId?: string
 ) => {
+  const termField =
+    isHistorical && taskId ? { task_id: taskId } : { detector_id: detectorId };
+
   return {
     size: 0,
     query: {
@@ -966,9 +971,7 @@ export const getTopAnomalousEntitiesQuery = (
             },
           },
           {
-            term: {
-              detector_id: detectorId,
-            },
+            term: termField,
           },
         ],
       },
@@ -1064,8 +1067,12 @@ export const getEntityAnomalySummariesQuery = (
   detectorId: string,
   size: number,
   categoryField: string,
-  entityValue: string
+  entityValue: string,
+  isHistorical?: boolean,
+  taskId?: string
 ) => {
+  const termField =
+    isHistorical && taskId ? { task_id: taskId } : { detector_id: detectorId };
   const fixedInterval = Math.max(
     Math.ceil((endTime - startTime) / (size * MIN_IN_MILLI_SECS)),
     1
@@ -1097,9 +1104,7 @@ export const getEntityAnomalySummariesQuery = (
             },
           },
           {
-            term: {
-              detector_id: detectorId,
-            },
+            term: termField,
           },
           {
             nested: {

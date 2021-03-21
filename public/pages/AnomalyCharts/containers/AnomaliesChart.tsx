@@ -253,7 +253,7 @@ export const AnomaliesChart = React.memo((props: AnomaliesChartProps) => {
                         heatmapDisplayOption={props.heatmapDisplayOption}
                         isNotSample={props.isNotSample}
                       />,
-                      props.showAlerts !== true
+                      props.showAlerts !== true && props.isHCDetector !== true
                         ? [
                             <EuiSpacer size="m" />,
                             <AnomalyOccurrenceChart
