@@ -108,8 +108,6 @@ export const AnomalyHistory = (props: AnomalyHistoryProps) => {
 
   const taskId = useAsyncRef(props.taskId);
 
-  console.log('task id: ', taskId);
-
   const [isLoading, setIsLoading] = useState(false);
   const initialStartDate =
     props.isHistorical && props.detector?.detectionDateRange

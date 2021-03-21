@@ -50,6 +50,7 @@ import {
   getErrorMessage,
 } from '../../../utils/utils';
 import { prettifyErrorMessage } from '../../../../server/utils/helpers';
+import { EmptyHistoricalDetectorResults } from '../components/EmptyHistoricalDetectorResults';
 
 interface HistoricalDetectorResultsProps extends RouteComponentProps {
   detectorId: string;
@@ -75,8 +76,8 @@ export function HistoricalDetectorResults(
     boolean
   >(false);
 
-  const isHCDetector = !isEmpty(get(props, 'detector.categoryField', []));
-  const historicalEnabled = !isEmpty(get(props, 'detector.detectionDateRange'));
+  const isHCDetector = !isEmpty(get(detector, 'categoryField', []));
+  const historicalEnabled = !isEmpty(get(detector, 'detectionDateRange'));
 
   const fetchDetector = async () => {
     try {
@@ -143,7 +144,12 @@ export function HistoricalDetectorResults(
       <EuiPage style={{ marginTop: '16px', paddingTop: '0px' }}>
         <EuiPageBody>
           <EuiSpacer size="l" />
-          {!isEmpty(detector) ? (
+          {!isEmpty(detector) && !historicalEnabled ? (
+            <EmptyHistoricalDetectorResults
+              detector={detector}
+              onConfirm={startHistoricalTask}
+            />
+          ) : !isEmpty(detector) ? (
             <Fragment>
               {historicalRangeModalOpen ? (
                 <EuiOverlayMask>
@@ -151,6 +157,7 @@ export function HistoricalDetectorResults(
                     detector={detector}
                     onClose={() => setHistoricalRangeModalOpen(false)}
                     onConfirm={startHistoricalTask}
+                    isEdit={true}
                   />
                 </EuiOverlayMask>
               ) : null}

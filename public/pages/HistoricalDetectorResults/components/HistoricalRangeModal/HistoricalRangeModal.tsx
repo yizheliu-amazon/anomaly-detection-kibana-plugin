@@ -40,12 +40,13 @@ interface HistoricalRangeModalProps {
   detector: Detector;
   onClose(): void;
   onConfirm(startTime: number, endTime: number): void;
+  isEdit: boolean;
 }
 
 export const HistoricalRangeModal = (props: HistoricalRangeModalProps) => {
   const [startTime, setStartTime] = useState<string>(
     convertTimestampToString(
-      get(props, 'detector.detectionDateRange.startTime', 'now')
+      get(props, 'detector.detectionDateRange.startTime', 'now-30d')
     )
   );
   const [endTime, setEndTime] = useState<string>(
@@ -57,7 +58,9 @@ export const HistoricalRangeModal = (props: HistoricalRangeModalProps) => {
     <EuiModal onClose={props.onClose}>
       <EuiModalHeader>
         <EuiModalHeaderTitle>
-          Modify historical analysis date range&nbsp;
+          {props.isEdit
+            ? 'Modify historical analysis date range'
+            : 'Enable historical analysis'}
         </EuiModalHeaderTitle>
       </EuiModalHeader>
       <EuiModalBody>
