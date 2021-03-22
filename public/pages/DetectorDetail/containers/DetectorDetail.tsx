@@ -65,7 +65,7 @@ interface DetectorDetailProps
 const tabs = [
   {
     id: DETECTOR_DETAIL_TABS.RESULTS,
-    name: 'Anomaly results',
+    name: 'Real-time results',
     route: DETECTOR_DETAIL_TABS.RESULTS,
   },
   {
@@ -300,12 +300,7 @@ export const DetectorDetail = (props: DetectorDetailProps) => {
           >
             <EuiFlexItem grow={false}>
               <EuiTitle size="l">
-                {
-                  <h1>
-                    {detector && detector.name}{' '}
-                    {getDetectorStateDetails(detector, isHCDetector, false)}
-                  </h1>
-                }
+                {<h1>{detector && detector.name} </h1>}
               </EuiTitle>
             </EuiFlexItem>
 
