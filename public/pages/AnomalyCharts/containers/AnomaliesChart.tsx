@@ -279,6 +279,7 @@ export const AnomaliesChart = React.memo((props: AnomaliesChartProps) => {
                               isNotSample={props.isNotSample}
                               detector={props.detector}
                               isHCDetector={props.isHCDetector}
+                              isHistorical={props.isHistorical}
                               selectedHeatmapCell={props.selectedHeatmapCell}
                             />,
                             <EuiSpacer size="m" />,
