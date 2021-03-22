@@ -148,7 +148,13 @@ export function AnomalyResultsTable(props: AnomalyResultsTableProps) {
       <EuiBasicTable
         items={targetAnomalies}
         columns={
-          props.isHCDetector
+          props.isHCDetector && props.isHistorical
+            ? [
+                ...staticColumn.slice(0, 2),
+                entityValueColumn,
+                ...staticColumn.slice(3),
+              ]
+            : props.isHCDetector
             ? [
                 ...staticColumn.slice(0, 2),
                 entityValueColumn,
