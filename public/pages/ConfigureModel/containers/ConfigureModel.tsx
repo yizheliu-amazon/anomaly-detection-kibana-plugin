@@ -90,6 +90,11 @@ export function ConfigureModel(props: ConfigureModelProps) {
   );
   const originalShingleSize = getShingleSizeFromObject(detector, isHCDetector);
 
+  // Jump to top of page on first load
+  useEffect(() => {
+    scroll(0, 0);
+  }, []);
+
   // When detector is loaded: get any category fields (if applicable) and
   // get all index mappings based on detector's selected index
   useEffect(() => {

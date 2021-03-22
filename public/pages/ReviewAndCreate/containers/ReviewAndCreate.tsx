@@ -61,6 +61,11 @@ export function ReviewAndCreate(props: ReviewAndCreateProps) {
   const dispatch = useDispatch();
   useHideSideNavBar(true, false);
 
+  // Jump to top of page on first load
+  useEffect(() => {
+    scroll(0, 0);
+  }, []);
+
   useEffect(() => {
     core.chrome.setBreadcrumbs([
       BREADCRUMBS.ANOMALY_DETECTOR,

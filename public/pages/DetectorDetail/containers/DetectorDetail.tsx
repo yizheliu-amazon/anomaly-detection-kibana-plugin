@@ -127,6 +127,11 @@ export const DetectorDetail = (props: DetectorDetailProps) => {
 
   useHideSideNavBar(true, false);
 
+  // Jump to top of page on first load
+  useEffect(() => {
+    scroll(0, 0);
+  }, []);
+
   useEffect(() => {
     if (hasError) {
       core.notifications.toasts.addDanger(

@@ -55,6 +55,11 @@ export function DetectorJobs(props: DetectorJobsProps) {
     props.initialValues ? props.initialValues.historical : false
   );
 
+  // Jump to top of page on first load
+  useEffect(() => {
+    scroll(0, 0);
+  }, []);
+
   useEffect(() => {
     core.chrome.setBreadcrumbs([
       BREADCRUMBS.ANOMALY_DETECTOR,

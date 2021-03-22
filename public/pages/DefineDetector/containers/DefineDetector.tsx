@@ -69,6 +69,11 @@ export const DefineDetector = (props: DefineDetectorProps) => {
   const detectorId: string = get(props, 'match.params.detectorId', '');
   const { detector, hasError } = useFetchDetectorInfo(detectorId);
 
+  // Jump to top of page on first load
+  useEffect(() => {
+    scroll(0, 0);
+  }, []);
+
   // Set breadcrumbs based on create / update
   useEffect(() => {
     const createOrEditBreadcrumb = props.isEdit
