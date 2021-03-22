@@ -470,6 +470,7 @@ export const DetectorDetail = (props: DetectorDetailProps) => {
               {...resultsProps}
               detectorId={detectorId}
               onStartDetector={() => handleStartAdJob(detectorId)}
+              onStopDetector={() => handleStopAdJob(detectorId)}
               onSwitchToConfiguration={handleSwitchToConfigurationTab}
             />
           )}

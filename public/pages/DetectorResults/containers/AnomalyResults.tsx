@@ -26,6 +26,7 @@ import {
   EuiFlexItem,
   EuiText,
   EuiLoadingSpinner,
+  EuiTitle,
 } from '@elastic/eui';
 import { get, isEmpty } from 'lodash';
 import React, { useEffect, Fragment, useState } from 'react';
@@ -68,10 +69,12 @@ import {
 import { SampleIndexDetailsCallout } from '../../SampleData/components/SampleIndexDetailsCallout/SampleIndexDetailsCallout';
 import { CoreStart } from '../../../../../../src/core/public';
 import { CoreServicesContext } from '../../../components/CoreServices/CoreServices';
+import { getDetectorStateDetails } from '../../DetectorDetail/utils/helpers';
 
 interface AnomalyResultsProps extends RouteComponentProps {
   detectorId: string;
   onStartDetector(): void;
+  onStopDetector(): void;
   onSwitchToConfiguration(): void;
 }
 
@@ -392,6 +395,45 @@ export function AnomalyResults(props: AnomalyResultsProps) {
           <EuiSpacer size="l" />
           {
             <Fragment>
+              {detector ? (
+                <EuiFlexGroup
+                  justifyContent="spaceBetween"
+                  style={{ marginBottom: '18px' }}
+                >
+                  <EuiFlexItem grow={false}>
+                    <EuiTitle size="m">
+                      {
+                        <h1>
+                          {'Real-time results'}{' '}
+                          {getDetectorStateDetails(
+                            detector,
+                            isHCDetector,
+                            false
+                          )}
+                        </h1>
+                      }
+                    </EuiTitle>
+                  </EuiFlexItem>
+
+                  <EuiFlexItem grow={false}>
+                    <EuiButton
+                      data-test-subj="stopDetectorButton"
+                      onClick={
+                        detector?.enabled
+                          ? props.onStopDetector
+                          : props.onStartDetector
+                      }
+                      iconType={detector?.enabled ? 'stop' : 'play'}
+                      disabled={
+                        !detector?.featureAttributes ||
+                        detector?.featureAttributes.length === 0
+                      }
+                    >
+                      {detector?.enabled ? 'Stop detector' : 'Start detector'}
+                    </EuiButton>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              ) : null}
               {isDetectorRunning ||
               isDetectorPaused ||
               isDetectorInitializing ||

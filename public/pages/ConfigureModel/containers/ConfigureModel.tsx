@@ -231,7 +231,11 @@ export function ConfigureModel(props: ConfigureModelProps) {
               <EuiPageHeader>
                 <EuiPageHeaderSection>
                   <EuiTitle size="l">
-                    <h1>Configure model </h1>
+                    <h1>
+                      {props.isEdit
+                        ? 'Edit model configuration'
+                        : 'Configure model'}{' '}
+                    </h1>
                   </EuiTitle>
                 </EuiPageHeaderSection>
               </EuiPageHeader>
