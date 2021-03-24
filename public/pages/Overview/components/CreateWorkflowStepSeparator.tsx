@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -12,11 +12,13 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
+import { EuiFlexItem } from '@elastic/eui';
+import React from 'react';
 
-@import 'components/ContentPanel/index.scss';
-@import 'pages/createDetector/index.scss';
-@import 'pages/Dashboard/index.scss';
-@import 'pages/DetectorConfig/index.scss';
-@import 'pages/AnomalyCharts/index.scss';
-@import 'pages/DetectorResults/index.scss';
-@import 'pages/Overview/index.scss';
+export const CreateWorkflowStepSeparator = () => {
+  return (
+    <EuiFlexItem grow={false}>
+      <div className="create-workflow-step-separator" />
+    </EuiFlexItem>
+  );
+};

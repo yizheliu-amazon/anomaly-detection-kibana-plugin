@@ -32,6 +32,7 @@ import { ConfigureModel } from '../ConfigureModel/containers/ConfigureModel';
 import { DashboardOverview } from '../Dashboard/Container/DashboardOverview';
 import { CoreServicesConsumer } from '../../components/CoreServices/CoreServices';
 import { CoreStart } from '../../../../../src/core/public';
+import { AnomalyDetectionOverview } from '../Overview';
 
 enum Navigation {
   AnomalyDetection = 'Anomaly detection',
@@ -43,66 +44,49 @@ enum Navigation {
   CreateDetectorSteps = 'Create detector steps',
 }
 
-enum Pathname {
-  Dashboard = '/dashboard',
-  Detectors = '/detectors',
-  HistoricalDetectors = '/historical-detectors',
-  SampleDetectors = '/sample-detectors',
-  CreateDetectorSteps = '/create-detector-steps',
-}
-
 interface MainProps extends RouteComponentProps {}
 
 export function Main(props: MainProps) {
   const hideSideNavBar = useSelector(
     (state: AppState) => state.adApp.hideSideNavBar
   );
+
+  const adState = useSelector((state: AppState) => state.ad);
+  const allDetectorList = adState.detectorList;
+  console.log('allDetectorList', allDetectorList);
+  const totalRealtimeDetectors = Object.values(allDetectorList).length;
+  console.log('totalRealtimeDetectors', totalRealtimeDetectors);
+  const errorGettingDetectors = adState.errorMessage;
+  const isLoadingDetectors = adState.requesting;
+
   const sideNav = [
     {
       name: Navigation.AnomalyDetection,
       id: 0,
-      href: `#${Pathname.Dashboard}`,
+      href: `#${APP_PATH.OVERVIEW}`,
       items: [
         {
-          name: Navigation.Realtime,
+          name: Navigation.Dashboard,
           id: 1,
-          forceOpen: true,
-          items: [
-            {
-              name: Navigation.Dashboard,
-              id: 2,
-              href: `#${Pathname.Dashboard}`,
-              isSelected: props.location.pathname === Pathname.Dashboard,
-            },
-            {
-              name: Navigation.Detectors,
-              id: 3,
-              href: `#${Pathname.Detectors}`,
-              isSelected: props.location.pathname === Pathname.Detectors,
-            },
-            {
-              name: Navigation.SampleDetectors,
-              id: 4,
-              href: `#${Pathname.SampleDetectors}`,
-              isSelected: props.location.pathname === Pathname.SampleDetectors,
-            },
-          ],
+          href: `#${APP_PATH.DASHBOARD}`,
+          isSelected: props.location.pathname === APP_PATH.DASHBOARD,
         },
         {
-          name: Navigation.HistoricalDetectors,
-          id: 5,
-          href: `#${Pathname.HistoricalDetectors}`,
-          isSelected: props.location.pathname === Pathname.HistoricalDetectors,
-        },
-        {
-          name: Navigation.CreateDetectorSteps,
-          id: 6,
-          href: `#${Pathname.CreateDetectorSteps}`,
-          isSelected: props.location.pathname === Pathname.CreateDetectorSteps,
+          name: Navigation.Detectors,
+          id: 2,
+          href: `#${APP_PATH.LIST_DETECTORS}`,
+          isSelected: props.location.pathname === APP_PATH.LIST_DETECTORS,
         },
       ],
     },
   ];
+
+  const getDefaultPage = () => {
+    if (totalRealtimeDetectors == 0 && !isLoadingDetectors) {
+      return APP_PATH.OVERVIEW;
+    }
+    return APP_PATH.DASHBOARD;
+  };
 
   return (
     <CoreServicesConsumer>
@@ -180,7 +164,11 @@ export function Main(props: MainProps) {
                     <CreateDetectorSteps {...props} />
                   )}
                 />
-                <Redirect from="/" to={APP_PATH.DASHBOARD} />
+                <Route
+                  path={APP_PATH.OVERVIEW}
+                  render={() => <AnomalyDetectionOverview />}
+                />
+                <Redirect from="/" to={getDefaultPage()} />
               </Switch>
             </EuiPageBody>
           </EuiPage>
