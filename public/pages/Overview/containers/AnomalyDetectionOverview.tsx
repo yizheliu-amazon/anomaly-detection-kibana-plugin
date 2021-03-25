@@ -23,6 +23,7 @@ import {
   EuiLink,
   EuiIcon,
   EuiButton,
+  EuiLoadingSpinner,
 } from '@elastic/eui';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -57,7 +58,11 @@ import ContentPanel from '../../../components/ContentPanel/ContentPanel';
 import { CreateWorkflowStepDetails } from '../components/CreateWorkflowStepDetails';
 import { CreateWorkflowStepSeparator } from '../components/CreateWorkflowStepSeparator';
 
-export function AnomalyDetectionOverview() {
+interface AnomalyDetectionOverviewProps {
+  isLoadingDetectors: boolean;
+}
+
+export function AnomalyDetectionOverview(props: AnomalyDetectionOverviewProps) {
   const core = React.useContext(CoreServicesContext) as CoreStart;
   const dispatch = useDispatch();
   const visibleIndices = useSelector(
@@ -175,7 +180,14 @@ export function AnomalyDetectionOverview() {
     }
   };
 
-  return (
+  return props.isLoadingDetectors ? (
+    <div>
+      <EuiLoadingSpinner size="s" />
+      &nbsp;&nbsp; <EuiLoadingSpinner size="m" />
+      &nbsp;&nbsp; <EuiLoadingSpinner size="l" />
+      &nbsp;&nbsp; <EuiLoadingSpinner size="xl" />
+    </div>
+  ) : (
     <Fragment>
       <EuiPageHeader>
         <EuiFlexGroup justifyContent="spaceBetween">
@@ -342,6 +354,7 @@ export function AnomalyDetectionOverview() {
           <EuiSpacer size="m" />
         </EuiFlexGroup>
       </ContentPanel>
+      )
       {showHttpResponseDetailsFlyout ? (
         <SampleDetailsFlyout
           title="Monitor HTTP responses"

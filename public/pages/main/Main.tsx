@@ -173,44 +173,21 @@ export function Main(props: MainProps) {
                 />
                 <Route
                   path={APP_PATH.OVERVIEW}
-                  render={() => <AnomalyDetectionOverview />}
+                  render={() => (
+                    <AnomalyDetectionOverview
+                      isLoadingDetectors={isLoadingDetectors}
+                    />
+                  )}
                 />
                 <Route path="/">
-                  {
-                    totalRealtimeDetectors > 0 ? (
-                      // <DashboardOverview
-                      //   // adState={adState}
-                      //   allDetectorList={allDetectorList}
-                      //   errorGettingDetectors={errorGettingDetectors}
-                      //   isLoadingDetectors={isLoadingDetectors}
-                      // />
-                      // <div>
-                      //   <EuiLoadingSpinner size="xl" />
-                      // </div>
-                      <DashboardOverview />
-                    ) : (
-                      <AnomalyDetectionOverview />
-                      // <AnomalyDetectionOverview
-                      //   allDetectors={allDetectorList}
-                      // />
-                      // <div>
-                      //   <EuiLoadingSpinner size="xl" />
-                      //   <EuiLoadingSpinner size="xl" />
-                      //   <EuiLoadingSpinner size="xl" />
-                      // </div>
-                    )
-                    // ) : (
-                    //   <div>
-                    //     <EuiLoadingSpinner size="s" />
-                    //     &nbsp;&nbsp;
-                    //     <EuiLoadingSpinner size="m" />
-                    //     &nbsp;&nbsp;
-                    //     <EuiLoadingSpinner size="l" />
-                    //     &nbsp;&nbsp;
-                    //     <EuiLoadingSpinner size="xl" />
-                    //   </div>
-                    // )}
-                  }
+                  {totalRealtimeDetectors > 0 ? (
+                    // </div>
+                    <DashboardOverview />
+                  ) : (
+                    <AnomalyDetectionOverview
+                      isLoadingDetectors={isLoadingDetectors}
+                    />
+                  )}
                 </Route>
               </Switch>
             </EuiPageBody>
