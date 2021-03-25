@@ -23,7 +23,13 @@ import { HistoricalDetectorList } from '../HistoricalDetectorList';
 import { HistoricalDetectorListRouterParams } from '../HistoricalDetectorList/containers/HistoricalDetectorList';
 import { HistoricalDetectorDetail } from '../HistoricalDetectorDetail';
 import { CreateDetectorSteps } from '../CreateDetectorSteps';
-import { EuiSideNav, EuiPage, EuiPageBody, EuiPageSideBar } from '@elastic/eui';
+import {
+  EuiSideNav,
+  EuiPage,
+  EuiPageBody,
+  EuiPageSideBar,
+  EuiLoadingSpinner,
+} from '@elastic/eui';
 import { useSelector } from 'react-redux';
 import { APP_PATH } from '../../utils/constants';
 import { DetectorDetail } from '../DetectorDetail';
@@ -52,13 +58,14 @@ export function Main(props: MainProps) {
   );
 
   const adState = useSelector((state: AppState) => state.ad);
+  console.log('adState', adState);
   const allDetectorList = adState.detectorList;
   console.log('allDetectorList', allDetectorList);
-  const totalRealtimeDetectors = Object.values(allDetectorList).length;
+  const totalRealtimeDetectors = adState.totalDetectors;
   console.log('totalRealtimeDetectors', totalRealtimeDetectors);
   const errorGettingDetectors = adState.errorMessage;
   const isLoadingDetectors = adState.requesting;
-
+  console.log('isLoadingDetectors', isLoadingDetectors);
   const sideNav = [
     {
       name: Navigation.AnomalyDetection,
@@ -168,7 +175,43 @@ export function Main(props: MainProps) {
                   path={APP_PATH.OVERVIEW}
                   render={() => <AnomalyDetectionOverview />}
                 />
-                <Redirect from="/" to={getDefaultPage()} />
+                <Route path="/">
+                  {
+                    totalRealtimeDetectors > 0 ? (
+                      // <DashboardOverview
+                      //   // adState={adState}
+                      //   allDetectorList={allDetectorList}
+                      //   errorGettingDetectors={errorGettingDetectors}
+                      //   isLoadingDetectors={isLoadingDetectors}
+                      // />
+                      // <div>
+                      //   <EuiLoadingSpinner size="xl" />
+                      // </div>
+                      <DashboardOverview />
+                    ) : (
+                      <AnomalyDetectionOverview />
+                      // <AnomalyDetectionOverview
+                      //   allDetectors={allDetectorList}
+                      // />
+                      // <div>
+                      //   <EuiLoadingSpinner size="xl" />
+                      //   <EuiLoadingSpinner size="xl" />
+                      //   <EuiLoadingSpinner size="xl" />
+                      // </div>
+                    )
+                    // ) : (
+                    //   <div>
+                    //     <EuiLoadingSpinner size="s" />
+                    //     &nbsp;&nbsp;
+                    //     <EuiLoadingSpinner size="m" />
+                    //     &nbsp;&nbsp;
+                    //     <EuiLoadingSpinner size="l" />
+                    //     &nbsp;&nbsp;
+                    //     <EuiLoadingSpinner size="xl" />
+                    //   </div>
+                    // )}
+                  }
+                </Route>
               </Switch>
             </EuiPageBody>
           </EuiPage>

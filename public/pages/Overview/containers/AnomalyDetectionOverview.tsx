@@ -63,8 +63,9 @@ export function AnomalyDetectionOverview() {
   const visibleIndices = useSelector(
     (state: AppState) => state.elasticsearch.indices
   );
+
   const allDetectors = Object.values(
-    useSelector((state: AppState) => state.ad.detectorList)
+    (state: AppState) => state.ad.detectorList
   );
 
   const [isLoadingHttpData, setIsLoadingHttpData] = useState<boolean>(false);
